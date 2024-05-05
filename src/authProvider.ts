@@ -1,15 +1,22 @@
-import { AuthBindings } from "@refinedev/core";
+import { AuthProvider } from "@refinedev/core";
 
-export const TOKEN_KEY = "refine-auth";
+import { directusClient } from "./directusClient";
+import { readMe } from "@tspvivek/refine-directus";
 
-export const authProvider: AuthBindings = {
+export const authProvider: AuthProvider = {
   login: async ({ username, email, password }) => {
     if ((username || email) && password) {
-      localStorage.setItem(TOKEN_KEY, username);
-      return {
-        success: true,
-        redirectTo: "/",
-      };
+      const { access_token } = await directusClient.login(
+        email.trim().toLowerCase(),
+        password,
+        { mode: "json" }
+      );
+      if (access_token) {
+        return {
+          success: true,
+          redirectTo: "/",
+        };
+      }
     }
 
     return {
@@ -21,14 +28,14 @@ export const authProvider: AuthBindings = {
     };
   },
   logout: async () => {
-    localStorage.removeItem(TOKEN_KEY);
+    await directusClient.logout();
     return {
       success: true,
       redirectTo: "/login",
     };
   },
   check: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = await directusClient.getToken();
     if (token) {
       return {
         authenticated: true,
@@ -42,12 +49,18 @@ export const authProvider: AuthBindings = {
   },
   getPermissions: async () => null,
   getIdentity: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
+    const me = await directusClient.request<{
+      id: string;
+      first_name?: string;
+      last_name?: string;
+      avatar?: string;
+      email: string;
+    }>(readMe({ fields: ["*.*"] }));
+    if (me) {
       return {
-        id: 1,
-        name: "John Doe",
-        avatar: "https://i.pravatar.cc/300",
+        id: me.id,
+        name: `${me.first_name} ${me.last_name}` || me.email,
+        avatar: me.avatar || "https://i.pravatar.cc/300",
       };
     }
     return null;

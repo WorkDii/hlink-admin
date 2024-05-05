@@ -16,10 +16,8 @@ import routerBindings, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
-import dataProvider from "@refinedev/simple-rest";
 import { App as AntdApp } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-import { authProvider } from "./authProvider";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import {
@@ -37,21 +35,32 @@ import {
 import { ForgotPassword } from "./pages/forgotPassword";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
+import { dataProvider } from "@tspvivek/refine-directus";
+import { directusClient } from "./directusClient";
+import { UnitList } from "./pages/unit";
+import { authProvider } from "./authProvider";
 
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
         <ColorModeContextProvider>
           <AntdApp>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
+                dataProvider={dataProvider(directusClient)}
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}
                 resources={[
+                  {
+                    name: "unit",
+                    list: "/units",
+                    meta: {
+                      noStatus: true,
+                      label: "หน่วยสินค้า",
+                    },
+                  },
                   {
                     name: "blog_posts",
                     list: "/blog-posts",
@@ -77,7 +86,7 @@ function App() {
                   syncWithLocation: true,
                   warnWhenUnsavedChanges: true,
                   useNewQueryKeys: true,
-                  projectId: "f0Im7F-QnvmU6-pIZt0H",
+                  projectId: "gCK5zza6eQkQSKSRnvMtongcEcWrquzTS5Khpc",
                 }}
               >
                 <Routes>
@@ -100,6 +109,9 @@ function App() {
                       index
                       element={<NavigateToResource resource="blog_posts" />}
                     />
+                    <Route path="/units">
+                      <Route index element={<UnitList />} />
+                    </Route>
                     <Route path="/blog-posts">
                       <Route index element={<BlogPostList />} />
                       <Route path="create" element={<BlogPostCreate />} />

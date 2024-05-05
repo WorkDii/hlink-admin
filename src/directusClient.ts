@@ -1,3 +1,6 @@
+// dataprovider.ts is a file that contains the dataProvider for the Directus API.
+// https://github.com/tspvivek/refine-directus/blob/master/package/src/dataProvider.ts
+
 import {
   AuthenticationData,
   AuthenticationStorage,
@@ -7,7 +10,7 @@ import {
   realtime,
 } from "@tspvivek/refine-directus";
 
-export const API_URL = "https://hlink-api.workdii.com";
+export const API_URL = import.meta.env.VITE_API_URL as string;
 
 const LOCAL_STORAGE_KEY = "hlink_directus_storage";
 
