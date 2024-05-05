@@ -517,6 +517,11 @@
   resolved "https://registry.yarnpkg.com/@ctrl/tinycolor/-/tinycolor-3.6.1.tgz#b6c75a56a1947cc916ea058772d666a2c8932f31"
   integrity sha512-SITSV6aIXsuVNV3f3O0f2n/cgyEDWoSqtZMYiAmcsYHydcKrOz3gUxB/iXd/Qf08+IZX4KpgNbvUdMBmWz+kcA==
 
+"@directus/sdk@^13.0.2":
+  version "13.0.2"
+  resolved "https://registry.yarnpkg.com/@directus/sdk/-/sdk-13.0.2.tgz#8657741b1b0c85d1402db98e4864c6cddfa0b075"
+  integrity sha512-KECQM0w8xlgr5EklX+Jb9+dIzXyvJFjRfhiIAI7l/b0WEtVaCfvRMIrJXR3XsLeVW9u2nu+b/TffOyTMSLjm2w==
+
 "@emotion/hash@^0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.8.0.tgz#bbbff68978fefdbe68ccb533bc8cbe1d1afb5413"
@@ -930,7 +935,7 @@
     temp "^0.9.4"
     tslib "^2.6.2"
 
-"@refinedev/core@^4.47.1", "@refinedev/core@^4.49.0":
+"@refinedev/core@^4.46.0", "@refinedev/core@^4.47.1", "@refinedev/core@^4.49.0":
   version "4.49.0"
   resolved "https://registry.yarnpkg.com/@refinedev/core/-/core-4.49.0.tgz#030ccc0e2dda0c54a8bfb0f7c6e3a2c7c8436f22"
   integrity sha512-rkWCPAboJG1Ta/cD0VMovNaRHxi5D2F9yQBq+mT7Qj3jMiJhq7wTrzJUpHLNOr7SKttOhv61+DhrIjEmOAx90A==
@@ -1102,6 +1107,15 @@
   resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.5.0.tgz#108208d0f1d75271300bc5560cf9a85a1fa01e89"
   integrity sha512-KnPRCkQTyqhanNC0K63GBG3wA8I+D1fQuVnAvcBF8f13akOKeQp1gSbu6f77zCxhEk727iV5oQnbHLYzHrECLg==
 
+"@tspvivek/refine-directus@^1.0.34":
+  version "1.0.34"
+  resolved "https://registry.yarnpkg.com/@tspvivek/refine-directus/-/refine-directus-1.0.34.tgz#d26230bc03a3fe33c96681e3ad292b6027a95928"
+  integrity sha512-/C7YlIOxGGbN1TAfzmu3wcmvWNZrSxPrpwxW8WSGs2Hy3mqVak/JlHcrO1nDnau2+8yRIC4MwwbKKVqQM3g3Kw==
+  dependencies:
+    "@directus/sdk" "^13.0.2"
+    "@refinedev/core" "^4.46.0"
+    "@types/react" "^18.2.20"
+
 "@types/babel__core@^7.20.5":
   version "7.20.5"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.20.5.tgz#3df15f27ba85319caa07ba08d0721889bb39c017"
@@ -1209,7 +1223,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^18.0.0":
+"@types/react@*", "@types/react@^18.0.0", "@types/react@^18.2.20":
   version "18.3.1"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.3.1.tgz#fed43985caa834a2084d002e4771e15dfcbdbe8e"
   integrity sha512-V0kuGBX3+prX+DQ/7r2qsv1NsdfnCLnTgnRJ1pYnxykBhGMz+qj+box5lq7XsO5mtZsBqpjwwTu/7wszPfMBcw==
