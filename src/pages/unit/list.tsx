@@ -1,5 +1,7 @@
 import { List, useTable } from "@refinedev/antd";
-import { Badge, Table } from "antd";
+import { Badge, Table, Typography } from "antd";
+
+const { Text } = Typography;
 
 export const UnitList = () => {
   const { tableProps } = useTable({
@@ -7,9 +9,12 @@ export const UnitList = () => {
   });
 
   return (
-    <List>
+    <List headerButtons>
+      <Text type="warning">
+        กรุณาแจ้ง admin เพื่อเพิ่มหน่วย, user ไม่สามารถเพิ่มหน่วยได้ด้วยตนเอง
+      </Text>
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="name" title={"name"} />
+        <Table.Column dataIndex="name" title={"ชื่อ"} />
         <Table.Column
           dataIndex="is_active"
           title={"สถานะการใช้งาน"}
