@@ -39,6 +39,7 @@ import { dataProvider } from "@tspvivek/refine-directus";
 import { directusClient } from "./directusClient";
 import { UnitList } from "./pages/unit";
 import { authProvider } from "./authProvider";
+import { VisitDrugList } from "./pages/visitdrug";
 
 function App() {
   return (
@@ -62,25 +63,33 @@ function App() {
                     },
                   },
                   {
-                    name: "blog_posts",
-                    list: "/blog-posts",
-                    create: "/blog-posts/create",
-                    edit: "/blog-posts/edit/:id",
-                    show: "/blog-posts/show/:id",
+                    name: "visitdrug",
+                    list: "/visitdrugs",
                     meta: {
-                      canDelete: true,
+                      noStatus: true,
+                      label: "รายการการจ่ายยา",
                     },
                   },
-                  {
-                    name: "categories",
-                    list: "/categories",
-                    create: "/categories/create",
-                    edit: "/categories/edit/:id",
-                    show: "/categories/show/:id",
-                    meta: {
-                      canDelete: true,
-                    },
-                  },
+                  // {
+                  //   name: "blog_posts",
+                  //   list: "/blog-posts",
+                  //   create: "/blog-posts/create",
+                  //   edit: "/blog-posts/edit/:id",
+                  //   show: "/blog-posts/show/:id",
+                  //   meta: {
+                  //     canDelete: true,
+                  //   },
+                  // },
+                  // {
+                  //   name: "categories",
+                  //   list: "/categories",
+                  //   create: "/categories/create",
+                  //   edit: "/categories/edit/:id",
+                  //   show: "/categories/show/:id",
+                  //   meta: {
+                  //     canDelete: true,
+                  //   },
+                  // },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -112,17 +121,8 @@ function App() {
                     <Route path="/units">
                       <Route index element={<UnitList />} />
                     </Route>
-                    <Route path="/blog-posts">
-                      <Route index element={<BlogPostList />} />
-                      <Route path="create" element={<BlogPostCreate />} />
-                      <Route path="edit/:id" element={<BlogPostEdit />} />
-                      <Route path="show/:id" element={<BlogPostShow />} />
-                    </Route>
-                    <Route path="/categories">
-                      <Route index element={<CategoryList />} />
-                      <Route path="create" element={<CategoryCreate />} />
-                      <Route path="edit/:id" element={<CategoryEdit />} />
-                      <Route path="show/:id" element={<CategoryShow />} />
+                    <Route path="/visitdrugs">
+                      <Route index element={<VisitDrugList />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
