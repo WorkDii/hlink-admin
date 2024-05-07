@@ -1,4 +1,4 @@
-import { Authenticated, GitHubBanner, Refine } from "@refinedev/core";
+import { Authenticated, Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
@@ -20,18 +20,6 @@ import { App as AntdApp } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
-import {
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostList,
-  BlogPostShow,
-} from "./pages/blog-posts";
-import {
-  CategoryCreate,
-  CategoryEdit,
-  CategoryList,
-  CategoryShow,
-} from "./pages/categories";
 import { ForgotPassword } from "./pages/forgotPassword";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
@@ -40,6 +28,7 @@ import { directusClient } from "./directusClient";
 import { UnitList } from "./pages/unit";
 import { authProvider } from "./authProvider";
 import { VisitDrugList } from "./pages/visitdrug";
+import { HospitalDrugList } from "./pages/hospital_drug";
 
 function App() {
   return (
@@ -68,6 +57,14 @@ function App() {
                     meta: {
                       noStatus: true,
                       label: "รายการการจ่ายยา",
+                    },
+                  },
+                  {
+                    name: "hospital_drug",
+                    list: "/hospital_drugs",
+                    meta: {
+                      noStatus: true,
+                      label: "รายการยาในโรงพยาบาล",
                     },
                   },
                   // {
@@ -123,6 +120,9 @@ function App() {
                     </Route>
                     <Route path="/visitdrugs">
                       <Route index element={<VisitDrugList />} />
+                    </Route>
+                    <Route path="/hospital_drugs">
+                      <Route index element={<HospitalDrugList />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
