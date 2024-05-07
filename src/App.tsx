@@ -20,15 +20,14 @@ import { App as AntdApp } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
-import { ForgotPassword } from "./pages/forgotPassword";
 import { Login } from "./pages/login";
-import { Register } from "./pages/register";
 import { dataProvider } from "@tspvivek/refine-directus";
 import { directusClient } from "./directusClient";
 import { UnitList } from "./pages/unit";
 import { authProvider } from "./authProvider";
 import { VisitDrugList } from "./pages/visitdrug";
 import { HospitalDrugList } from "./pages/hospital_drug";
+import { TitleApp } from "./components";
 
 function App() {
   return (
@@ -67,26 +66,6 @@ function App() {
                       label: "รายการยาในโรงพยาบาล",
                     },
                   },
-                  // {
-                  //   name: "blog_posts",
-                  //   list: "/blog-posts",
-                  //   create: "/blog-posts/create",
-                  //   edit: "/blog-posts/edit/:id",
-                  //   show: "/blog-posts/show/:id",
-                  //   meta: {
-                  //     canDelete: true,
-                  //   },
-                  // },
-                  // {
-                  //   name: "categories",
-                  //   list: "/categories",
-                  //   create: "/categories/create",
-                  //   edit: "/categories/edit/:id",
-                  //   show: "/categories/show/:id",
-                  //   meta: {
-                  //     canDelete: true,
-                  //   },
-                  // },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -105,6 +84,9 @@ function App() {
                         <ThemedLayoutV2
                           Header={() => <Header sticky />}
                           Sider={(props) => <ThemedSiderV2 {...props} fixed />}
+                          Title={({ collapsed }) => (
+                            <TitleApp collapsed={collapsed}></TitleApp>
+                          )}
                         >
                           <Outlet />
                         </ThemedLayoutV2>
@@ -113,7 +95,7 @@ function App() {
                   >
                     <Route
                       index
-                      element={<NavigateToResource resource="blog_posts" />}
+                      element={<NavigateToResource resource="visitdrugs" />}
                     />
                     <Route path="/units">
                       <Route index element={<UnitList />} />
@@ -137,14 +119,8 @@ function App() {
                     }
                   >
                     <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route
-                      path="/forgot-password"
-                      element={<ForgotPassword />}
-                    />
                   </Route>
                 </Routes>
-
                 <RefineKbar />
                 <UnsavedChangesNotifier />
                 <DocumentTitleHandler />
