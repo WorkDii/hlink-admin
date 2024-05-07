@@ -27,7 +27,7 @@ import { UnitList } from "./pages/unit";
 import { authProvider } from "./authProvider";
 import { VisitDrugList } from "./pages/visitdrug";
 import { HospitalDrugList } from "./pages/hospital_drug";
-import { TitleApp } from "./components";
+import { CustomSider, TitleApp } from "./components";
 
 function App() {
   return (
@@ -80,7 +80,9 @@ function App() {
                       >
                         <ThemedLayoutV2
                           Header={() => <Header sticky />}
-                          Sider={(props) => <ThemedSiderV2 {...props} fixed />}
+                          Sider={(props) => (
+                            <CustomSider {...props}></CustomSider>
+                          )}
                           Title={({ collapsed }) => (
                             <TitleApp collapsed={collapsed}></TitleApp>
                           )}
