@@ -1,5 +1,6 @@
 import { SearchOutlined } from "@ant-design/icons";
 import { List, useTable } from "@refinedev/antd";
+import { useResource, useUserFriendlyName } from "@refinedev/core";
 import { Badge, Form, Grid, Input, Space, Table, Typography } from "antd";
 import debounce from "lodash/debounce";
 
@@ -41,8 +42,14 @@ export const UnitList = () => {
   };
   const debouncedOnChange = debounce(onSearch, 500);
 
+  const { resource } = useResource();
+  const getUserFriendlyName = useUserFriendlyName();
   return (
     <List
+      title={`${getUserFriendlyName(
+        resource?.name,
+        "plural"
+      )} (หน่วยของยาที่ใช้ในโรงพยาบาลและสถานบริการสุขภาพ)`}
       headerButtons={() => {
         return (
           <Space

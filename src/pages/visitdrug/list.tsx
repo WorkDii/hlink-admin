@@ -1,5 +1,5 @@
 import { DateField, List, useTable } from "@refinedev/antd";
-import { useMany } from "@refinedev/core";
+import { useMany, useResource, useUserFriendlyName } from "@refinedev/core";
 import { Table, Typography } from "antd";
 import _ from "lodash";
 
@@ -19,8 +19,15 @@ export const VisitDrugList = () => {
     },
   });
 
+  const { resource } = useResource();
+  const getUserFriendlyName = useUserFriendlyName();
   return (
-    <List>
+    <List
+      title={`${getUserFriendlyName(
+        resource?.name,
+        "plural"
+      )} (รายกการยาที่ รพ.สต. จ่ายให้ผู้ป่วย)`}
+    >
       <Text type="warning">
         ข้อมูลนี้เกิดจากการดึงข้อมูลมาจาก รพ.สต. โดยอัตโนมัติ
       </Text>

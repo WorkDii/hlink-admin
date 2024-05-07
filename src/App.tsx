@@ -47,7 +47,6 @@ function App() {
                     list: "/units",
                     meta: {
                       noStatus: true,
-                      label: "หน่วยสินค้า",
                     },
                   },
                   {
@@ -55,7 +54,6 @@ function App() {
                     list: "/visitdrugs",
                     meta: {
                       noStatus: true,
-                      label: "รายการการจ่ายยา",
                     },
                   },
                   {
@@ -63,7 +61,6 @@ function App() {
                     list: "/hospital_drugs",
                     meta: {
                       noStatus: true,
-                      label: "รายการยาในโรงพยาบาล",
                     },
                   },
                 ]}

@@ -1,4 +1,5 @@
 import { List, useTable } from "@refinedev/antd";
+import { useResource, useUserFriendlyName } from "@refinedev/core";
 import { Table, Tag, Typography } from "antd";
 import _ from "lodash";
 
@@ -11,9 +12,15 @@ export const HospitalDrugList = () => {
       fields: ["*", "hospital_drug_unit.unit.*", "hcode.name"],
     },
   });
-
+  const { resource } = useResource();
+  const getUserFriendlyName = useUserFriendlyName();
   return (
-    <List>
+    <List
+      title={`${getUserFriendlyName(
+        resource?.name,
+        "plural"
+      )} (รายกการยาของโรงพยาบาลแม่ข่าย)`}
+    >
       <Table
         {...tableProps}
         rowKey="id"
