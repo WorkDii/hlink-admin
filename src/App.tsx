@@ -28,6 +28,7 @@ import { authProvider } from "./authProvider";
 import { VisitDrugList } from "./pages/visitdrug";
 import { HospitalDrugList } from "./pages/hospital_drug";
 import { CustomSider, TitleApp } from "./components";
+import { HospitalDrugUnitList } from "./pages/hospital_drug_unit";
 
 function App() {
   return (
@@ -59,6 +60,13 @@ function App() {
                   {
                     name: "hospital_drug",
                     list: "/hospital_drugs",
+                    meta: {
+                      noStatus: true,
+                    },
+                  },
+                  {
+                    name: "hospital_drug_unit",
+                    list: "/hospital_drug_units",
                     meta: {
                       noStatus: true,
                     },
@@ -104,6 +112,9 @@ function App() {
                     </Route>
                     <Route path="/hospital_drugs">
                       <Route index element={<HospitalDrugList />} />
+                    </Route>
+                    <Route path="/hospital_drug_units">
+                      <Route index element={<HospitalDrugUnitList />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
