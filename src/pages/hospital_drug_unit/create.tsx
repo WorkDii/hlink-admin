@@ -29,7 +29,9 @@ export const HospitalDrugUnitCreate = () => {
   });
   const { selectProps: unitSelectProps } = useSelect({
     resource: "unit",
-    filters: [{ field: "id", operator: "nin", value: readyUnit }],
+    filters: readyUnit.length
+      ? [{ field: "id", operator: "nin", value: readyUnit }]
+      : undefined,
 
     // fix type error
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
