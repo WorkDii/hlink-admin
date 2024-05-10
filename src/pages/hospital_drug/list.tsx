@@ -17,10 +17,10 @@ export const HospitalDrugList = () => {
   console.log(tableProps);
   return (
     <List
-      title={`${getUserFriendlyName(
-        resource?.name,
-        "plural"
-      )} (รายกการยาของโรงพยาบาลแม่ข่าย)`}
+      headerProps={{
+        title: `${getUserFriendlyName(resource?.name, "plural")}`,
+        subTitle: `รายกการยาของโรงพยาบาลแม่ข่าย`,
+      }}
     >
       <Text type="danger">
         column รพ. อาจจะลบในอนาคต ถ้าแต่ละ รพ. ไม่มีประเด้นเรื่อง code24

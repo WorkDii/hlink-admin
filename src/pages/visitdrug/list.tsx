@@ -23,10 +23,10 @@ export const VisitDrugList = () => {
   const getUserFriendlyName = useUserFriendlyName();
   return (
     <List
-      title={`${getUserFriendlyName(
-        resource?.name,
-        "plural"
-      )} (รายกการยาที่ รพ.สต. จ่ายให้ผู้ป่วย)`}
+      headerProps={{
+        title: `${getUserFriendlyName(resource?.name, "plural")}`,
+        subTitle: `รายการยาที่ รพ.สต. จ่ายให้ผู้ป่วย`,
+      }}
     >
       <Text type="warning">
         ข้อมูลนี้เกิดจากการดึงข้อมูลมาจาก รพ.สต. โดยอัตโนมัติ

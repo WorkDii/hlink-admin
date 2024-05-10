@@ -46,10 +46,10 @@ export const UnitList = () => {
   const getUserFriendlyName = useUserFriendlyName();
   return (
     <List
-      title={`${getUserFriendlyName(
-        resource?.name,
-        "plural"
-      )} (หน่วยของยาที่ใช้ในโรงพยาบาลและสถานบริการสุขภาพ)`}
+      headerProps={{
+        title: `${getUserFriendlyName(resource?.name, "plural")}`,
+        subTitle: `หน่วยของยาที่ใช้ในโรงพยาบาลและสถานบริการสุขภาพ`,
+      }}
       headerButtons={() => {
         return (
           <Space
