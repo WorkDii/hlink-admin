@@ -1,7 +1,6 @@
 import { List, useTable } from "@refinedev/antd";
 import { useResource, useUserFriendlyName } from "@refinedev/core";
-import { Table, Tag, Typography } from "antd";
-import _ from "lodash";
+import { Table, Typography } from "antd";
 
 const { Text } = Typography;
 
@@ -39,17 +38,25 @@ export const HospitalDrugUnitList = () => {
         "hospital_drug.default_unit.*",
       ],
     },
+    sorters: {
+      initial: [
+        { field: "hcode", order: "asc" },
+        { field: "hospital_drug", order: "asc" },
+        { field: "multiplier", order: "asc" },
+      ],
+    },
   });
   const { resource } = useResource();
   const getUserFriendlyName = useUserFriendlyName();
-  console.log(tableProps);
   return (
     <List
-      title={`${getUserFriendlyName(
-        resource?.name,
-        "plural"
-      )} (รายการหน่วยของยาที่ใช้งานในโรงพยาบาลนั้นๆ  เช่น 100008190003471120381546 มีการใช้งานหน่วยเม็ดและกระปุก เป็นต้น)`}
+      headerProps={{
+        title: `${getUserFriendlyName(resource?.name, "plural")}`,
+        subTitle:
+          "รายการหน่วยของยาที่ใช้งานในโรงพยาบาลนั้นๆ เช่น xxx มีการใช้งานหน่วยเม็ดแผงและกระปุก เป็นต้น",
+      }}
     >
+      <Text type="secondary"></Text>
       <Table
         {...tableProps}
         rowKey="id"
@@ -71,8 +78,17 @@ export const HospitalDrugUnitList = () => {
           title="ยา"
           sorter
           render={(v: HospitalDrug) => {
+            return <Text>{`[${v.drugcode24}] ${v.name}`}</Text>;
+          }}
+        />
+        <Table.Column
+          dataIndex="hospital_drug"
+          title="หน่วยพื้นฐาน"
+          render={(v: HospitalDrug) => {
             return (
-              <Text>{`[${v.drugcode24}] ${v.name} (default_unit: ${v.default_unit.name})`}</Text>
+              <Text>
+                {v.default_unit.name} / {v.default_unit.name_eng}
+              </Text>
             );
           }}
         />
@@ -80,15 +96,15 @@ export const HospitalDrugUnitList = () => {
           dataIndex="unit"
           title="หน่วย"
           sorter
-          render={(v: any) => {
-            return <Text>{v.name}</Text>;
+          render={(v: Unit) => {
+            return (
+              <Text>
+                {v.name} / {v.name_eng}
+              </Text>
+            );
           }}
         />
-        <Table.Column
-          dataIndex="order"
-          title="ลำดับหน่วย (จากเล็กไปใหญ่)"
-          sorter
-        />
+        <Table.Column dataIndex="multiplier" title="ตัวคูณ" sorter />
       </Table>
     </List>
   );

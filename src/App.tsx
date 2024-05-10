@@ -5,7 +5,6 @@ import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import {
   ErrorComponent,
   ThemedLayoutV2,
-  ThemedSiderV2,
   useNotificationProvider,
 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
@@ -28,7 +27,10 @@ import { authProvider } from "./authProvider";
 import { VisitDrugList } from "./pages/visitdrug";
 import { HospitalDrugList } from "./pages/hospital_drug";
 import { CustomSider, TitleApp } from "./components";
-import { HospitalDrugUnitList } from "./pages/hospital_drug_unit";
+import {
+  HospitalDrugUnitCreate,
+  HospitalDrugUnitList,
+} from "./pages/hospital_drug_unit";
 
 function App() {
   return (
@@ -51,6 +53,12 @@ function App() {
                     },
                   },
                   {
+                    name: "ou",
+                    meta: {
+                      noStatus: true,
+                    },
+                  },
+                  {
                     name: "visitdrug",
                     list: "/visitdrugs",
                     meta: {
@@ -67,6 +75,8 @@ function App() {
                   {
                     name: "hospital_drug_unit",
                     list: "/hospital_drug_units",
+                    create: "/hospital_drug_units/create",
+
                     meta: {
                       noStatus: true,
                     },
@@ -115,6 +125,10 @@ function App() {
                     </Route>
                     <Route path="/hospital_drug_units">
                       <Route index element={<HospitalDrugUnitList />} />
+                      <Route
+                        path="create"
+                        element={<HospitalDrugUnitCreate />}
+                      />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
