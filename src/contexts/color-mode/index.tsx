@@ -50,6 +50,10 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
         theme={{
           ...RefineThemes.Green,
           algorithm: mode === "light" ? defaultAlgorithm : darkAlgorithm,
+          token: {
+            ...RefineThemes.Green.token,
+            fontFamily: "Sarabun, sans-serif",
+          },
         }}
       >
         {children}
