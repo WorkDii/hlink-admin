@@ -1,6 +1,6 @@
-import { List, useTable } from "@refinedev/antd";
+import { DeleteButton, List, useTable } from "@refinedev/antd";
 import { useResource, useUserFriendlyName } from "@refinedev/core";
-import { Table, Typography } from "antd";
+import { Space, Table, Typography } from "antd";
 
 const { Text } = Typography;
 
@@ -104,7 +104,22 @@ export const HospitalDrugUnitList = () => {
             );
           }}
         />
-        <Table.Column dataIndex="multiplier" title="ตัวคูณ" sorter />
+        <Table.Column
+          dataIndex="multiplier"
+          title="ตัวคูณ"
+          sorter
+          fixed="right"
+        />
+        <Table.Column
+          fixed="right"
+          title="Actions"
+          dataIndex="actions"
+          render={(_, record: any) => (
+            <Space>
+              <DeleteButton hideText size="small" recordItemId={record.id} />
+            </Space>
+          )}
+        />
       </Table>
     </List>
   );
