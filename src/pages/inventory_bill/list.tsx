@@ -39,7 +39,6 @@ export const InventoryBillList = () => {
   });
   const { resource } = useResource();
   const getUserFriendlyName = useUserFriendlyName();
-  console.log(tableProps.dataSource);
   return (
     <List
       headerProps={{

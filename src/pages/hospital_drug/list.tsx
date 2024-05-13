@@ -14,7 +14,6 @@ export const HospitalDrugList = () => {
   });
   const { resource } = useResource();
   const getUserFriendlyName = useUserFriendlyName();
-  console.log(tableProps);
   return (
     <List
       headerProps={{
