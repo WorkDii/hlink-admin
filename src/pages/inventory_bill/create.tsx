@@ -3,6 +3,8 @@ import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Select, Space, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import CreateDrugItem from "./createDrugItem";
+import { useDataProvider } from "@refinedev/core";
+import { getBillId } from "./createCustomValue";
 
 const Text = Typography.Text;
 
@@ -28,13 +30,20 @@ export const InventoryBillCreate = () => {
     searchField: "search",
   });
 
+  const dataProvider = useDataProvider();
   return (
     <Create saveButtonProps={saveButtonProps}>
       <Form
         {...formProps}
         layout="vertical"
-        onFinish={(v) => {
-          console.log(11111, v);
+        onFinish={async (v: any) => {
+          const bill_id = await getBillId(dataProvider(), v.hcode);
+          if (formProps.onFinish)
+            formProps.onFinish({
+              ...v,
+              bill_id,
+              status: "pending",
+            });
         }}
       >
         <Form.Item

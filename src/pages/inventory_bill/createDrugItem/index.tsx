@@ -1,10 +1,9 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { useSelect } from "@refinedev/antd";
 import { Button, Col, Form, Input, Row, Select, Tag } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import { FormInstance, FormListFieldData } from "antd/lib";
 import { useEffect, useState } from "react";
-import { useDefaultUnit } from "./defaultUnit";
+import { useUnit } from "./unit";
 
 type Props = FormListFieldData & {
   hospitalDrugSelectProps: any;
@@ -25,7 +24,11 @@ function CreateDrugItem({
     form
   );
 
+  const { unitSelectProps, defaultUnit, unitOptions, findMultiplier } =
+    useUnit(hospital_drug);
+
   const _quantity = useWatch(["inventory_drug", name, "_quantity"], form);
+
   useEffect(() => {
     form.setFieldValue(
       ["inventory_drug", name, "quantity"],
@@ -33,37 +36,10 @@ function CreateDrugItem({
     );
   }, [_quantity, form, multiplier, name]);
 
-  const defaultUnit = useDefaultUnit(hospital_drug);
-  const {
-    selectProps: hospitalDrugsUnitProps,
-    queryResult: hospitalDrugsUnit,
-  } = useSelect<{
-    multiplier: number;
-    unit: { name: string; name_eng: string; id: string };
-  }>({
-    resource: "hospital_drug_unit",
-    filters: [{ field: "hospital_drug", operator: "eq", value: hospital_drug }],
-    meta: {
-      fields: ["unit.*", "multiplier"],
-    },
-    sorters: [
-      {
-        field: "multiplier",
-        order: "asc",
-      },
-    ],
-    // fix type error
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    optionLabel: (v) => {
-      return `${v.unit?.name}/${v.unit?.name_eng} (x ${v.multiplier})`;
-    },
-    // fix type error
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    optionValue: "unit.id",
-    pagination: { pageSize: 10000 },
-  });
+  useEffect(() => {
+    form.setFieldValue(["inventory_drug", name, "unit"], null);
+    form.setFieldValue(["inventory_drug", name, "_quantity"], null);
+  }, [hospital_drug]);
 
   return (
     <Row key={key} gutter={12} align="middle">
@@ -77,13 +53,7 @@ function CreateDrugItem({
             },
           ]}
         >
-          <Select
-            {...hospitalDrugSelectProps}
-            onChange={() => {
-              form.setFieldValue(["inventory_drug", name, "unit"], null);
-              form.setFieldValue(["inventory_drug", name, "_quantity"], null);
-            }}
-          />
+          <Select {...hospitalDrugSelectProps} />
         </Form.Item>
       </Col>
       <Col span={4}>
@@ -110,22 +80,10 @@ function CreateDrugItem({
           ]}
         >
           <Select
-            {...hospitalDrugsUnitProps}
-            options={[
-              defaultUnit?.option || [],
-              ...(hospitalDrugsUnitProps.options
-                ? hospitalDrugsUnitProps.options
-                : []),
-            ]}
+            {...unitSelectProps}
+            options={unitOptions}
             onChange={(value) => {
-              const _d = hospitalDrugsUnit?.data?.data.find((d) => {
-                return d.unit.id === value;
-              });
-              if (_d) {
-                setMultiplier(_d?.multiplier);
-              } else {
-                setMultiplier(1);
-              }
+              setMultiplier(findMultiplier(value as any));
             }}
           ></Select>
         </Form.Item>
