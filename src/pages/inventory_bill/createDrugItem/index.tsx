@@ -1,11 +1,10 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { useSelect } from "@refinedev/antd";
-import { useOne } from "@refinedev/core";
-import { Button, Col, Form, Input, Row, Select, Tag, Typography } from "antd";
+import { Button, Col, Form, Input, Row, Select, Tag } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import { FormInstance, FormListFieldData } from "antd/lib";
 import { useEffect, useState } from "react";
-const { Text } = Typography;
+import { useDefaultUnit } from "./defaultUnit";
 
 type Props = FormListFieldData & {
   hospitalDrugSelectProps: any;
@@ -13,7 +12,7 @@ type Props = FormListFieldData & {
   form: FormInstance;
 };
 
-function CreateInventoryDrugItem({
+function CreateDrugItem({
   key,
   name,
   hospitalDrugSelectProps,
@@ -34,16 +33,7 @@ function CreateInventoryDrugItem({
     );
   }, [_quantity, form, multiplier, name]);
 
-  const hospitalDrugs = useOne<{
-    default_unit: { id: string; name: string; name_eng: string };
-  }>({
-    resource: "hospital_drug",
-    id: hospital_drug,
-    meta: {
-      fields: ["default_unit.name", "default_unit.name_eng", "default_unit.id"],
-    },
-  });
-  const default_unit = hospitalDrugs.data?.data.default_unit;
+  const defaultUnit = useDefaultUnit(hospital_drug);
   const {
     selectProps: hospitalDrugsUnitProps,
     queryResult: hospitalDrugsUnit,
@@ -122,10 +112,7 @@ function CreateInventoryDrugItem({
           <Select
             {...hospitalDrugsUnitProps}
             options={[
-              {
-                value: default_unit?.id,
-                label: `${default_unit?.name}/${default_unit?.name_eng}`,
-              },
+              defaultUnit?.option || [],
               ...(hospitalDrugsUnitProps.options
                 ? hospitalDrugsUnitProps.options
                 : []),
@@ -145,8 +132,7 @@ function CreateInventoryDrugItem({
       </Col>
       <Col span={3}>
         <Tag color="success">
-          {_quantity * multiplier} {default_unit?.name} /{" "}
-          {default_unit?.name_eng}
+          {_quantity * multiplier} {defaultUnit?.label}
         </Tag>
       </Col>
       <Col span={2}>
@@ -156,4 +142,4 @@ function CreateInventoryDrugItem({
   );
 }
 
-export default CreateInventoryDrugItem;
+export default CreateDrugItem;

@@ -2,7 +2,7 @@ import { PlusCircleOutlined } from "@ant-design/icons";
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Select, Space, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
-import CreateInventoryDrugItem from "./create_inventory_drug";
+import CreateDrugItem from "./createDrugItem";
 
 const Text = Typography.Text;
 
@@ -90,12 +90,12 @@ export const InventoryBillCreate = () => {
               <>
                 <Space direction="vertical" style={{ width: "100%" }}>
                   {fields.map((props) => (
-                    <CreateInventoryDrugItem
+                    <CreateDrugItem
                       {...props}
                       hospitalDrugSelectProps={hospitalDrugSelectProps}
                       remove={remove}
                       form={form}
-                    ></CreateInventoryDrugItem>
+                    ></CreateDrugItem>
                   ))}
                   <Typography.Link onClick={() => add()}>
                     <PlusCircleOutlined /> เพิ่มรายการยา
