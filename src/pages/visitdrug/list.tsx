@@ -1,21 +1,17 @@
-import { DateField, List, useTable } from "@refinedev/antd";
-import { useMany, useResource, useUserFriendlyName } from "@refinedev/core";
-import { Table, Typography } from "antd";
-import _ from "lodash";
+import { DateField, FilterDropdown, List, useTable } from "@refinedev/antd";
+import { useResource, useUserFriendlyName } from "@refinedev/core";
+import { Input, Table, Typography } from "antd";
 
 const { Text } = Typography;
 
 export const VisitDrugList = () => {
   const { tableProps } = useTable({
     syncWithLocation: true,
-  });
-
-  const { data: ouData, isLoading: ouIsLoading } = useMany({
-    resource: "ou",
-    ids: _.uniq(tableProps?.dataSource?.map((item) => item?.pcucode)),
-
-    queryOptions: {
-      enabled: !!tableProps?.dataSource,
+    meta: {
+      fields: ["*", "hospital_drug.*", "pcucode.*"],
+    },
+    sorters: {
+      initial: [{ field: "dateupdate", order: "desc" }],
     },
   });
 
@@ -43,14 +39,32 @@ export const VisitDrugList = () => {
           dataIndex={"pcucode"}
           title={"รพ.สต."}
           render={(value) => {
-            if (ouIsLoading) return <>Loading...</>;
-            const item = ouData?.data?.find((item) => item.id === value);
-            return `[${item?.id}] ${item?.name}`;
+            return `[${value.id}] ${value.name}`;
           }}
           sorter
         />
         <Table.Column dataIndex="visitno" title="visitcode" sorter />
         <Table.Column dataIndex="drugcode" title={"รหัสยาของ รพ.สต."} sorter />
+        <Table.Column
+          dataIndex={["hospital_drug", "drugcode24"]}
+          title={"รหัสยา 24 หลักของโรงพยาบาล"}
+          sorter
+        />
+        <Table.Column
+          dataIndex={["hospital_drug", "name"]}
+          title={"ชื่อยาของโรงพยาบาล"}
+          sorter
+        />
+        <Table.Column
+          dataIndex="drugtype"
+          title="ประเภทยา"
+          sorter
+          filterDropdown={(props) => (
+            <FilterDropdown {...props}>
+              <Input placeholder="Search Name" />
+            </FilterDropdown>
+          )}
+        />
         <Table.Column dataIndex="unit" title="ปริมาณการจ่ายยา" sorter />
         <Table.Column
           dataIndex="dateupdate"
@@ -59,11 +73,6 @@ export const VisitDrugList = () => {
           render={(v) => (
             <DateField value={v} format="LLL" locales="th"></DateField>
           )}
-        />
-        <Table.Column
-          dataIndex="hospital_code"
-          title={"รหัสยา 24 หลักของโรงพยาบาล"}
-          sorter
         />
       </Table>
     </List>
