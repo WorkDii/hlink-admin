@@ -32,6 +32,7 @@ import {
   HospitalDrugUnitList,
 } from "./pages/hospital_drug_unit";
 import { InventoryBillCreate, InventoryBillList } from "./pages/inventory_bill";
+import { InventoryList } from "./pages/inventory";
 
 function App() {
   return (
@@ -90,6 +91,13 @@ function App() {
                       noStatus: true,
                     },
                   },
+                  {
+                    name: "inventory",
+                    list: "/inventories",
+                    meta: {
+                      noStatus: true,
+                    },
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -135,6 +143,9 @@ function App() {
                     <Route path="/inventory_bills">
                       <Route index element={<InventoryBillList />} />
                       <Route path="create" element={<InventoryBillCreate />} />
+                    </Route>
+                    <Route path="/inventories">
+                      <Route index element={<InventoryList />} />
                     </Route>
                     <Route path="/hospital_drug_units">
                       <Route index element={<HospitalDrugUnitList />} />

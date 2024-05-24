@@ -1,11 +1,11 @@
 import { DateField, FilterDropdown, List, useTable } from "@refinedev/antd";
 import { useResource, useUserFriendlyName } from "@refinedev/core";
-import { Input, Table, Typography } from "antd";
+import { Button, Input, Table, Typography } from "antd";
 
 const { Text } = Typography;
 
 export const VisitDrugList = () => {
-  const { tableProps } = useTable({
+  const { tableProps, setFilters } = useTable({
     syncWithLocation: true,
     meta: {
       fields: ["*", "hospital_drug.*", "pcucode.*"],
@@ -27,6 +27,21 @@ export const VisitDrugList = () => {
       <Text type="warning">
         ข้อมูลนี้เกิดจากการดึงข้อมูลมาจาก รพ.สต. โดยอัตโนมัติ
       </Text>
+      <div>
+        <Button
+          type="dashed"
+          danger
+          onClick={() => {
+            setFilters([
+              { field: "drugtype", operator: "in", value: ["01", "10"] },
+              { field: "hospital_drug", operator: "null", value: true },
+            ]);
+          }}
+        >
+          รายการที่คาดว่ามีปัญญหา
+        </Button>
+      </div>
+
       <Table
         {...tableProps}
         rowKey="id"
