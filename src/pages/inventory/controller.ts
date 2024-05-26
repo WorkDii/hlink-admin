@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { aggregate } from "@tspvivek/refine-directus";
+import { aggregate, readItems } from "@tspvivek/refine-directus";
 import { directusClient } from "../../directusClient";
 
-export async function getDrugUsedCount(hospital_drug?: string[]) {
+async function getDrugUsedCount(hospital_drug?: string[], pcucode?: string) {
   if (!hospital_drug?.length) return {};
   const data = await directusClient.request(
     aggregate("visitdrug" as any, {
@@ -17,6 +17,13 @@ export async function getDrugUsedCount(hospital_drug?: string[]) {
                 _in: hospital_drug,
               },
             },
+            pcucode
+              ? {
+                  pcucode: {
+                    _eq: pcucode,
+                  },
+                }
+              : {},
           ],
         },
       },
@@ -28,7 +35,7 @@ export async function getDrugUsedCount(hospital_drug?: string[]) {
   }, {} as { [key: string]: number });
 }
 
-export async function getDrugBoughtCount(hospital_drug?: string[]) {
+async function getDrugBoughtCount(hospital_drug?: string[], pcucode?: string) {
   if (!hospital_drug?.length) return {};
   const data = await directusClient.request(
     aggregate("inventory_drug" as any, {
@@ -43,6 +50,15 @@ export async function getDrugBoughtCount(hospital_drug?: string[]) {
                 _in: hospital_drug,
               },
             },
+            pcucode
+              ? {
+                  inventory_bill: {
+                    pcucode: {
+                      _eq: pcucode,
+                    },
+                  },
+                }
+              : {},
           ],
         },
       },
@@ -55,9 +71,9 @@ export async function getDrugBoughtCount(hospital_drug?: string[]) {
   }, {} as { [key: string]: number });
 }
 
-export async function getDrugCount(hospital_drug?: string[]) {
-  const bought = await getDrugBoughtCount(hospital_drug);
-  const used = await getDrugUsedCount(hospital_drug);
+export async function getDrugCount(hospital_drug?: string[], pcucode?: string) {
+  const bought = await getDrugBoughtCount(hospital_drug, pcucode);
+  const used = await getDrugUsedCount(hospital_drug, pcucode);
 
   const _data: {
     [key: string]: { bought: number; used: number; remain: number };

@@ -1,6 +1,6 @@
 import { List, useTable } from "@refinedev/antd";
-import { useResource, useUserFriendlyName } from "@refinedev/core";
-import { Table, Typography } from "antd";
+import { useList, useResource, useUserFriendlyName } from "@refinedev/core";
+import { Flex, Radio, Table, Typography } from "antd";
 import { getDrugCount } from "./controller";
 import { useEffect, useState } from "react";
 
@@ -24,21 +24,46 @@ export const InventoryList = () => {
     };
   }>({});
 
+  const [pcucode, setPcucode] = useState<string | undefined>(undefined);
+
   useEffect(() => {
     if (!tableProps?.dataSource?.length) return;
     const hospital_drug = tableProps?.dataSource?.map((v) => v.id) as string[];
-    getDrugCount(hospital_drug).then((data) => {
+    getDrugCount(hospital_drug, pcucode).then((data) => {
       setDrugCount(data);
     });
-  }, [tableProps?.dataSource]);
+  }, [tableProps?.dataSource, pcucode]);
 
+  const { data: allChildrenPcu } = useList({
+    resource: "ou",
+    filters: [{ field: "drug_stock_parent", operator: "nnull", value: true }],
+    meta: {
+      fields: ["id", "name"],
+    },
+  });
   return (
     <List
       headerProps={{
         title: `${getUserFriendlyName(resource?.name, "plural")}`,
-        subTitle: `ปริมาณการใช้งานยาที่ รพซ.สต. ใช้ในการรักษาผู้ป่วย`,
+        subTitle: `ปริมาณการใช้งานยาที่ รพ.สต. ใช้ในการรักษาผู้ป่วย`,
       }}
     >
+      <div id="pcu"></div>
+      <Text>เลือกสถานบริการ</Text>
+      <Flex gap="4px 0" wrap style={{ marginBottom: "16px" }}>
+        <Radio.Group
+          onChange={(v) => {
+            setPcucode(v.target.value);
+          }}
+          defaultValue={pcucode}
+          size="large"
+        >
+          <Radio.Button value={undefined}>ทั้งหมด</Radio.Button>
+          {allChildrenPcu?.data.map((v) => {
+            return <Radio.Button value={v.id}>{v.name}</Radio.Button>;
+          })}
+        </Radio.Group>
+      </Flex>
       <Table
         {...tableProps}
         rowKey="id"
