@@ -1,7 +1,7 @@
 import { List, useTable } from "@refinedev/antd";
 import { useResource, useUserFriendlyName } from "@refinedev/core";
 import { Table, Typography } from "antd";
-import { getDrugUsedCount } from "./controller";
+import { getDrugCount } from "./controller";
 import { useEffect, useState } from "react";
 
 const { Text } = Typography;
@@ -16,18 +16,22 @@ export const InventoryList = () => {
   });
   const { resource } = useResource();
   const getUserFriendlyName = useUserFriendlyName();
-
-  const [drugUsedCount, setDrugUsedCount] = useState<{ [key: string]: number }>(
-    {}
-  );
+  const [drugCount, setDrugCount] = useState<{
+    [key: string]: {
+      bought: number;
+      used: number;
+      remain: number;
+    };
+  }>({});
 
   useEffect(() => {
     if (!tableProps?.dataSource?.length) return;
     const hospital_drug = tableProps?.dataSource?.map((v) => v.id) as string[];
-    getDrugUsedCount(hospital_drug).then((data) => {
-      setDrugUsedCount(data);
+    getDrugCount(hospital_drug).then((data) => {
+      setDrugCount(data);
     });
   }, [tableProps?.dataSource]);
+
   return (
     <List
       headerProps={{
@@ -35,12 +39,6 @@ export const InventoryList = () => {
         subTitle: `ปริมาณการใช้งานยาที่ รพซ.สต. ใช้ในการรักษาผู้ป่วย`,
       }}
     >
-      <Text type="danger">
-        {/* column รพ. อาจจะลบในอนาคต ถ้าแต่ละ รพ. ไม่มีประเด้นเรื่อง code24
-        เหมือนกัน แต่ต้องการใช้ชื่อ ต่างกัน หรือประเด็นเรื่องหน่วย
-        ที่เข้ากันไม่ได้ ใน v.1 โปรแกรมจะทำการใช้งานหน่วยที่เล็กที่สุด
-        เท่านั้นก่อน */}
-      </Text>
       <Table
         {...tableProps}
         rowKey="id"
@@ -54,10 +52,31 @@ export const InventoryList = () => {
         <Table.Column dataIndex="drugcode24" title="รหัสยา 24 หลัก" sorter />
         <Table.Column
           dataIndex="id"
+          title="จำนวนที่ซื้อ"
+          render={(v) => {
+            return drugCount?.[v]?.bought | 0;
+          }}
+          fixed="right"
+        />
+        <Table.Column
+          dataIndex="id"
           title="ปริมาณการใช้"
           render={(v) => {
-            return drugUsedCount[v] | 0;
+            return drugCount?.[v]?.used | 0;
           }}
+          fixed="right"
+        />
+        <Table.Column
+          dataIndex="id"
+          title="จำนวนคงเหลือ"
+          render={(v) => {
+            const amount = drugCount?.[v]?.remain;
+            if (amount < 0) {
+              return <Text type="danger">{amount}</Text>;
+            }
+            return amount;
+          }}
+          fixed="right"
         />
       </Table>
     </List>
