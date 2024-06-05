@@ -33,6 +33,10 @@ import {
 } from "./pages/hospital_drug_unit";
 import { InventoryBillCreate, InventoryBillList } from "./pages/inventory_bill";
 import { InventoryList } from "./pages/inventory";
+import {
+  InventoryRequestCreate,
+  InventoryRequestList,
+} from "./pages/inventory_request";
 
 function App() {
   return (
@@ -92,6 +96,14 @@ function App() {
                     },
                   },
                   {
+                    name: "inventory_request",
+                    list: "/inventory_requests",
+                    create: "/inventory_requests/create",
+                    meta: {
+                      noStatus: true,
+                    },
+                  },
+                  {
                     name: "inventory",
                     list: "/inventories",
                     meta: {
@@ -146,6 +158,13 @@ function App() {
                     </Route>
                     <Route path="/inventories">
                       <Route index element={<InventoryList />} />
+                    </Route>
+                    <Route path="/inventory_requests">
+                      <Route index element={<InventoryRequestList />} />
+                      <Route
+                        path="create"
+                        element={<InventoryRequestCreate />}
+                      />
                     </Route>
                     <Route path="/hospital_drug_units">
                       <Route index element={<HospitalDrugUnitList />} />
