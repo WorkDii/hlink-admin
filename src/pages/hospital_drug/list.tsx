@@ -1,9 +1,12 @@
-import { List, useTable } from "@refinedev/antd";
+import { List, useTable, BooleanField } from "@refinedev/antd";
 import { useResource, useUserFriendlyName } from "@refinedev/core";
-import { Table, Tag, Typography } from "antd";
-import _ from "lodash";
+import { Table, Typography } from "antd";
 
 const { Text } = Typography;
+
+const TrueIcon = () => <span>✅</span>;
+
+const FalseIcon = () => <span>❌</span>;
 
 export const HospitalDrugList = () => {
   const { tableProps } = useTable({
@@ -46,17 +49,24 @@ export const HospitalDrugList = () => {
         <Table.Column dataIndex="name" title="ชื่อยา" sorter />
         <Table.Column dataIndex="drugcode24" title="รหัสยา 24 หลัก" sorter />
         <Table.Column
-          dataIndex={"default_unit"}
+          dataIndex={["default_unit", "name"]}
           title={"หน่วย"}
-          render={(value: { name: string; name_eng: string; id: string }) => {
-            return (
-              <Tag key={value.id}>
-                {value.name} / {value.name_eng}
-              </Tag>
-            );
-          }}
           sorter
         />
+        <Table.Column
+          dataIndex={"ncd_cup"}
+          title={"NCD_CUP"}
+          sorter
+          align="center"
+          render={(value) => (
+            <BooleanField
+              value={value}
+              trueIcon={<TrueIcon />}
+              falseIcon={<FalseIcon />}
+            />
+          )}
+        />
+        <Table.Column dataIndex={"prepack"} title={"PREPACK"} sorter />
       </Table>
     </List>
   );
