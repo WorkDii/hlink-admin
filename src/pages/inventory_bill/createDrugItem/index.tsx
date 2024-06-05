@@ -45,7 +45,6 @@ function CreateDrugItem({
 
   return (
     <Row key={key} gutter={12} align="middle">
-      {multiplier}
       <Col span={11}>
         <Form.Item
           label={"รายการยา"}
