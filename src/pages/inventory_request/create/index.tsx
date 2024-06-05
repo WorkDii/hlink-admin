@@ -2,15 +2,18 @@ import { PlusCircleOutlined } from "@ant-design/icons";
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Select, Space, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
-import CreateDrugItem from "./createDrugItem";
+import CreateDrugItem from "../createDrugItem";
 import { useDataProvider } from "@refinedev/core";
-import { getBillId } from "./createCustomValue";
+import { getBillId } from "../createCustomValue";
+import { useEffect } from "react";
+import { getRecommendDrug } from "./getRecommendDrug";
 
 const Text = Typography.Text;
 
 export const InventoryRequestCreate = () => {
   const { formProps, saveButtonProps, form } = useForm();
   const hcode = useWatch("hcode", form);
+  const pcucode = useWatch("pcucode", form);
 
   const { selectProps: ouSelectProps } = useSelect({
     resource: "ou",
@@ -30,20 +33,28 @@ export const InventoryRequestCreate = () => {
     searchField: "search",
   });
 
-  const dataProvider = useDataProvider();
+  const dataProvider = useDataProvider()();
+  useEffect(() => {
+    if (pcucode) {
+      getRecommendDrug(pcucode).then((v) => {
+        console.log(3333333, v);
+      });
+    }
+  }, [pcucode]);
   return (
     <Create saveButtonProps={saveButtonProps}>
       <Form
         {...formProps}
         layout="vertical"
         onFinish={async (v: any) => {
-          const bill_id = await getBillId(dataProvider(), v.hcode);
-          if (formProps.onFinish)
-            formProps.onFinish({
-              ...v,
-              bill_id,
-              status: "pending",
-            });
+          console.log(22222222, v);
+          // const bill_id = await getBillId(dataProvider(), v.hcode);
+          // if (formProps.onFinish)
+          //   formProps.onFinish({
+          //     ...v,
+          //     bill_id,
+          //     status: "pending",
+          //   });
         }}
       >
         <Form.Item
