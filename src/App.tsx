@@ -74,15 +74,15 @@ function App() {
                       noStatus: true,
                     },
                   },
-                  {
-                    name: "hospital_drug_unit",
-                    list: "/hospital_drug_units",
-                    create: "/hospital_drug_units/create",
+                  // {
+                  //   name: "hospital_drug_unit",
+                  //   list: "/hospital_drug_units",
+                  //   create: "/hospital_drug_units/create",
 
-                    meta: {
-                      noStatus: true,
-                    },
-                  },
+                  //   meta: {
+                  //     noStatus: true,
+                  //   },
+                  // },
                   {
                     name: "inventory_bill",
                     list: "/inventory_bills",
