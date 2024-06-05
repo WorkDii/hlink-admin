@@ -2,7 +2,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Input, Row, Select, Tag } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import { FormInstance, FormListFieldData } from "antd/lib";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useUnit } from "./unit";
 
 type Props = FormListFieldData & {
@@ -18,14 +18,16 @@ function CreateDrugItem({
   remove,
   form,
 }: Props) {
-  const [multiplier, setMultiplier] = useState<number>(1);
   const hospital_drug = useWatch(
     ["inventory_drug", name, "hospital_drug"],
     form
   );
 
-  const { unitSelectProps, defaultUnit, unitOptions, findMultiplier } =
-    useUnit(hospital_drug);
+  const {
+    options: unitOptions,
+    multiplier,
+    setMultiplier,
+  } = useUnit(hospital_drug);
 
   const _quantity = useWatch(["inventory_drug", name, "_quantity"], form);
 
@@ -43,6 +45,7 @@ function CreateDrugItem({
 
   return (
     <Row key={key} gutter={12} align="middle">
+      {multiplier}
       <Col span={11}>
         <Form.Item
           label={"รายการยา"}
@@ -79,18 +82,12 @@ function CreateDrugItem({
             },
           ]}
         >
-          <Select
-            {...unitSelectProps}
-            options={unitOptions}
-            onChange={(value) => {
-              setMultiplier(findMultiplier(value as any));
-            }}
-          ></Select>
+          <Select options={unitOptions} onChange={setMultiplier}></Select>
         </Form.Item>
       </Col>
       <Col span={3}>
         <Tag color="success">
-          {_quantity * multiplier} {defaultUnit?.label}
+          {_quantity * multiplier} {unitOptions[0]?.label}
         </Tag>
       </Col>
       <Col span={2}>

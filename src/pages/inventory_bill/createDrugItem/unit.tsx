@@ -1,52 +1,38 @@
-import { useSelect } from "@refinedev/antd";
-import { useDefaultUnit } from "./defaultUnit";
+import { useEffect, useState } from "react";
+import { directusClient } from "../../../directusClient";
+import { readItem } from "@tspvivek/refine-directus";
 
 export function useUnit(hospital_drug_id: string) {
-  const defaultUnit = useDefaultUnit(hospital_drug_id);
+  const [options, setOptions] = useState<{ value: number; label: string }[]>(
+    []
+  );
+  const [multiplier, setMultiplier] = useState<number>(1);
 
-  const { selectProps: unitSelectProps, queryResult: unitQueryResult } =
-    useSelect<{
-      multiplier: number;
-      unit: { name: string; id: string };
-    }>({
-      resource: "hospital_drug_unit",
-      filters: [
-        { field: "hospital_drug", operator: "eq", value: hospital_drug_id },
-      ],
-      meta: {
-        fields: ["unit.*", "multiplier"],
-      },
-      sorters: [
-        {
-          field: "multiplier",
-          order: "asc",
-        },
-      ],
-      // fix type error
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      optionLabel: (v) => {
-        return `${v.unit?.name} (x ${v.multiplier})`;
-      },
-      // fix type error
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      optionValue: "unit.id",
-      pagination: { pageSize: 10000 },
-    });
-  const defaultUnitOption = defaultUnit?.option ? [defaultUnit.option] : [];
-  const options = unitSelectProps.options || [];
-
-  return {
-    unitSelectProps,
-    unitOptions: [...defaultUnitOption, ...options],
-    defaultUnit,
-    findMultiplier: (value: string) => {
-      // หาใน hospital_drug_unit ถ้าหากไม่เจอ แปลว่าเป็นหน่วยพื้นฐาน ซึ่งเท่ากับ 1
-      const _d = unitQueryResult.data?.data.find((d) => {
-        return d.unit.id === value;
+  useEffect(() => {
+    setMultiplier(1);
+    if (!hospital_drug_id) return;
+    directusClient
+      .request<{ prepack: number; default_unit: { name: string } }>(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        readItem("hospital_drug", hospital_drug_id, {
+          fields: ["default_unit.name", "prepack"],
+        })
+      )
+      .then((data) => {
+        const options = [
+          {
+            value: 1,
+            label: `${data.default_unit.name}`,
+          },
+          {
+            value: data.prepack,
+            label: `PREPACK / ${data.prepack}`,
+          },
+        ];
+        setOptions(options);
       });
-      return _d?.multiplier || 1;
-    },
-  };
+  }, [hospital_drug_id]);
+
+  return { options, multiplier, setMultiplier };
 }
