@@ -79,22 +79,8 @@ export const InventoryBillList = () => {
             });
           }}
         />
-        <Table.Column
-          dataIndex="hcode"
-          title="รพ."
-          sorter
-          render={(v: Ou) => {
-            return <Text>{`${v.name}`}</Text>;
-          }}
-        />
-        <Table.Column
-          dataIndex="pcucode"
-          title="รพ.สต."
-          sorter
-          render={(v: Ou) => {
-            return <Text>{`${v.name}`}</Text>;
-          }}
-        />
+        <Table.Column dataIndex={["hcode", "name"]} title="รพ." sorter />
+        <Table.Column dataIndex={["pcucode", "name"]} title="รพ.สต." sorter />
         <Table.Column
           dataIndex="date_created"
           title="วันที่"
