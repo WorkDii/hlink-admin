@@ -7,7 +7,7 @@ export function useUnit(hospital_drug_id: string) {
   const { selectProps: unitSelectProps, queryResult: unitQueryResult } =
     useSelect<{
       multiplier: number;
-      unit: { name: string; name_eng: string; id: string };
+      unit: { name: string; id: string };
     }>({
       resource: "hospital_drug_unit",
       filters: [
@@ -26,7 +26,7 @@ export function useUnit(hospital_drug_id: string) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       optionLabel: (v) => {
-        return `${v.unit?.name}/${v.unit?.name_eng} (x ${v.multiplier})`;
+        return `${v.unit?.name} (x ${v.multiplier})`;
       },
       // fix type error
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

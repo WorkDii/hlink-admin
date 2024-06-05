@@ -19,11 +19,6 @@ export const UnitList = () => {
               operator: "contains",
               value: values.name,
             },
-            {
-              field: "name_eng",
-              operator: "contains",
-              value: values.name,
-            },
           ],
         },
       ];
@@ -82,8 +77,8 @@ export const UnitList = () => {
           showSizeChanger: true,
         }}
       >
+        <Table.Column dataIndex="id" title={"รหัส"} sorter />
         <Table.Column dataIndex="name" title={"ชื่อ"} sorter />
-        <Table.Column dataIndex="name_eng" title={"ชื่อ(อังกฤษ)"} sorter />
         <Table.Column
           dataIndex="is_active"
           title={"สถานะการใช้งาน"}

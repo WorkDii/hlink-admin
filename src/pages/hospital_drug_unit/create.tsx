@@ -36,7 +36,7 @@ export const HospitalDrugUnitCreate = () => {
     // fix type error
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    optionLabel: (v: Unit) => `${v?.name} / (${v?.name_eng})`,
+    optionLabel: (v: Unit) => `${v?.name}`,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     searchField: "search",

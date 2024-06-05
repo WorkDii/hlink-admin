@@ -24,7 +24,6 @@ export interface Unit {
   date_updated: null;
   name: string;
   is_active: boolean;
-  name_eng: string;
 }
 export const HospitalDrugUnitList = () => {
   const { tableProps } = useTable({
@@ -85,11 +84,7 @@ export const HospitalDrugUnitList = () => {
           dataIndex="hospital_drug"
           title="หน่วยพื้นฐาน"
           render={(v: HospitalDrug) => {
-            return (
-              <Text>
-                {v.default_unit.name} / {v.default_unit.name_eng}
-              </Text>
-            );
+            return <Text>{v.default_unit.name}</Text>;
           }}
         />
         <Table.Column
@@ -97,11 +92,7 @@ export const HospitalDrugUnitList = () => {
           title="หน่วย"
           sorter
           render={(v: Unit) => {
-            return (
-              <Text>
-                {v.name} / {v.name_eng}
-              </Text>
-            );
+            return <Text>{v.name}</Text>;
           }}
         />
         <Table.Column

@@ -17,7 +17,6 @@ export interface HospitalDrug {
   name: string;
   default_unit: {
     name: string;
-    name_eng: string;
   };
 }
 

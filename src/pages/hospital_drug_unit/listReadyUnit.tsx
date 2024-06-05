@@ -61,11 +61,7 @@ const ListReadyUnit = ({ hcode, hospital_drug, setReadyUnit }: Props) => {
         dataIndex="unit"
         title="หน่วย"
         render={(v: Unit) => {
-          return (
-            <Text>
-              {v.name} / {v.name_eng}
-            </Text>
-          );
+          return <Text>{v.name}</Text>;
         }}
       />
       <Table.Column
