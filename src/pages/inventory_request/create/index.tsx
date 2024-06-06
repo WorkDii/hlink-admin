@@ -8,6 +8,7 @@ import { getBillId } from "../createCustomValue";
 import { useEffect } from "react";
 import { getRecommendDrug } from "./getRecommendDrug";
 import { RequestTableDrug } from "./requestDrugTable";
+import { getListHospitalDrugUsage } from "./getListHospitalDrugUsage";
 
 const Text = Typography.Text;
 
@@ -24,13 +25,13 @@ export const InventoryRequestCreate = () => {
   const dataProvider = useDataProvider()();
   useEffect(() => {
     if (pcucode) {
-      getRecommendDrug(pcucode).then((v) => {
-        form.setFieldValue("inventory_drug", v.slice(0, 1000));
-        // console.log(11111111, form.getFieldValue("inventory_drug"));
+      getListHospitalDrugUsage(pcucode).then((v) => {
+        form.setFieldValue("inventory_drug", v.slice(0, 1));
       });
     }
   }, [pcucode]);
 
+  // temporary data
   useEffect(() => {
     form.setFieldsValue({
       hcode: "10682",
@@ -44,7 +45,7 @@ export const InventoryRequestCreate = () => {
         },
       ],
     });
-  }, [form]);
+  }, []);
   return (
     <Create saveButtonProps={saveButtonProps}>
       <Form
@@ -112,6 +113,7 @@ export const InventoryRequestCreate = () => {
           {(fields, operation, { errors }) => {
             return (
               <RequestTableDrug
+                form={form}
                 fields={fields}
                 operation={operation}
                 errors={errors}

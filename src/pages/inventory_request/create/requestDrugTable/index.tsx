@@ -2,6 +2,7 @@ import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
+  FormInstance,
   FormListFieldData,
   FormListOperation,
   Input,
@@ -10,54 +11,35 @@ import {
   Typography,
 } from "antd";
 import React from "react";
-import { render } from "react-dom";
+import HospitalDrugColumn from "./hospital_drug_column";
+import CurrentRateColumn from "./current_rate_column";
 
 type Props = {
   fields: FormListFieldData[];
   operation: FormListOperation;
   errors: React.ReactNode[];
+  form: FormInstance;
 };
 
 export const RequestTableDrug = ({
   fields,
   operation: { add, move, remove },
   errors,
+  form,
 }: Props) => {
   const dataSource = fields.map((field) => ({ index: field.name }));
   const columns = [
     {
       title: "รายการยา",
-      render: (_: any, record: { index: number }) => {
-        return (
-          <Form.Item
-            name={[record.index, "hospital_drug"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input></Input>
-          </Form.Item>
-        );
-      },
+      render: (_: any, { index }: { index: number }) => (
+        <HospitalDrugColumn index={index} form={form}></HospitalDrugColumn>
+      ),
     },
     {
       title: "ปริมาณการใช้ 30 วัน",
-      render: (_: any, record: { index: number }) => {
-        return (
-          <Form.Item
-            name={[record.index, "current_rate"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input readOnly></Input>
-          </Form.Item>
-        );
-      },
+      render: (_: any, { index }: { index: number }) => (
+        <CurrentRateColumn index={index} form={form}></CurrentRateColumn>
+      ),
     },
     {
       title: "ปริมาณคงเหลือ",
@@ -122,8 +104,7 @@ export const RequestTableDrug = ({
               },
             ]}
           >
-            {/* <Input readOnly></Input> */}
-            <Typography></Typography>
+            <Input readOnly></Input>
           </Form.Item>
         );
       },
