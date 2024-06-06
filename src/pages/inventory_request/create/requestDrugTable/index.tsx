@@ -6,13 +6,13 @@ import {
   FormListFieldData,
   FormListOperation,
   Input,
+  InputNumber,
   Space,
   Table,
   Typography,
 } from "antd";
 import React from "react";
 import HospitalDrugColumn from "./hospital_drug_column";
-import CurrentRateColumn from "./current_rate_column";
 
 type Props = {
   fields: FormListFieldData[];
@@ -37,9 +37,20 @@ export const RequestTableDrug = ({
     },
     {
       title: "ปริมาณการใช้ 30 วัน",
-      render: (_: any, { index }: { index: number }) => (
-        <CurrentRateColumn index={index} form={form}></CurrentRateColumn>
-      ),
+      render: (_: any, record: { index: number }) => {
+        return (
+          <Form.Item
+            name={[record.index, "current_rate"]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <InputNumber disabled></InputNumber>
+          </Form.Item>
+        );
+      },
     },
     {
       title: "ปริมาณคงเหลือ",
@@ -53,7 +64,7 @@ export const RequestTableDrug = ({
               },
             ]}
           >
-            <Input readOnly></Input>
+            <InputNumber disabled></InputNumber>
           </Form.Item>
         );
       },
@@ -70,7 +81,7 @@ export const RequestTableDrug = ({
               },
             ]}
           >
-            <Input></Input>
+            <InputNumber></InputNumber>
           </Form.Item>
         );
       },
@@ -104,7 +115,7 @@ export const RequestTableDrug = ({
               },
             ]}
           >
-            <Input readOnly></Input>
+            <InputNumber disabled></InputNumber>
           </Form.Item>
         );
       },
