@@ -93,8 +93,6 @@ export async function getRecommendDrug(pcucode: string) {
   const usage = await getUsage(pcucode);
   const bought = await getBought(pcucode);
   const hospitalDrug = await getHospitalDrug(rate.map((r) => r.hospital_drug));
-
-  console.log(1111, rate, usage, bought, hospitalDrug);
   const recommend = rate.map((r) => {
     const current_rate = r.usage_rate_30_day_ago;
     const _usage = parseInt(
