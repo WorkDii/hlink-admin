@@ -2,7 +2,7 @@ import { PlusCircleOutlined } from "@ant-design/icons";
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Select, Space, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
-import CreateDrugItem from "../createDrugItem";
+import CreateDrugItem from "./createDrugItem";
 import { useDataProvider } from "@refinedev/core";
 import { getBillId } from "../createCustomValue";
 import { useEffect } from "react";
@@ -20,27 +20,30 @@ export const InventoryRequestCreate = () => {
     optionLabel: "name",
   });
 
-  const { selectProps: hospitalDrugSelectProps } = useSelect({
-    resource: "hospital_drug",
-    filters: [{ field: "hcode", operator: "eq", value: hcode }],
-
-    // fix type error
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    optionLabel: (v) => `[${v.drugcode24}] ${v.name}`,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    searchField: "search",
-  });
-
   const dataProvider = useDataProvider()();
   useEffect(() => {
     if (pcucode) {
       getRecommendDrug(pcucode).then((v) => {
-        console.log(3333333, v);
+        form.setFieldValue("inventory_drug", v.slice(0, 2));
+        // console.log(11111111, form.getFieldValue("inventory_drug"));
       });
     }
   }, [pcucode]);
+
+  useEffect(() => {
+    form.setFieldsValue({
+      hcode: "10682",
+      pcucode: "09570",
+      inventory_drug: [
+        {
+          quantity: 9700,
+          unit: 100,
+          _quantity: "97",
+          hospital_drug: "0a03fe46-de4f-40c7-9458-339936b2d5ed",
+        },
+      ],
+    });
+  }, [form]);
   return (
     <Create saveButtonProps={saveButtonProps}>
       <Form
@@ -111,8 +114,8 @@ export const InventoryRequestCreate = () => {
                 <Space direction="vertical" style={{ width: "100%" }}>
                   {fields.map((props) => (
                     <CreateDrugItem
+                      hcode={hcode}
                       {...props}
-                      hospitalDrugSelectProps={hospitalDrugSelectProps}
                       remove={remove}
                       form={form}
                     ></CreateDrugItem>

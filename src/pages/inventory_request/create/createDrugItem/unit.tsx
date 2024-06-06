@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { directusClient } from "../../../directusClient";
+import { directusClient } from "../../../../directusClient";
 import { readItem } from "@tspvivek/refine-directus";
 
 export function useUnit(hospital_drug_id: string) {

@@ -1,23 +1,19 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Input, Row, Select, Tag } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import { FormInstance, FormListFieldData } from "antd/lib";
 import { useEffect } from "react";
 import { useUnit } from "./unit";
+import { useSelect } from "@refinedev/antd";
 
 type Props = FormListFieldData & {
-  hospitalDrugSelectProps: any;
+  hcode: string;
   remove: (index: number | number[]) => void;
   form: FormInstance;
 };
 
-function CreateDrugItem({
-  key,
-  name,
-  hospitalDrugSelectProps,
-  remove,
-  form,
-}: Props) {
+function CreateDrugItem({ key, name, remove, form, hcode }: Props) {
   const hospital_drug = useWatch(
     ["inventory_drug", name, "hospital_drug"],
     form
@@ -30,6 +26,16 @@ function CreateDrugItem({
   } = useUnit(hospital_drug);
 
   const _quantity = useWatch(["inventory_drug", name, "_quantity"], form);
+
+  const { selectProps: hospitalDrugSelectProps } = useSelect({
+    resource: "hospital_drug",
+    filters: [{ field: "hcode", operator: "eq", value: hcode }],
+    // @ts-ignore
+    optionLabel: (v) => `[${v.drugcode24}] ${v.name}`,
+    // @ts-ignore
+    searchField: "search",
+    defaultValue: hospital_drug,
+  });
 
   useEffect(() => {
     form.setFieldValue(
