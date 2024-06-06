@@ -7,6 +7,7 @@ import { useDataProvider } from "@refinedev/core";
 import { getBillId } from "../createCustomValue";
 import { useEffect } from "react";
 import { getRecommendDrug } from "./getRecommendDrug";
+import { RequestTableDrug } from "./requestDrugTable";
 
 const Text = Typography.Text;
 
@@ -24,7 +25,7 @@ export const InventoryRequestCreate = () => {
   useEffect(() => {
     if (pcucode) {
       getRecommendDrug(pcucode).then((v) => {
-        form.setFieldValue("inventory_drug", v.slice(0, 2));
+        form.setFieldValue("inventory_drug", v.slice(0, 1000));
         // console.log(11111111, form.getFieldValue("inventory_drug"));
       });
     }
@@ -108,24 +109,13 @@ export const InventoryRequestCreate = () => {
             },
           ]}
         >
-          {(fields, { add, remove }, { errors }) => {
+          {(fields, operation, { errors }) => {
             return (
-              <>
-                <Space direction="vertical" style={{ width: "100%" }}>
-                  {fields.map((props) => (
-                    <CreateDrugItem
-                      hcode={hcode}
-                      {...props}
-                      remove={remove}
-                      form={form}
-                    ></CreateDrugItem>
-                  ))}
-                  <Typography.Link onClick={() => add()}>
-                    <PlusCircleOutlined /> เพิ่มรายการยา
-                  </Typography.Link>
-                </Space>
-                <Form.ErrorList errors={errors} />
-              </>
+              <RequestTableDrug
+                fields={fields}
+                operation={operation}
+                errors={errors}
+              ></RequestTableDrug>
             );
           }}
         </Form.List>
