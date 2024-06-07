@@ -5,7 +5,6 @@ import {
   FormInstance,
   FormListFieldData,
   FormListOperation,
-  Input,
   InputNumber,
   Space,
   Table,
@@ -13,6 +12,7 @@ import {
 } from "antd";
 import React from "react";
 import HospitalDrugColumn from "./hospital_drug_column";
+import UnitColumn from "./unit_column";
 
 type Props = {
   fields: FormListFieldData[];
@@ -23,12 +23,16 @@ type Props = {
 
 export const RequestTableDrug = ({
   fields,
-  operation: { add, move, remove },
+  operation: { add, remove },
   errors,
   form,
 }: Props) => {
   const dataSource = fields.map((field) => ({ index: field.name }));
   const columns = [
+    {
+      title: "ลำดับที่",
+      render: (_: any, { index }: { index: number }) => index + 1,
+    },
     {
       title: "รายการยา",
       render: (_: any, { index }: { index: number }) => (
@@ -88,20 +92,9 @@ export const RequestTableDrug = ({
     },
     {
       title: "หน่วย",
-      render: (_: any, record: { index: number }) => {
-        return (
-          <Form.Item
-            name={[record.index, "unit"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input></Input>
-          </Form.Item>
-        );
-      },
+      render: (_: any, { index }: { index: number }) => (
+        <UnitColumn form={form} index={index}></UnitColumn>
+      ),
     },
     {
       title: "จำนวนสั่งซื้อสุทธิ",
@@ -135,7 +128,7 @@ export const RequestTableDrug = ({
   return (
     <>
       <Space direction="vertical" style={{ width: "100%" }}>
-        <Table dataSource={dataSource} columns={columns} />
+        <Table dataSource={dataSource} columns={columns} pagination={false} />
         <Typography.Link onClick={() => add()}>
           <PlusCircleOutlined /> เพิ่มรายการยา
         </Typography.Link>

@@ -1,12 +1,8 @@
-import { PlusCircleOutlined } from "@ant-design/icons";
 import { Create, useForm, useSelect } from "@refinedev/antd";
-import { Form, Select, Space, Typography } from "antd";
+import { Form, Select, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
-import CreateDrugItem from "./createDrugItem";
 import { useDataProvider } from "@refinedev/core";
-import { getBillId } from "../createCustomValue";
 import { useEffect } from "react";
-import { getRecommendDrug } from "./getRecommendDrug";
 import { RequestTableDrug } from "./requestDrugTable";
 import { getListHospitalDrugUsage } from "./getListHospitalDrugUsage";
 
@@ -14,7 +10,6 @@ const Text = Typography.Text;
 
 export const InventoryRequestCreate = () => {
   const { formProps, saveButtonProps, form } = useForm();
-  const hcode = useWatch("hcode", form);
   const pcucode = useWatch("pcucode", form);
 
   const { selectProps: ouSelectProps } = useSelect({
@@ -24,9 +19,10 @@ export const InventoryRequestCreate = () => {
 
   const dataProvider = useDataProvider()();
   useEffect(() => {
+    form.setFieldValue("inventory_drug", null);
     if (pcucode) {
       getListHospitalDrugUsage(pcucode).then((v) => {
-        form.setFieldValue("inventory_drug", v.slice(0, 1));
+        form.setFieldValue("inventory_drug", v);
       });
     }
   }, [pcucode]);
@@ -36,14 +32,6 @@ export const InventoryRequestCreate = () => {
     form.setFieldsValue({
       hcode: "10682",
       pcucode: "09570",
-      inventory_drug: [
-        {
-          quantity: 9700,
-          unit: 100,
-          _quantity: "97",
-          hospital_drug: "0a03fe46-de4f-40c7-9458-339936b2d5ed",
-        },
-      ],
     });
   }, []);
   return (

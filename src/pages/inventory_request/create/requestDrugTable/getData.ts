@@ -65,12 +65,17 @@ async function getBought(pcucode: string, hospital_drug: string) {
   return parseInt(data[0]?.sum?.quantity || "0");
 }
 
-async function getPrepack(hospital_drug: string) {
-  const data = await directusClient.request<{ prepack: number }>(
+async function getHospitalDrugItem(hospital_drug: string) {
+  const data = await directusClient.request<{
+    prepack: number;
+    default_unit: { id: string; name: string };
+  }>(
     // @ts-ignore
-    readItem("hospital_drug", hospital_drug)
+    readItem("hospital_drug", hospital_drug, {
+      fields: ["*", "default_unit.*"],
+    })
   );
-  return data.prepack;
+  return data;
 }
 
 // ต้องการเติมแบบ prepack ให้ใกล้เคียง 60 วันมาที่สุด โดยห้ามน้อยว่า 30 วันเป็นอันขาด (สามารถเกิน 60 วัน ได้ กรณีที่ เศษของจำนวน Prepack น้อยกว่า 50%)
@@ -100,18 +105,19 @@ export async function getData(pcucode: string, hospital_drug: string) {
   const rate = await getRate(pcucode, hospital_drug);
   const usage = await getUsage(pcucode, hospital_drug);
   const bought = await getBought(pcucode, hospital_drug);
-  const prepack = await getPrepack(hospital_drug);
+  const hospitalDrugItem = await getHospitalDrugItem(hospital_drug);
 
   return {
     current_rate: rate,
     current_usage: usage,
     current_remain: bought - usage,
     bought,
-    prepack,
+    prepack: hospitalDrugItem.prepack,
+    default_unit: hospitalDrugItem.default_unit,
     ...getRecommendRequestQuantity({
       current_rate: rate,
       current_remain: bought - usage,
-      prepack,
+      prepack: hospitalDrugItem.prepack,
     }),
   };
 }
