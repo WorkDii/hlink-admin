@@ -13,6 +13,7 @@ import {
 import React from "react";
 import HospitalDrugColumn from "./hospital_drug_column";
 import UnitColumn from "./unit_column";
+import { updateQuantity } from "./updateQuantity";
 
 type Props = {
   fields: FormListFieldData[];
@@ -85,7 +86,11 @@ export const RequestTableDrug = ({
               },
             ]}
           >
-            <InputNumber></InputNumber>
+            <InputNumber
+              onChange={() => {
+                updateQuantity(form, record.index);
+              }}
+            ></InputNumber>
           </Form.Item>
         );
       },

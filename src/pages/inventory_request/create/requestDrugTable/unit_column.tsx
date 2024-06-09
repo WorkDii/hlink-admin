@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Form, FormInstance, Select } from "antd";
 import { useWatch } from "antd/es/form/Form";
+import { updateQuantity } from "./updateQuantity";
 
 type Props = {
   index: number;
@@ -25,7 +26,11 @@ export default function UnitColumn({ index, form }: Props) {
         },
       ]}
     >
-      <Select>
+      <Select
+        onChange={() => {
+          updateQuantity(form, index);
+        }}
+      >
         {defaultUnit && (
           <Select.Option value={defaultUnit.id}>
             {defaultUnit.name}
