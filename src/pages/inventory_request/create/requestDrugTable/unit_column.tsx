@@ -2,6 +2,7 @@
 import { Form, FormInstance, Select } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import { updateQuantity } from "./updateQuantity";
+import { PREPACK_UNIT_ID } from "../../../../contexts/constants";
 
 type Props = {
   index: number;
@@ -36,7 +37,9 @@ export default function UnitColumn({ index, form }: Props) {
             {defaultUnit.name}
           </Select.Option>
         )}
-        <Select.Option value="000">PREPACK / {prepack}</Select.Option>
+        <Select.Option value={PREPACK_UNIT_ID}>
+          PREPACK / {prepack}
+        </Select.Option>
       </Select>
     </Form.Item>
   );

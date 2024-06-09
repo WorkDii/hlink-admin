@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { aggregate, dataProvider, readItems } from "@tspvivek/refine-directus";
+import { aggregate, readItems } from "@tspvivek/refine-directus";
 import { directusClient } from "../../../directusClient";
 import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity";
-import { stringify } from "querystring";
+import { PREPACK_UNIT_ID } from "../../../contexts/constants";
 
 export interface HospitalDrug {
   id: string;
@@ -157,7 +157,7 @@ export async function getRecommendDrug(
       current_remain: _bought - _usage,
       current_usage: _usage,
       current_bought: _bought,
-      unit: "000",
+      unit: PREPACK_UNIT_ID,
       ...getRecommendRequestQuantity({
         current_rate: r.current_rate,
         current_remain: _bought - _usage,
