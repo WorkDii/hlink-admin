@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { RequestTableDrug } from "./requestDrugTable";
 import { getRecommendDrug } from "./getRecommendDrug";
 import { resetHospitalDrugSelect } from "./resetHospitalDrugSelect";
+import { From, createDataInventoryRequest } from "./create";
 
 const Text = Typography.Text;
 
@@ -45,14 +46,8 @@ export const InventoryRequestCreate = () => {
         {...formProps}
         layout="vertical"
         onFinish={async (v: any) => {
-          console.log(22222222, v);
-          // const bill_id = await getBillId(dataProvider(), v.hcode);
-          // if (formProps.onFinish)
-          //   formProps.onFinish({
-          //     ...v,
-          //     bill_id,
-          //     status: "pending",
-          //   });
+          const data = await createDataInventoryRequest(v);
+          if (formProps.onFinish) formProps.onFinish(data || {});
         }}
       >
         <Form.Item name={"hospital_drug_selected"}></Form.Item>
