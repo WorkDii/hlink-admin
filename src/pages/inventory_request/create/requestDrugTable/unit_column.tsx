@@ -9,10 +9,13 @@ type Props = {
 
 export default function UnitColumn({ index, form }: Props) {
   const defaultUnit = useWatch<{ id: string; name: string }>(
-    ["inventory_drug", index, "default_unit"],
+    ["inventory_drug", index, "hospital_drug", "default_unit"],
     form
   );
-  const prepack = useWatch<number>(["inventory_drug", index, "prepack"], form);
+  const prepack = useWatch<number>(
+    ["inventory_drug", index, "hospital_drug", "prepack"],
+    form
+  );
   return (
     <Form.Item
       name={[index, "unit"]}

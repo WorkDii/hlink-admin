@@ -1,5 +1,5 @@
 import { describe, expect } from "vitest";
-import { getRecommendRequestQuantity } from "./getRecommendDrug";
+import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity";
 
 describe("getRecommendDrug", (test) => {
   test("should return recommend drug", async () => {
@@ -12,7 +12,6 @@ describe("getRecommendDrug", (test) => {
     ).toEqual({
       _quantity: 2,
       quantity: 20,
-      unit: 10,
     });
 
     expect(
@@ -24,7 +23,6 @@ describe("getRecommendDrug", (test) => {
     ).toEqual({
       _quantity: 3,
       quantity: 30,
-      unit: 10,
     });
 
     expect(
@@ -36,7 +34,6 @@ describe("getRecommendDrug", (test) => {
     ).toEqual({
       _quantity: 2,
       quantity: 20,
-      unit: 10,
     });
 
     expect(
@@ -48,7 +45,6 @@ describe("getRecommendDrug", (test) => {
     ).toEqual({
       _quantity: 10,
       quantity: 100,
-      unit: 10,
     });
 
     expect(
@@ -60,7 +56,6 @@ describe("getRecommendDrug", (test) => {
     ).toEqual({
       _quantity: 9,
       quantity: 90,
-      unit: 10,
     });
 
     // look strange => should consult P'tai hatyai hospital
@@ -73,7 +68,6 @@ describe("getRecommendDrug", (test) => {
     ).toEqual({
       _quantity: 1,
       quantity: 100,
-      unit: 100,
     });
   });
 });

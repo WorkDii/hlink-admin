@@ -128,7 +128,7 @@ export const RequestTableDrug = ({
   return (
     <>
       <Space direction="vertical" style={{ width: "100%" }}>
-        <Table dataSource={dataSource} columns={columns} pagination={false} />
+        <Table dataSource={dataSource} columns={columns} />
         <Typography.Link onClick={() => add()}>
           <PlusCircleOutlined /> เพิ่มรายการยา
         </Typography.Link>

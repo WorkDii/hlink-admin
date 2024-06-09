@@ -4,7 +4,7 @@ import { useWatch } from "antd/es/form/Form";
 import { useDataProvider } from "@refinedev/core";
 import { useEffect } from "react";
 import { RequestTableDrug } from "./requestDrugTable";
-import { getListHospitalDrugUsage } from "./getListHospitalDrugUsage";
+import { getRecommendDrug } from "./getRecommendDrug";
 
 const Text = Typography.Text;
 
@@ -21,7 +21,8 @@ export const InventoryRequestCreate = () => {
   useEffect(() => {
     form.setFieldValue("inventory_drug", null);
     if (pcucode) {
-      getListHospitalDrugUsage(pcucode).then((v) => {
+      getRecommendDrug(pcucode).then((v) => {
+        console.log("done");
         form.setFieldValue("inventory_drug", v);
       });
     }
