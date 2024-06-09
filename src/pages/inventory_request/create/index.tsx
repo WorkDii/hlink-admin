@@ -1,12 +1,11 @@
 import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Select, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
-import { useDataProvider } from "@refinedev/core";
 import { useEffect } from "react";
 import { RequestTableDrug } from "./requestDrugTable";
 import { getRecommendDrug } from "./getRecommendDrug";
 import { resetHospitalDrugSelect } from "./resetHospitalDrugSelect";
-import { From, createDataInventoryRequest } from "./create";
+import { createDataInventoryRequest } from "./create";
 
 const Text = Typography.Text;
 
@@ -19,7 +18,6 @@ export const InventoryRequestCreate = () => {
     optionLabel: "name",
   });
 
-  const dataProvider = useDataProvider()();
   useEffect(() => {
     form.setFieldValue("inventory_drug", null);
     if (pcucode) {
@@ -32,14 +30,6 @@ export const InventoryRequestCreate = () => {
       });
     }
   }, [pcucode]);
-
-  // temporary data
-  useEffect(() => {
-    form.setFieldsValue({
-      hcode: "10682",
-      pcucode: "09570",
-    });
-  }, []);
   return (
     <Create saveButtonProps={saveButtonProps}>
       <Form
