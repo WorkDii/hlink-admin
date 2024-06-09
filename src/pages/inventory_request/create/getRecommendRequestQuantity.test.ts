@@ -58,6 +58,17 @@ describe("getRecommendDrug", (test) => {
       quantity: 90,
     });
 
+    expect(
+      getRecommendRequestQuantity({
+        current_rate: 1,
+        current_remain: 109,
+        prepack: 10,
+      })
+    ).toEqual({
+      _quantity: 0,
+      quantity: 0,
+    });
+
     // look strange => should consult P'tai hatyai hospital
     expect(
       getRecommendRequestQuantity({
