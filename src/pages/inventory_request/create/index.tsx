@@ -5,6 +5,7 @@ import { useDataProvider } from "@refinedev/core";
 import { useEffect } from "react";
 import { RequestTableDrug } from "./requestDrugTable";
 import { getRecommendDrug } from "./getRecommendDrug";
+import { resetHospitalDrugSelect } from "./resetHospitalDrugSelect";
 
 const Text = Typography.Text;
 
@@ -22,8 +23,11 @@ export const InventoryRequestCreate = () => {
     form.setFieldValue("inventory_drug", null);
     if (pcucode) {
       getRecommendDrug(pcucode).then((v) => {
-        console.log("done");
-        form.setFieldValue("inventory_drug", v);
+        form.setFieldValue(
+          "inventory_drug",
+          v.filter((v) => v._quantity > 0)
+        );
+        resetHospitalDrugSelect(form);
       });
     }
   }, [pcucode]);
@@ -51,6 +55,7 @@ export const InventoryRequestCreate = () => {
           //   });
         }}
       >
+        <Form.Item name={"hospital_drug_selected"}></Form.Item>
         <Form.Item
           label={"โรงพยาบาล"}
           name={["hcode"]}

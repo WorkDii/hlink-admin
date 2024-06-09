@@ -27,7 +27,7 @@ export interface TempRecommendObject {
   };
 }
 
-async function getInitialData(pcucode: string) {
+async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
   const data = await directusClient.request<
     { usage_rate_30_day_ago: number; hospital_drug: HospitalDrug; id: string }[]
   >(
@@ -38,6 +38,9 @@ async function getInitialData(pcucode: string) {
         pcucode: {
           _eq: pcucode,
         },
+        ...(fix_hospital_drug
+          ? { hospital_drug: { _eq: fix_hospital_drug } }
+          : {}),
       },
       fields: [
         "id",
@@ -48,16 +51,41 @@ async function getInitialData(pcucode: string) {
     })
   );
 
-  const obj: {
-    [key: string]: { current_rate: number; hospital_drug: HospitalDrug };
-  } = {};
-  data.forEach((d) => {
-    obj[d.hospital_drug.id] = {
-      current_rate: d.usage_rate_30_day_ago,
-      hospital_drug: d.hospital_drug,
+  // if fix_hospital_drug is provided and no data found, return minimal data set
+  // fix_hospital_drug is used to get the data for the specific hospital_drug
+  // this is used when the user is change the hospital_drug
+  if (fix_hospital_drug && data.length === 0) {
+    const hospital_drug = await directusClient.request<HospitalDrug[]>(
+      // @ts-ignore
+      readItems("hospital_drug", {
+        limit: 1,
+        filter: {
+          id: {
+            _eq: fix_hospital_drug,
+          },
+        },
+        fields: ["*", "default_unit.*"],
+      })
+    );
+
+    return {
+      [fix_hospital_drug]: {
+        current_rate: 0,
+        hospital_drug: hospital_drug[0],
+      },
     };
-  });
-  return obj;
+  } else {
+    const obj: {
+      [key: string]: { current_rate: number; hospital_drug: HospitalDrug };
+    } = {};
+    data.forEach((d) => {
+      obj[d.hospital_drug.id] = {
+        current_rate: d.usage_rate_30_day_ago,
+        hospital_drug: d.hospital_drug,
+      };
+    });
+    return obj;
+  }
 }
 
 async function getUsage(pcucode: string, obj: TempRecommendObject) {
@@ -110,31 +138,32 @@ async function getBought(pcucode: string, obj: TempRecommendObject) {
   });
   return obj;
 }
-export async function getRecommendDrug(pcucode: string) {
-  const recommendObject = await getInitialData(pcucode);
+
+export async function getRecommendDrug(
+  pcucode: string,
+  fix_hospital_drug?: string
+) {
+  const recommendObject = await getInitialData(pcucode, fix_hospital_drug);
   const usage = await getUsage(pcucode, recommendObject);
   const bought = await getBought(pcucode, usage);
-  const recommend = Object.keys(recommendObject)
-    .map((key) => {
-      const r = recommendObject[key];
-      const _usage = usage[key]?.usage || 0;
-      const _bought = bought[key]?.bought || 0;
-      const prepack = r.hospital_drug.prepack;
-      return {
-        hospital_drug: r.hospital_drug,
+  const recommend = Object.keys(recommendObject).map((key) => {
+    const r = recommendObject[key];
+    const _usage = usage[key]?.usage || 0;
+    const _bought = bought[key]?.bought || 0;
+    const prepack = r.hospital_drug.prepack;
+    return {
+      hospital_drug: r.hospital_drug,
+      current_rate: r.current_rate,
+      current_remain: _bought - _usage,
+      current_usage: _usage,
+      current_bought: _bought,
+      unit: "000",
+      ...getRecommendRequestQuantity({
         current_rate: r.current_rate,
         current_remain: _bought - _usage,
-        current_usage: _usage,
-        current_bought: _bought,
-        unit: "000",
-        ...getRecommendRequestQuantity({
-          current_rate: r.current_rate,
-          current_remain: _bought - _usage,
-          prepack,
-        }),
-      };
-    })
-    .filter((r) => r._quantity > 0);
-  console.log(recommend.filter((r) => r._quantity === 0));
+        prepack,
+      }),
+    };
+  });
   return recommend;
 }
