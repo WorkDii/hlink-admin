@@ -9,7 +9,7 @@ export interface Ou {
   name: string;
 }
 export interface InventoryRequestDrug {
-  request_quantity: number;
+  quantity: number;
   hospital_drug: HospitalDrug;
 }
 
@@ -29,9 +29,7 @@ export const InventoryRequestList = () => {
         "status.*",
         "hcode.name",
         "pcucode.name",
-        "inventory_request_drug.request_quantity",
-        "inventory_request_drug.hospital_drug.name",
-        "inventory_request_drug.hospital_drug.default_unit.*",
+        "inventory_request_drug",
       ],
     },
     sorters: { initial: [{ field: "date_created", order: "desc" }] },
@@ -67,16 +65,8 @@ export const InventoryRequestList = () => {
           dataIndex={"inventory_request_drug"}
           title={"ยา"}
           sorter
-          render={(v: InventoryRequestDrug[]) => {
-            if (v.length === 0) return "-";
-            return v.map((hdrug) => {
-              return (
-                <Tag>
-                  {hdrug.hospital_drug.name} {hdrug.request_quantity}{" "}
-                  {hdrug.hospital_drug.default_unit?.name}
-                </Tag>
-              );
-            });
+          render={(v: string[]) => {
+            return <>{v.length} รายการ</>;
           }}
         />
         <Table.Column dataIndex={["hcode", "name"]} title="รพ." sorter />
