@@ -1,9 +1,12 @@
 import { List, useTable } from "@refinedev/antd";
 import { useResource, useUserFriendlyName } from "@refinedev/core";
-import { Table, Tag, Typography } from "antd";
+import { Button, Table, Tag, Typography } from "antd";
 import BillStatusTag from "../bill_staus";
 const { Text } = Typography;
 import dayjs from "dayjs";
+import { CSVLink } from "react-csv";
+import { getCSVData, headers } from "./getCSVData";
+import DownloadButton from "./downloadButton";
 
 export interface Ou {
   name: string;
@@ -76,6 +79,19 @@ export const InventoryRequestList = () => {
           title="วันที่"
           sorter
           render={(v: string) => dayjs(v).format("DD/MM/YYYY HH:mm:ss")}
+        />
+        <Table.Column
+          dataIndex="id"
+          title="action"
+          sorter
+          render={(v: any, record: any) => {
+            return (
+              <DownloadButton
+                id={v}
+                request_id={record.request_id}
+              ></DownloadButton>
+            );
+          }}
         />
       </Table>
     </List>
