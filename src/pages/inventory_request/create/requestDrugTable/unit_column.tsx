@@ -38,7 +38,7 @@ export default function UnitColumn({ index, form }: Props) {
           </Select.Option>
         )}
         <Select.Option value={PREPACK_UNIT_ID}>
-          {prepack} ({defaultUnit.name})
+          {prepack} ({defaultUnit?.name})
         </Select.Option>
       </Select>
     </Form.Item>
