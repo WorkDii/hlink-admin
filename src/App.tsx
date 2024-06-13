@@ -52,47 +52,11 @@ function App() {
                 authProvider={authProvider}
                 resources={[
                   {
-                    name: "unit",
-                    list: "/units",
+                    name: "inventory",
+                    list: "/inventories",
                     meta: {
                       noStatus: true,
-                    },
-                  },
-                  {
-                    name: "ou",
-                    meta: {
-                      noStatus: true,
-                    },
-                  },
-                  {
-                    name: "visitdrug",
-                    list: "/visitdrugs",
-                    meta: {
-                      noStatus: true,
-                    },
-                  },
-                  {
-                    name: "hospital_drug",
-                    list: "/hospital_drugs",
-                    meta: {
-                      noStatus: true,
-                    },
-                  },
-                  // {
-                  //   name: "hospital_drug_unit",
-                  //   list: "/hospital_drug_units",
-                  //   create: "/hospital_drug_units/create",
-
-                  //   meta: {
-                  //     noStatus: true,
-                  //   },
-                  // },
-                  {
-                    name: "inventory_bill",
-                    list: "/inventory_bills",
-                    create: "/inventory_bills/create",
-                    meta: {
-                      noStatus: true,
+                      label: "คลังยา",
                     },
                   },
                   {
@@ -101,13 +65,57 @@ function App() {
                     create: "/inventory_requests/create",
                     meta: {
                       noStatus: true,
+                      label: "คำขอเบิกยา",
                     },
                   },
                   {
-                    name: "inventory",
-                    list: "/inventories",
+                    name: "inventory_bill",
+                    list: "/inventory_bills",
+                    create: "/inventory_bills/create",
                     meta: {
                       noStatus: true,
+                      label: "บิลเบิกยา",
+                    },
+                  },
+                  {
+                    name: "visitdrug",
+                    list: "/visitdrugs",
+                    meta: {
+                      noStatus: true,
+                      label: "รายการใช้ยา",
+                    },
+                  },
+                  {
+                    name: "setting",
+                    meta: {
+                      noStatus: true,
+                      label: "ตั้งค่า",
+                    },
+                  },
+                  {
+                    name: "hospital_drug",
+                    list: "/hospital_drugs",
+                    meta: {
+                      noStatus: true,
+                      label: "รายชื่อยา",
+                      parent: "setting",
+                    },
+                  },
+                  {
+                    name: "unit",
+                    list: "/units",
+                    meta: {
+                      noStatus: true,
+                      label: "หน่วย",
+                      parent: "setting",
+                    },
+                  },
+                  {
+                    name: "ou",
+                    meta: {
+                      noStatus: true,
+                      label: "หน่วยงาน",
+                      parent: "setting",
                     },
                   },
                 ]}

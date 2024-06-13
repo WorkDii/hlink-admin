@@ -1,5 +1,4 @@
 import { List, useTable } from "@refinedev/antd";
-import { useResource, useUserFriendlyName } from "@refinedev/core";
 import { Table, Tag, Typography } from "antd";
 import BillStatusTag from "../bill_staus";
 const { Text } = Typography;
@@ -36,12 +35,9 @@ export const InventoryBillList = () => {
     },
     sorters: { initial: [{ field: "date_created", order: "desc" }] },
   });
-  const { resource } = useResource();
-  const getUserFriendlyName = useUserFriendlyName();
   return (
     <List
       headerProps={{
-        title: `${getUserFriendlyName(resource?.name, "plural")}`,
         subTitle: "รายการการส่งยาให้ รพ.สต.",
       }}
     >

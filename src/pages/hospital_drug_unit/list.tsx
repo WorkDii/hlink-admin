@@ -50,7 +50,6 @@ export const HospitalDrugUnitList = () => {
   return (
     <List
       headerProps={{
-        title: `${getUserFriendlyName(resource?.name, "plural")}`,
         subTitle:
           "รายการหน่วยของยาที่ใช้งานในโรงพยาบาลนั้นๆ เช่น xxx มีการใช้งานหน่วยเม็ดแผงและกระปุก เป็นต้น",
       }}
