@@ -1,5 +1,5 @@
 import { List, useTable } from "@refinedev/antd";
-import { useList, useResource, useUserFriendlyName } from "@refinedev/core";
+import { useList } from "@refinedev/core";
 import { Flex, Radio, Table, Typography } from "antd";
 import { getDrugCount } from "./controller";
 import { useEffect, useState } from "react";
@@ -14,8 +14,6 @@ export const InventoryList = () => {
     },
     resource: "hospital_drug",
   });
-  const { resource } = useResource();
-  const getUserFriendlyName = useUserFriendlyName();
   const [drugCount, setDrugCount] = useState<{
     [key: string]: {
       bought: number;
@@ -44,7 +42,6 @@ export const InventoryList = () => {
   return (
     <List
       headerProps={{
-        title: `${getUserFriendlyName(resource?.name, "plural")}`,
         subTitle: `ปริมาณการใช้งานยาที่ รพ.สต. ใช้ในการรักษาผู้ป่วย`,
       }}
     >

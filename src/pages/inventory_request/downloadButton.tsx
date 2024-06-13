@@ -31,6 +31,7 @@ export interface InventoryRequestDrug {
   inventory_request: string;
   current_rate: number;
   current_remain: number;
+  current_prepack: number;
   quantity: number;
   hospital_drug: HospitalDrug;
 }
@@ -62,6 +63,7 @@ export const columns = [
   { displayName: "quantity", id: "quantity" },
   { displayName: "current_rate", id: "current_rate" },
   { displayName: "current_remain", id: "current_remain" },
+  { displayName: "current_prepack", id: "current_prepack" },
 ];
 
 const getData = async (id: string) => {
@@ -86,6 +88,7 @@ const getData = async (id: string) => {
     quantity: drug.quantity,
     current_rate: drug.current_rate,
     current_remain: drug.current_remain,
+    current_prepack: drug.current_prepack,
   }));
 };
 

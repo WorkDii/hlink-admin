@@ -1,5 +1,4 @@
 import { List, useTable, BooleanField } from "@refinedev/antd";
-import { useResource, useUserFriendlyName } from "@refinedev/core";
 import { Table, Typography } from "antd";
 
 const { Text } = Typography;
@@ -15,12 +14,9 @@ export const HospitalDrugList = () => {
       fields: ["*", "default_unit.*", "hcode.name"],
     },
   });
-  const { resource } = useResource();
-  const getUserFriendlyName = useUserFriendlyName();
   return (
     <List
       headerProps={{
-        title: `${getUserFriendlyName(resource?.name, "plural")}`,
         subTitle: `รายกการยาของโรงพยาบาลแม่ข่าย`,
       }}
     >

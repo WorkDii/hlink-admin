@@ -158,6 +158,7 @@ export async function getRecommendDrug(
       current_usage: _usage,
       current_bought: _bought,
       unit: PREPACK_UNIT_ID,
+      current_prepack: prepack,
       ...getRecommendRequestQuantity({
         current_rate: r.current_rate,
         current_remain: _bought - _usage,

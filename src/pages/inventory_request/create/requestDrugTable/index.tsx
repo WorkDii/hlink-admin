@@ -75,7 +75,7 @@ export const RequestTableDrug = ({
       },
     },
     {
-      title: "จำนวนสั่งซื้อ",
+      title: "จำนวนขอเบิก",
       render: (_: any, record: { index: number }) => {
         return (
           <Form.Item
@@ -102,7 +102,7 @@ export const RequestTableDrug = ({
       ),
     },
     {
-      title: "จำนวนสั่งซื้อสุทธิ",
+      title: "จำนวนขอเบิกสุทธิ",
       render: (_: any, record: { index: number }) => {
         return (
           <Form.Item

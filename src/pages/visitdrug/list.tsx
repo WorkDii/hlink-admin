@@ -1,5 +1,4 @@
 import { DateField, FilterDropdown, List, useTable } from "@refinedev/antd";
-import { useResource, useUserFriendlyName } from "@refinedev/core";
 import { Button, Input, Table, Typography } from "antd";
 
 const { Text } = Typography;
@@ -15,12 +14,9 @@ export const VisitDrugList = () => {
     },
   });
 
-  const { resource } = useResource();
-  const getUserFriendlyName = useUserFriendlyName();
   return (
     <List
       headerProps={{
-        title: `${getUserFriendlyName(resource?.name, "plural")}`,
         subTitle: `รายการยาที่ รพ.สต. จ่ายให้ผู้ป่วย`,
       }}
     >
