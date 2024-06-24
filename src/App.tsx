@@ -149,7 +149,7 @@ function App() {
                   >
                     <Route
                       index
-                      element={<NavigateToResource resource="visitdrugs" />}
+                      element={<NavigateToResource resource="inventory" />}
                     />
                     <Route path="/units">
                       <Route index element={<UnitList />} />
