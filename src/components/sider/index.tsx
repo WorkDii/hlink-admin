@@ -1,21 +1,34 @@
 import { ThemedSiderV2 } from "@refinedev/antd";
-import { Menu } from "antd";
+import { Button, Menu } from "antd";
 import { FaLine } from "react-icons/fa";
 
 export const CustomSider = (props: any) => {
   return (
     <ThemedSiderV2
       {...props}
-      render={({ items, logout }) => {
+      render={({ items, logout, collapsed }) => {
         return (
           <>
             {items}
             {logout}
-            <Menu.Item icon={<FaLine />}>
-              <a href="#" target="_blank" rel="noopener noreferrer">
-                ติดต่อ Admin
-              </a>
-            </Menu.Item>
+            <div
+              style={{
+                width: "100%",
+                padding: "16px 16px",
+                position: "absolute",
+                bottom: 48,
+              }}
+            >
+              <Button
+                icon={<FaLine />}
+                style={{ width: "100%" }}
+                onClick={() => {
+                  window.open("https://line.me/ti/p/O-tsCPcI6P");
+                }}
+              >
+                {!collapsed && "ติดต่อ Admin"}
+              </Button>
+            </div>
           </>
         );
       }}
