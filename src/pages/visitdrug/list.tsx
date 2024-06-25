@@ -1,9 +1,11 @@
 import { DateField, FilterDropdown, List, useTable } from "@refinedev/antd";
-import { Button, Input, Table, Typography } from "antd";
-
-const { Text } = Typography;
+import { Input, Table } from "antd";
+import PcuOptionsButton from "../../components/pcuOptionsButton";
+import { useEffect, useState } from "react";
 
 export const VisitDrugList = () => {
+  const [pcucode, setPcucode] = useState<string | undefined>(undefined);
+
   const { tableProps, setFilters } = useTable({
     syncWithLocation: true,
     meta: {
@@ -14,30 +16,30 @@ export const VisitDrugList = () => {
     },
   });
 
+  useEffect(() => {
+    setFilters([{ field: "pcucode", operator: "eq", value: pcucode }]);
+  }, [pcucode]);
+
   return (
     <List
       headerProps={{
         subTitle: `รายการยาที่ รพ.สต. จ่ายให้ผู้ป่วย`,
       }}
     >
-      <Text type="warning">
-        ข้อมูลนี้เกิดจากการดึงข้อมูลมาจาก รพ.สต. โดยอัตโนมัติ
-      </Text>
-      <div>
-        <Button
-          type="dashed"
-          danger
-          onClick={() => {
-            setFilters([
-              { field: "drugtype", operator: "in", value: ["01", "10"] },
-              { field: "hospital_drug", operator: "null", value: true },
-            ]);
-          }}
-        >
-          รายการที่คาดว่ามีปัญญหา
-        </Button>
-      </div>
-
+      <PcuOptionsButton
+        pcucode={pcucode}
+        setPcucode={setPcucode}
+        style={{ marginBottom: 8 }}
+      ></PcuOptionsButton>
+      {/* <Checkbox
+        style={{ marginBottom: 16 }}
+        onChange={(e) => {
+          setIsExpectedProblems(e.target.checked);
+        }}
+        checked={isExpectedProblems}
+      >
+        เลือกเฉพาะรายการที่คาดว่ามีปัญหา
+      </Checkbox> */}
       <Table
         {...tableProps}
         rowKey="id"

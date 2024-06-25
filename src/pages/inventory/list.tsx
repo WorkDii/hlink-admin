@@ -1,8 +1,8 @@
 import { List, useTable } from "@refinedev/antd";
-import { useList } from "@refinedev/core";
-import { Flex, Radio, Table, Typography } from "antd";
+import { Table, Typography } from "antd";
 import { getDrugCount } from "./controller";
 import { useEffect, useState } from "react";
+import PcuOptionsButton from "../../components/pcuOptionsButton";
 
 const { Text } = Typography;
 
@@ -31,36 +31,17 @@ export const InventoryList = () => {
       setDrugCount(data);
     });
   }, [tableProps?.dataSource, pcucode]);
-
-  const { data: allChildrenPcu } = useList({
-    resource: "ou",
-    filters: [{ field: "drug_stock_parent", operator: "nnull", value: true }],
-    meta: {
-      fields: ["id", "name"],
-    },
-  });
   return (
     <List
       headerProps={{
         subTitle: `ปริมาณการใช้งานยาที่ รพ.สต. ใช้ในการรักษาผู้ป่วย`,
       }}
     >
-      <div id="pcu"></div>
-      <Text>เลือกสถานบริการ</Text>
-      <Flex gap="4px 0" wrap style={{ marginBottom: "16px" }}>
-        <Radio.Group
-          onChange={(v) => {
-            setPcucode(v.target.value);
-          }}
-          defaultValue={pcucode}
-          size="large"
-        >
-          <Radio.Button value={undefined}>ทั้งหมด</Radio.Button>
-          {allChildrenPcu?.data.map((v) => {
-            return <Radio.Button value={v.id}>{v.name}</Radio.Button>;
-          })}
-        </Radio.Group>
-      </Flex>
+      <PcuOptionsButton
+        pcucode={pcucode}
+        setPcucode={setPcucode}
+        style={{ marginBottom: 16 }}
+      ></PcuOptionsButton>
       <Table
         {...tableProps}
         rowKey="id"
