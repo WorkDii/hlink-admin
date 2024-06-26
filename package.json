@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
+    "@react-pdf/renderer": "^3.4.4",
     "@refinedev/antd": "5.40.0",
     "@refinedev/cli": "2.16.34",
     "@refinedev/core": "4.51.0",
