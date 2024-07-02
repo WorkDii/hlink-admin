@@ -1,11 +1,10 @@
 import { List, useTable } from "@refinedev/antd";
-import { Table, Typography } from "antd";
+import { Flex, Table, Typography } from "antd";
 import BillStatusTag from "../bill_staus";
 const { Text } = Typography;
 import dayjs from "dayjs";
 import DownloadButton from "./downloadButton";
-import { PDFViewer } from "@react-pdf/renderer";
-import { MyDocument } from "./report";
+import ReportDownloadButton from "./report/downloadButton";
 
 export interface Ou {
   name: string;
@@ -81,23 +80,25 @@ export const InventoryRequestList = () => {
             dataIndex="id"
             title="action"
             sorter
-            render={(v: any, record: any) => {
+            render={(id: string, record: any) => {
               return (
-                <DownloadButton
-                  id={v}
-                  request_id={record.request_id}
-                ></DownloadButton>
+                <Flex gap="small">
+                  <DownloadButton
+                    id={id}
+                    request_id={record.request_id}
+                  ></DownloadButton>
+                  <ReportDownloadButton
+                    id={id}
+                    pcu={record.pcucode.name}
+                    request_id={record.request_id}
+                    date_created={record.date_created}
+                  ></ReportDownloadButton>
+                </Flex>
               );
             }}
           />
         </Table>
       </List>
-      {/* <div style={{ width: "100%0", height: "100vh", border: "1px solid " }}>
-        <MyDocument />
-      </div> */}
-      <PDFViewer style={{ width: "100%", height: "100vh" }}>
-        <MyDocument />
-      </PDFViewer>
     </>
   );
 };

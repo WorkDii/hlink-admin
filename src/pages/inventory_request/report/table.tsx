@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import PropTypes from "prop-types";
+import { getInventoryRequestItem } from "../getInventoryRequestItem";
 
 const styles = StyleSheet.create({
   table: {
@@ -14,6 +15,7 @@ const styles = StyleSheet.create({
   header: {
     borderBottom: "2px solid #000",
     borderTop: "none",
+    fontSize: 16,
   },
   bold: {
     fontWeight: "bold",
@@ -54,7 +56,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const ReportTable = ({ data, maximumDays }: any) => {
+type Props = {
+  data: Awaited<ReturnType<typeof getInventoryRequestItem>>;
+};
+
+const ReportTable = ({ data }: Props) => {
   return (
     <View style={styles.table}>
       <View style={[styles.row, styles.bold, styles.header]} fixed>
@@ -81,18 +87,19 @@ const ReportTable = ({ data, maximumDays }: any) => {
           คงเหลือ
         </Text>
       </View>
-      {data.map((row: any, i: any) => (
+      {data.map((row, i: any) => (
         <View key={i} style={styles.row}>
           <Text style={[styles.colIndex, styles.col]}>{i + 1}</Text>
           <Text style={[styles.colName, styles.col]}>
-            [{row.code24}] - {row.name}
+            [{row.hospital_drug_drugcode24}] - {row.hospital_drug_name}
           </Text>
-          {/* <Text>{row.name}</Text> */}
           <Text style={[styles.colQuantity, styles.col]}>
             <Text style={styles.bold}>{row.quantity}</Text>
           </Text>
-          <Text style={[styles.colRate, styles.col]}>{row.rate}</Text>
-          <Text style={[styles.colRemain, styles.col]}>{row.remain}</Text>
+          <Text style={[styles.colRate, styles.col]}>{row.current_rate}</Text>
+          <Text style={[styles.colRemain, styles.col]}>
+            {row.current_remain}
+          </Text>
         </View>
       ))}
     </View>

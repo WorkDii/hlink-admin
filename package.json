@@ -19,6 +19,7 @@
     "antd": "^5.18.3",
     "antd-style": "^3.6.2",
     "dayjs": "^1.11.11",
+    "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
     "react": "^18.0.0",
     "react-csv-downloader": "^3.1.0",
@@ -27,6 +28,7 @@
     "react-router-dom": "^6.8.1"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^18.16.2",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",

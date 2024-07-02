@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
 import { Document, Page, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import ReportTable from "./table";
 import Signature from "./signature";
 import Note from "./note";
+import { getInventoryRequestItem } from "../getInventoryRequestItem";
 
 Font.register({
   family: "Sarabun",
@@ -28,24 +28,15 @@ const styles = StyleSheet.create({
   },
 });
 
+type Props = {
+  data: Awaited<ReturnType<typeof getInventoryRequestItem>>;
+  pcu: string;
+  request_id: string;
+  date_created: string;
+};
+
 // Create Document Component
-export const MyDocument = () => {
-  const pcuname = "รพ.สต.ควนลัง";
-  const data = [];
-  for (let index = 0; index < 100; index++) {
-    data.push({
-      code24: "100286000002040640181079",
-      name: "Silver zinc sulfadiazine cream   (Silveral)",
-      quantity: 10,
-      rate: 10,
-      remain: 100,
-    });
-  }
-
-  useEffect(() => {
-    console.log(111111);
-  }, []);
-
+export const ReportDrug = ({ data, pcu, request_id, date_created }: Props) => {
   return (
     <Document>
       <Page style={styles.body}>
@@ -57,7 +48,7 @@ export const MyDocument = () => {
             fontSize: "12px",
           }}
           render={({ pageNumber, totalPages }) =>
-            `หมายเลขคำขอที่ IDR09570240001 หน้าที่ ${(pageNumber + "").padStart(
+            `หมายเลขคำขอที่ ${request_id} หน้าที่ ${(pageNumber + "").padStart(
               2,
               "0"
             )} / ${(totalPages + "").padStart(2, "0")}`
@@ -71,7 +62,7 @@ export const MyDocument = () => {
             fontWeight: "bold",
           }}
         >
-          แบบคำขอเบิกยา {pcuname}
+          แบบคำขอเบิกยา {pcu}
         </Text>
         <Text
           style={{
@@ -80,8 +71,8 @@ export const MyDocument = () => {
             marginBottom: 16,
           }}
         >
-          หมายเลขคำขอที่ IDR09570240001 ณ วันที่{" "}
-          {new Date().toLocaleDateString("th-TH", {
+          หมายเลขคำขอที่ {request_id} ณ วันที่{" "}
+          {new Date(date_created).toLocaleDateString("th-TH", {
             year: "numeric",
             month: "long",
             day: "numeric",
