@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 const styles = StyleSheet.create({
   table: {
     width: "100%",
-    fontSize: 12,
+    fontSize: 14,
   },
   row: {
     display: "flex",
@@ -95,21 +95,6 @@ const ReportTable = ({ data, maximumDays }: any) => {
           <Text style={[styles.colRemain, styles.col]}>{row.remain}</Text>
         </View>
       ))}
-      <Text
-        style={{
-          fontWeight: "bold",
-          textDecoration: "underline",
-          paddingTop: "16px",
-        }}
-      >
-        หมายเหตุ
-      </Text>
-      <Text style={{ fontStyle: "italic", color: "gray" }}>
-        rate/ด. = คือปริมาณการใช้ยา 30 วัน โดยคำนวณจากค่าเฉลีย 90 วันย้อนหลัง{" "}
-      </Text>
-      <Text style={{ fontStyle: "italic", color: "gray" }}>
-        คงเหลือ = จำนวนยาคงเหลือในคลัง ณ วันที่ทำรายงาน
-      </Text>
     </View>
   );
 };

@@ -2,36 +2,19 @@ import React, { useEffect } from "react";
 import { Document, Page, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import ReportTable from "./table";
 import Signature from "./signature";
+import Note from "./note";
 
 Font.register({
   family: "Sarabun",
   fonts: [
-    // regular
-    { src: "/Sarabun-Thin.ttf", fontWeight: "thin" },
-    { src: "/Sarabun-Light.ttf", fontWeight: "light" },
-    { src: "/Sarabun-Regular.ttf" },
-    { src: "/Sarabun-Medium.ttf", fontWeight: "medium" },
-    { src: "/Sarabun-SemiBold.ttf", fontWeight: "semibold" },
-    { src: "/Sarabun-Bold.ttf", fontWeight: "bold" },
-    // italic
-    { src: "/Sarabun-ThinItalic.ttf", fontWeight: "thin", fontStyle: "italic" },
+    { src: "/THSarabunNew/THSarabunNew.ttf" },
+    { src: "/THSarabunNew/THSarabunNew Bold.ttf", fontWeight: "bold" },
+    { src: "/THSarabunNew/THSarabunNew Italic.ttf", fontStyle: "italic" },
     {
-      src: "/Sarabun-LightItalic.ttf",
-      fontWeight: "light",
+      src: "/THSarabunNew/THSarabunNew BoldItalic.ttf",
+      fontWeight: "bold",
       fontStyle: "italic",
     },
-    { src: "/Sarabun-Italic.ttf", fontStyle: "italic" },
-    {
-      src: "/Sarabun-MediumItalic.ttf",
-      fontWeight: "medium",
-      fontStyle: "italic",
-    },
-    {
-      src: "/Sarabun-SemiBoldItalic.ttf",
-      fontWeight: "semibold",
-      fontStyle: "italic",
-    },
-    { src: "/Sarabun-BoldItalic.ttf", fontWeight: "bold", fontStyle: "italic" },
   ],
 });
 
@@ -71,11 +54,10 @@ export const MyDocument = () => {
           style={{
             color: "gray",
             textAlign: "right",
-            fontSize: "8px",
-            paddingBottom: "16px",
+            fontSize: "12px",
           }}
           render={({ pageNumber, totalPages }) =>
-            `หมายเลขคำขอที่ IDR09570240001  ${(pageNumber + "").padStart(
+            `หมายเลขคำขอที่ IDR09570240001 หน้าที่ ${(pageNumber + "").padStart(
               2,
               "0"
             )} / ${(totalPages + "").padStart(2, "0")}`
@@ -87,7 +69,6 @@ export const MyDocument = () => {
             textAlign: "center",
             fontSize: "16px",
             fontWeight: "bold",
-            marginBottom: 8,
           }}
         >
           แบบคำขอเบิกยา {pcuname}
@@ -95,12 +76,11 @@ export const MyDocument = () => {
         <Text
           style={{
             textAlign: "center",
-            fontSize: "14px",
-            fontWeight: "light",
+            fontSize: "16px",
             marginBottom: 16,
           }}
         >
-          ณ วันที่{" "}
+          หมายเลขคำขอที่ IDR09570240001 ณ วันที่{" "}
           {new Date().toLocaleDateString("th-TH", {
             year: "numeric",
             month: "long",
@@ -108,6 +88,7 @@ export const MyDocument = () => {
           })}
         </Text>
         <ReportTable data={data} maximumDays={10}></ReportTable>
+        <Note />
         <Signature />
       </Page>
     </Document>
