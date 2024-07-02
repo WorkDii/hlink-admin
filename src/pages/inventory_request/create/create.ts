@@ -31,7 +31,10 @@ export async function createDataInventoryRequest(data: From) {
       pcucode: data.pcucode,
       hcode: data.hcode,
       status: PENDING_STATUS,
-      inventory_request_drug: data.inventory_drug,
+      inventory_request_drug: data.inventory_drug.map((i) => ({
+        ...i,
+        hospital_drug: i.hospital_drug.id,
+      })),
     };
   }
 }
