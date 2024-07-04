@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { readItems, createItem } from "@tspvivek/refine-directus";
+import { readItems } from "@tspvivek/refine-directus";
 import {
   INVENTORY_DRUG_REQUEST_BILL_ID,
   PENDING_STATUS,

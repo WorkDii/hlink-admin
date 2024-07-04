@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { aggregate, readItems } from "@tspvivek/refine-directus";
+import { aggregate, readItem, readItems } from "@tspvivek/refine-directus";
 import { directusClient } from "../../../directusClient";
 import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity";
 import { PREPACK_UNIT_ID } from "../../../contexts/constants";
+import { dateTime2TimeBangkok } from "../../../utils";
 
 export interface HospitalDrug {
   id: string;
@@ -88,7 +89,11 @@ async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
   }
 }
 
-async function getUsage(pcucode: string, obj: TempRecommendObject) {
+async function getUsage(
+  pcucode: string,
+  obj: TempRecommendObject,
+  dateResetStocck?: string
+) {
   const data = await directusClient.request<
     { hospital_drug: string; sum: { unit: string } }[]
   >(
@@ -100,6 +105,12 @@ async function getUsage(pcucode: string, obj: TempRecommendObject) {
         filter: {
           pcucode: { _eq: pcucode },
           hospital_drug: { _in: Object.keys(obj) },
+          // นับการใช้เฉพาะข้อมูลยาหลังจากการ reset stock
+          dateupdate: dateResetStocck
+            ? {
+                _gte: dateTime2TimeBangkok(dateResetStocck),
+              }
+            : undefined,
         },
       },
       aggregate: { sum: ["unit"] },
@@ -139,12 +150,21 @@ async function getBought(pcucode: string, obj: TempRecommendObject) {
   return obj;
 }
 
+async function getPcuDateResetDrugStock(pcucode: string) {
+  const data = await directusClient.request<{ date_reset_drug_stock?: string }>(
+    // @ts-ignore
+    readItem("ou", pcucode)
+  );
+  return data.date_reset_drug_stock;
+}
+
 export async function getRecommendDrug(
   pcucode: string,
   fix_hospital_drug?: string
 ) {
+  const dateResetStocck = await getPcuDateResetDrugStock(pcucode);
   const recommendObject = await getInitialData(pcucode, fix_hospital_drug);
-  const usage = await getUsage(pcucode, recommendObject);
+  const usage = await getUsage(pcucode, recommendObject, dateResetStocck);
   const bought = await getBought(pcucode, usage);
   const recommend = Object.keys(recommendObject).map((key) => {
     const r = recommendObject[key];

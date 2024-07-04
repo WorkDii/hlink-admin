@@ -36,7 +36,7 @@ export interface Ou {
   date_updated: Date;
   name: string;
   drug_stock_parent?: string;
-  date_reset_drug_stock?: Date;
+  date_reset_drug_stock?: string;
 }
 
 export interface Role {
