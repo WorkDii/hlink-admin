@@ -10,21 +10,16 @@ import {
 } from "antd";
 import React from "react";
 import { useConfigProvider } from "../../contexts/configProvider";
+import { User } from "../../type";
 
 const { Text } = Typography;
 const { useToken } = theme;
-
-type IUser = {
-  id: number;
-  name: string;
-  avatar: string;
-};
 
 export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
   sticky,
 }) => {
   const { token } = useToken();
-  const { data: user } = useGetIdentity<IUser>();
+  const { data: user } = useGetIdentity<User>();
   const { mode, setMode } = useConfigProvider();
 
   const headerStyles: React.CSSProperties = {
@@ -52,8 +47,17 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
           defaultChecked={mode === "dark"}
         />
         <Space style={{ marginLeft: "8px" }} size="middle">
-          {user?.name && <Text strong>{user.name}</Text>}
-          {user?.avatar && <Avatar src={user?.avatar} alt={user?.name} />}
+          {user?.first_name && (
+            <Text strong>
+              {user.first_name} {user.last_name}
+            </Text>
+          )}
+          {
+            <Avatar
+              src={user?.avatar || "https://i.pravatar.cc/300"}
+              alt={user?.first_name}
+            />
+          }
         </Space>
       </Space>
     </AntdLayout.Header>

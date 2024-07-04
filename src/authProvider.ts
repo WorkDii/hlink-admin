@@ -57,11 +57,7 @@ export const authProvider: AuthProvider = {
       email: string;
     }>(readMe({ fields: ["*.*"] }));
     if (me) {
-      return {
-        id: me.id,
-        name: `${me.first_name} ${me.last_name}` || me.email,
-        avatar: me.avatar || "https://i.pravatar.cc/300",
-      };
+      return me;
     }
     return null;
   },
