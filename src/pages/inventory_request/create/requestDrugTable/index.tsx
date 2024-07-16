@@ -1,4 +1,8 @@
-import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  PlusCircleOutlined,
+  MinusCircleOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -134,9 +138,19 @@ export const RequestTableDrug = ({
     <>
       <Space direction="vertical" style={{ width: "100%" }}>
         <Table dataSource={dataSource} columns={columns} />
-        <Typography.Link onClick={() => add()}>
-          <PlusCircleOutlined /> เพิ่มรายการยา
-        </Typography.Link>
+        <Space>
+          <Typography.Link onClick={() => add()}>
+            <PlusCircleOutlined /> เพิ่มรายการยา
+          </Typography.Link>
+          <Typography.Link
+            onClick={() => {
+              form.setFieldValue(["inventory_drug"], []);
+            }}
+            type="danger"
+          >
+            <MinusCircleOutlined /> ลบรายการทั้งหมดออก
+          </Typography.Link>
+        </Space>
       </Space>
       <Form.ErrorList errors={errors} />
     </>
