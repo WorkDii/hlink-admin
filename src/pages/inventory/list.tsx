@@ -1,13 +1,15 @@
 import { List, useTable } from "@refinedev/antd";
-import { Table, Typography } from "antd";
+import { Form, Grid, Input, Space, Table, Typography } from "antd";
 import { getDrugCount } from "./controller";
 import { useEffect, useState } from "react";
 import PcuOptionsButton from "../../components/pcuOptionsButton";
+import { SearchOutlined } from "@ant-design/icons";
+import { debounce } from "lodash";
 
 const { Text } = Typography;
 
 export const InventoryList = () => {
-  const { tableProps } = useTable({
+  const { tableProps, searchFormProps, setFilters } = useTable({
     syncWithLocation: true,
     meta: {
       fields: ["*", "hcode.*"],
@@ -31,10 +33,50 @@ export const InventoryList = () => {
       setDrugCount(data);
     });
   }, [tableProps?.dataSource, pcucode]);
+
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === "") {
+      setFilters([], "replace");
+    } else {
+      setFilters(
+        [
+          {
+            field: "search",
+            operator: "eq",
+            value: e.target.value,
+          },
+        ],
+        "replace"
+      );
+    }
+  };
+  const debouncedOnChange = debounce(onSearch, 500);
+  const screens = Grid.useBreakpoint();
+
   return (
     <List
       headerProps={{
         subTitle: `ปริมาณการใช้งานยาที่ รพ.สต. ใช้ในการรักษาผู้ป่วย`,
+      }}
+      headerButtons={() => {
+        return (
+          <Space
+            style={{
+              marginTop: screens.xs ? "1.6rem" : undefined,
+            }}
+          >
+            <Form {...searchFormProps} layout="inline">
+              <Form.Item name="name" noStyle>
+                <Input
+                  size="large"
+                  prefix={<SearchOutlined className="anticon tertiary" />}
+                  placeholder="Search by ชื่อยา รหัสยา"
+                  onChange={debouncedOnChange}
+                />
+              </Form.Item>
+            </Form>
+          </Space>
+        );
       }}
     >
       <PcuOptionsButton
