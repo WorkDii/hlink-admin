@@ -22,7 +22,6 @@ const PcuOptionsButton = ({ setPcucode, pcucode, ...props }: Props) => {
 
   return (
     <div {...props}>
-      <Text>เลือกสถานบริการ</Text>
       <Flex gap="4px 0" wrap>
         <Radio.Group
           onChange={(v) => {

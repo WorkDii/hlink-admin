@@ -32,6 +32,7 @@ export const InventoryList = () => {
   useEffect(() => {
     if (!tableProps?.dataSource?.length) return;
     const hospital_drug = tableProps?.dataSource?.map((v) => v.id) as string[];
+    if (!pcucode) return;
     getDrugCount(hospital_drug, pcucode).then(
       ({ data, dateResetDrugStock }) => {
         setDrugCount(data);
@@ -133,7 +134,7 @@ export const InventoryList = () => {
             if (amount < 0) {
               return <Text type="danger">{amount}</Text>;
             }
-            return amount;
+            return amount || 0;
           }}
           fixed="right"
         />
