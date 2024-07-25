@@ -145,10 +145,23 @@ export const RequestTableDrug = ({
   ];
   return (
     <>
-      <Space direction="vertical" style={{ width: "100%" }}>
-        <Table dataSource={dataSource} columns={columns} />
+      <Space direction="vertical" style={{ width: "100%", textAlign: "right" }}>
         <Space>
-          <Typography.Link onClick={() => add()}>
+          <Typography.Link
+            onClick={() =>
+              add(
+                {
+                  hospital_drug: { drugcode24: "1242", name: "Paracetamol" },
+                  current_rate: 30,
+                  current_remain: 100,
+                  quantity: 0,
+                  _quantity: 0,
+                  unit: "เม็ด",
+                },
+                0
+              )
+            }
+          >
             <PlusCircleOutlined /> เพิ่มรายการยา
           </Typography.Link>
           <Typography.Link
@@ -160,6 +173,7 @@ export const RequestTableDrug = ({
             <MinusCircleOutlined /> ลบรายการทั้งหมดออก
           </Typography.Link>
         </Space>
+        <Table dataSource={dataSource} columns={columns} />
       </Space>
       <Form.ErrorList errors={errors} />
     </>
