@@ -80,7 +80,7 @@ export const InventoryRequestCreate = () => {
           />
         </Form.Item>
         <Form.List
-          name="inventory_drug"
+          name={["inventory_drug"]}
           rules={[
             {
               validator: async (_, names) => {

@@ -1839,9 +1839,9 @@
     loupe "^2.3.7"
     pretty-format "^29.7.0"
 
-"@wdii/numth@npm:@jsr/wdii__numth@^0.1.0":
+"@wdii/numth@npm:@jsr/wdii__numth":
   version "0.1.0"
-  resolved "https://npm.jsr.io/~/11/@jsr/wdii__numth/0.1.0.tgz"
+  resolved "https://npm.jsr.io/~/11/@jsr/wdii__numth/0.1.0.tgz#6DF1E5074743EDDAE512A079FA8A7C50EBB501F6"
   integrity sha512-MUPIxAbKmAUrGM/K2oj10+96pu44an3XA2EaEYk65/FUPI6SXhx8Ln2k7azJbGRqNijtYNme6pzhLqX03mvpKQ==
 
 abs-svg-path@^0.1.1:

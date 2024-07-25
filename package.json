@@ -16,7 +16,7 @@
     "@tspvivek/refine-directus": "^1.0.34",
     "@types/lodash": "^4.17.1",
     "@uiw/react-md-editor": "^3.19.5",
-    "@wdii/numth": "npm:@jsr/wdii__numth@^0.1.0",
+    "@wdii/numth": "npm:@jsr/wdii__numth",
     "antd": "^5.18.3",
     "antd-style": "^3.6.2",
     "dayjs": "^1.11.11",
