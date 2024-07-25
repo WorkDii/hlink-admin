@@ -1,13 +1,17 @@
 import { List, useTable } from "@refinedev/antd";
-import { Form, Grid, Input, Space, Table, Typography } from "antd";
+import { Form, Grid, Input, Space, Spin, Table, Typography } from "antd";
 import { getDrugCount } from "./controller";
 import { useEffect, useState } from "react";
 import PcuOptionsButton from "../../components/pcuOptionsButton";
 import { SearchOutlined } from "@ant-design/icons";
-import { debounce } from "lodash";
+import { debounce, isNumber } from "lodash";
+import "./table.css";
 
 const { Text } = Typography;
 
+function showValue(data?: number) {
+  return data === undefined ? <Spin></Spin> : data || 0;
+}
 export const InventoryList = () => {
   const { tableProps, searchFormProps, setFilters, setCurrent } = useTable({
     syncWithLocation: true,
@@ -30,7 +34,6 @@ export const InventoryList = () => {
   >(undefined);
 
   useEffect(() => {
-    if (!tableProps?.dataSource?.length) return;
     const hospital_drug = tableProps?.dataSource?.map((v) => v.id) as string[];
     if (!pcucode) return;
     getDrugCount(hospital_drug, pcucode).then(
@@ -39,7 +42,7 @@ export const InventoryList = () => {
         setDateResetDrugStock(dateResetDrugStock);
       }
     );
-  }, [tableProps?.dataSource, pcucode]);
+  }, [pcucode, tableProps?.dataSource]);
 
   const screens = Grid.useBreakpoint();
 
@@ -106,6 +109,9 @@ export const InventoryList = () => {
           ...tableProps.pagination,
           showSizeChanger: true,
         }}
+        rowClassName={(r: any) => {
+          return drugCount?.[r.id]?.remain < 0 ? "table-row-danger" : "";
+        }}
       >
         <Table.Column dataIndex={["hcode", "name"]} title={"รพ."} sorter />
         <Table.Column dataIndex="name" title="ชื่อยา" sorter />
@@ -114,7 +120,7 @@ export const InventoryList = () => {
           dataIndex="id"
           title="จำนวนที่ซื้อ"
           render={(v) => {
-            return drugCount?.[v]?.bought | 0;
+            return showValue(drugCount?.[v]?.bought);
           }}
           fixed="right"
         />
@@ -122,7 +128,7 @@ export const InventoryList = () => {
           dataIndex="id"
           title="ปริมาณการใช้"
           render={(v) => {
-            return drugCount?.[v]?.used | 0;
+            return showValue(drugCount?.[v]?.used);
           }}
           fixed="right"
         />
@@ -130,11 +136,12 @@ export const InventoryList = () => {
           dataIndex="id"
           title="จำนวนคงเหลือ"
           render={(v) => {
-            const amount = drugCount?.[v]?.remain;
-            if (amount < 0) {
-              return <Text type="danger">{amount}</Text>;
-            }
-            return amount || 0;
+            const amount = showValue(drugCount?.[v]?.remain);
+            return isNumber(amount) && amount < 0 ? (
+              <Text type="danger">{amount}</Text>
+            ) : (
+              amount
+            );
           }}
           fixed="right"
         />
