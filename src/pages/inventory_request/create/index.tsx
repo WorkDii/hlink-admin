@@ -13,9 +13,15 @@ export const InventoryRequestCreate = () => {
   const { formProps, saveButtonProps, form } = useForm();
   const pcucode = useWatch("pcucode", form);
 
-  const { selectProps: ouSelectProps } = useSelect({
+  const { selectProps: ouHospitalSelectProps } = useSelect({
     resource: "ou",
     optionLabel: "name",
+    filters: [{ field: "drug_stock_parent", operator: "null", value: true }],
+  });
+  const { selectProps: ouPCUSelectProps } = useSelect({
+    resource: "ou",
+    optionLabel: "name",
+    filters: [{ field: "drug_stock_parent", operator: "nnull", value: true }],
   });
 
   useEffect(() => {
@@ -51,7 +57,7 @@ export const InventoryRequestCreate = () => {
           ]}
         >
           <Select
-            {...ouSelectProps}
+            {...ouHospitalSelectProps}
             onChange={() => {
               form.resetFields(["inventory_drug"]);
             }}
@@ -67,7 +73,7 @@ export const InventoryRequestCreate = () => {
           ]}
         >
           <Select
-            {...ouSelectProps}
+            {...ouPCUSelectProps}
             onChange={() => {
               form.resetFields(["hospital_drug"]);
             }}
