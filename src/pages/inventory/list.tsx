@@ -9,7 +9,7 @@ import { debounce } from "lodash";
 const { Text } = Typography;
 
 export const InventoryList = () => {
-  const { tableProps, searchFormProps, setFilters } = useTable({
+  const { tableProps, searchFormProps, setFilters, setCurrent } = useTable({
     syncWithLocation: true,
     meta: {
       fields: ["*", "hcode.*"],
@@ -25,16 +25,25 @@ export const InventoryList = () => {
   }>({});
 
   const [pcucode, setPcucode] = useState<string | undefined>(undefined);
+  const [dateResetDrugStock, setDateResetDrugStock] = useState<
+    string | undefined
+  >(undefined);
 
   useEffect(() => {
     if (!tableProps?.dataSource?.length) return;
     const hospital_drug = tableProps?.dataSource?.map((v) => v.id) as string[];
-    getDrugCount(hospital_drug, pcucode).then((data) => {
-      setDrugCount(data);
-    });
+    getDrugCount(hospital_drug, pcucode).then(
+      ({ data, dateResetDrugStock }) => {
+        setDrugCount(data);
+        setDateResetDrugStock(dateResetDrugStock);
+      }
+    );
   }, [tableProps?.dataSource, pcucode]);
 
+  const screens = Grid.useBreakpoint();
+
   const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrent(1);
     if (e.target.value === "") {
       setFilters([], "replace");
     } else {
@@ -46,17 +55,22 @@ export const InventoryList = () => {
             value: e.target.value,
           },
         ],
-        "replace"
+        "merge"
       );
     }
   };
   const debouncedOnChange = debounce(onSearch, 500);
-  const screens = Grid.useBreakpoint();
-
   return (
     <List
       headerProps={{
-        subTitle: `ปริมาณการใช้งานยาที่ รพ.สต. ใช้ในการรักษาผู้ป่วย`,
+        subTitle: (
+          <div>
+            ปริมาณการใช้งานยาที่ รพ.สต. ใช้ในการรักษาผู้ป่วย
+            <Text type="danger" style={{ marginLeft: "8px" }}>
+              โดยคำนวนตั้งแต่วันเริ่มคลังยา ({dateResetDrugStock || "-"})
+            </Text>
+          </div>
+        ),
       }}
       headerButtons={() => {
         return (
