@@ -62,12 +62,6 @@ export const HospitalDrugList = () => {
         );
       }}
     >
-      <Text type="danger">
-        column รพ. อาจจะลบในอนาคต ถ้าแต่ละ รพ. ไม่มีประเด้นเรื่อง code24
-        เหมือนกัน แต่ต้องการใช้ชื่อ ต่างกัน หรือประเด็นเรื่องหน่วย
-        ที่เข้ากันไม่ได้ ใน v.1 โปรแกรมจะทำการใช้งานหน่วยที่เล็กที่สุด
-        เท่านั้นก่อน
-      </Text>
       <Table
         {...tableProps}
         rowKey="id"
@@ -78,7 +72,7 @@ export const HospitalDrugList = () => {
       >
         <Table.Column
           dataIndex={"hcode"}
-          title={"รพ."}
+          title={"ได้รับยาจาก รพ."}
           sorter
           render={(v) => {
             return <Text>{v.name}</Text>;

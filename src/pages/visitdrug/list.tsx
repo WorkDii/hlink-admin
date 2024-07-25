@@ -1,12 +1,17 @@
 import { DateField, FilterDropdown, List, useTable } from "@refinedev/antd";
-import { Input, Table } from "antd";
+import { Input, Space, Table, Grid, Form } from "antd";
 import PcuOptionsButton from "../../components/pcuOptionsButton";
 import { useEffect, useState } from "react";
+import { SearchOutlined } from "@ant-design/icons";
+import { debounce } from "lodash";
+
+const { useBreakpoint } = Grid;
 
 export const VisitDrugList = () => {
   const [pcucode, setPcucode] = useState<string | undefined>(undefined);
+  const screens = useBreakpoint();
 
-  const { tableProps, setFilters } = useTable({
+  const { tableProps, setFilters, setCurrent, searchFormProps } = useTable({
     syncWithLocation: true,
     meta: {
       fields: ["*", "hospital_drug.*", "pcucode.*"],
@@ -20,10 +25,64 @@ export const VisitDrugList = () => {
     setFilters([{ field: "pcucode", operator: "eq", value: pcucode }]);
   }, [pcucode]);
 
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrent(1);
+    if (e.target.value === "") {
+      setFilters([], "replace");
+    } else {
+      setFilters(
+        [
+          {
+            operator: "or",
+            value: [
+              {
+                field: "hospital_drug.name",
+                operator: "containss",
+                value: e.target.value,
+              },
+              {
+                field: "hospital_drug.drugcode24",
+                operator: "containss",
+                value: e.target.value,
+              },
+              {
+                field: "visitno",
+                operator: "containss",
+                value: e.target.value,
+              },
+            ],
+          },
+        ],
+        "merge"
+      );
+    }
+  };
+  const debouncedOnChange = debounce(onSearch, 500);
+
   return (
     <List
       headerProps={{
         subTitle: `รายการยาที่ รพ.สต. จ่ายให้ผู้ป่วย`,
+      }}
+      headerButtons={() => {
+        return (
+          <Space
+            style={{
+              marginTop: screens.xs ? "1.6rem" : undefined,
+            }}
+          >
+            <Form {...searchFormProps} layout="inline">
+              <Form.Item name="name" noStyle>
+                <Input
+                  size="large"
+                  prefix={<SearchOutlined className="anticon tertiary" />}
+                  placeholder="Search by ชื่อยา รหัสยา"
+                  onChange={debouncedOnChange}
+                />
+              </Form.Item>
+            </Form>
+          </Space>
+        );
       }}
     >
       <PcuOptionsButton
