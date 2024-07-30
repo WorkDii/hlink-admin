@@ -12,12 +12,15 @@ import {
   InputNumber,
   Space,
   Table,
-  Typography,
 } from "antd";
-import React from "react";
-import HospitalDrugColumn from "./hospital_drug_column";
+import React, { useState } from "react";
 import UnitColumn from "./unit_column";
 import { updateQuantity } from "./updateQuantity";
+import { accountant } from "@wdii/numth";
+import ModalSearchDrug from "./modalSearchDrug";
+import { useWatch } from "antd/es/form/Form";
+import NetAmountRequest from "./netAmountRequest";
+import NetAmountAfterRequest from "./netAmountAfterRequest";
 
 type Props = {
   fields: FormListFieldData[];
@@ -33,6 +36,10 @@ export const RequestTableDrug = ({
   form,
 }: Props) => {
   const dataSource = fields.map((field) => ({ index: field.name }));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const hcode = useWatch(["hcode"], form);
+  const pcucode = useWatch(["pcucode"], form);
+
   const columns = [
     {
       title: "ลำดับที่",
@@ -40,50 +47,42 @@ export const RequestTableDrug = ({
     },
     {
       title: "รายการยา",
-      render: (_: any, { index }: { index: number }) => (
-        <HospitalDrugColumn index={index} form={form}></HospitalDrugColumn>
-      ),
+      render: (_: any, { index }: { index: number }) => {
+        const { name, drugcode24 } = form.getFieldValue([
+          "inventory_drug",
+          index,
+          "hospital_drug",
+        ]) as { id: number; name: string; drugcode24: string };
+        return (
+          <>
+            <div>[{drugcode24}]</div>
+            <div>{name}</div>
+          </>
+        );
+      },
     },
     {
       title: "ปริมาณการใช้ 30 วัน",
-      render: (_: any, record: { index: number }) => {
-        return (
-          <Form.Item
-            name={[record.index, "current_rate"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <InputNumber disabled></InputNumber>
-          </Form.Item>
+      render: (_: any, { index }: { index: number }) => {
+        return accountant(
+          form.getFieldValue(["inventory_drug", index, "current_rate"])
         );
       },
     },
     {
       title: "ปริมาณคงเหลือ",
-      render: (_: any, record: { index: number }) => {
-        return (
-          <Form.Item
-            name={[record.index, "current_remain"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <InputNumber disabled></InputNumber>
-          </Form.Item>
+      render: (_: any, { index }: { index: number }) => {
+        return accountant(
+          form.getFieldValue(["inventory_drug", index, "current_remain"])
         );
       },
     },
     {
       title: "จำนวนขอเบิก",
-      render: (_: any, record: { index: number }) => {
+      render: (_: any, { index }: { index: number }) => {
         return (
           <Form.Item
-            name={[record.index, "_quantity"]}
+            name={[index, "_quantity"]}
             rules={[
               {
                 required: true,
@@ -92,7 +91,7 @@ export const RequestTableDrug = ({
           >
             <InputNumber
               onChange={() => {
-                updateQuantity(form, record.index);
+                updateQuantity(form, index);
               }}
             ></InputNumber>
           </Form.Item>
@@ -107,18 +106,18 @@ export const RequestTableDrug = ({
     },
     {
       title: "จำนวนขอเบิกสุทธิ",
-      render: (_: any, record: { index: number }) => {
+      render: (_: any, { index }: { index: number }) => {
+        return <NetAmountRequest index={index} form={form}></NetAmountRequest>;
+      },
+    },
+    {
+      title: "จำนวนหลังเบิก",
+      render: (_: any, { index }: { index: number }) => {
         return (
-          <Form.Item
-            name={[record.index, "quantity"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <InputNumber disabled></InputNumber>
-          </Form.Item>
+          <NetAmountAfterRequest
+            index={index}
+            form={form}
+          ></NetAmountAfterRequest>
         );
       },
     },
@@ -136,21 +135,41 @@ export const RequestTableDrug = ({
   ];
   return (
     <>
-      <Space direction="vertical" style={{ width: "100%" }}>
+      <Space direction="vertical" style={{ width: "100%", textAlign: "right" }}>
+        <ModalSearchDrug
+          isModalOpen={isModalOpen}
+          handleCancel={() => {
+            setIsModalOpen(false);
+          }}
+          handleOk={(data: any) => {
+            add(data, 0);
+            setIsModalOpen(false);
+          }}
+          form={form}
+        ></ModalSearchDrug>
+        {pcucode && hcode && (
+          <Space>
+            <Button
+              onClick={() => {
+                form.setFieldValue(["inventory_drug"], []);
+              }}
+              type="default"
+              danger
+            >
+              <MinusCircleOutlined /> ลบรายการทั้งหมดออก
+            </Button>
+            <Button
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
+              type="primary"
+            >
+              <PlusCircleOutlined /> เพิ่มรายการยา
+            </Button>
+          </Space>
+        )}
+
         <Table dataSource={dataSource} columns={columns} />
-        <Space>
-          <Typography.Link onClick={() => add()}>
-            <PlusCircleOutlined /> เพิ่มรายการยา
-          </Typography.Link>
-          <Typography.Link
-            onClick={() => {
-              form.setFieldValue(["inventory_drug"], []);
-            }}
-            type="danger"
-          >
-            <MinusCircleOutlined /> ลบรายการทั้งหมดออก
-          </Typography.Link>
-        </Space>
       </Space>
       <Form.ErrorList errors={errors} />
     </>
