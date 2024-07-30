@@ -77,7 +77,7 @@ function App() {
               {
                 name: "inventory_bill",
                 list: "/inventory_bills",
-                create: "/inventory_bills/create",
+                // create: "/inventory_bills/create",
                 meta: {
                   noStatus: true,
                   label: "บิลเบิกยา",
