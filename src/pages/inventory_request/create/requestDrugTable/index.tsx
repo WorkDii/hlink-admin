@@ -12,12 +12,15 @@ import {
   InputNumber,
   Space,
   Table,
-  Typography,
 } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import UnitColumn from "./unit_column";
 import { updateQuantity } from "./updateQuantity";
 import { accountant } from "@wdii/numth";
+import ModalSearchDrug from "./modalSearchDrug";
+import { useWatch } from "antd/es/form/Form";
+import NetAmountRequest from "./netAmountRequest";
+import NetAmountAfterRequest from "./netAmountAfterRequest";
 
 type Props = {
   fields: FormListFieldData[];
@@ -33,6 +36,10 @@ export const RequestTableDrug = ({
   form,
 }: Props) => {
   const dataSource = fields.map((field) => ({ index: field.name }));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const hcode = useWatch(["hcode"], form);
+  const pcucode = useWatch(["pcucode"], form);
+
   const columns = [
     {
       title: "ลำดับที่",
@@ -100,34 +107,17 @@ export const RequestTableDrug = ({
     {
       title: "จำนวนขอเบิกสุทธิ",
       render: (_: any, { index }: { index: number }) => {
-        return accountant(
-          form.getFieldValue(["inventory_drug", index, "quantity"])
-        );
+        return <NetAmountRequest index={index} form={form}></NetAmountRequest>;
       },
     },
     {
       title: "จำนวนหลังเบิก",
       render: (_: any, { index }: { index: number }) => {
-        const total = ((form.getFieldValue([
-          "inventory_drug",
-          index,
-          "quantity",
-        ]) as number) +
-          form.getFieldValue([
-            "inventory_drug",
-            index,
-            "current_remain",
-          ])) as number;
-        const current_rate = form.getFieldValue([
-          "inventory_drug",
-          index,
-          "current_rate",
-        ]) as number;
         return (
-          <>
-            <div>{accountant(total)}</div>
-            <div>(x{accountant(total / current_rate)})</div>
-          </>
+          <NetAmountAfterRequest
+            index={index}
+            form={form}
+          ></NetAmountAfterRequest>
         );
       },
     },
@@ -146,33 +136,39 @@ export const RequestTableDrug = ({
   return (
     <>
       <Space direction="vertical" style={{ width: "100%", textAlign: "right" }}>
-        <Space>
-          <Typography.Link
-            onClick={() =>
-              add(
-                {
-                  hospital_drug: { drugcode24: "1242", name: "Paracetamol" },
-                  current_rate: 30,
-                  current_remain: 100,
-                  quantity: 0,
-                  _quantity: 0,
-                  unit: "เม็ด",
-                },
-                0
-              )
-            }
-          >
-            <PlusCircleOutlined /> เพิ่มรายการยา
-          </Typography.Link>
-          <Typography.Link
-            onClick={() => {
-              form.setFieldValue(["inventory_drug"], []);
-            }}
-            type="danger"
-          >
-            <MinusCircleOutlined /> ลบรายการทั้งหมดออก
-          </Typography.Link>
-        </Space>
+        <ModalSearchDrug
+          isModalOpen={isModalOpen}
+          handleCancel={() => {
+            setIsModalOpen(false);
+          }}
+          handleOk={(data: any) => {
+            add(data, 0);
+            setIsModalOpen(false);
+          }}
+          form={form}
+        ></ModalSearchDrug>
+        {pcucode && hcode && (
+          <Space>
+            <Button
+              onClick={() => {
+                form.setFieldValue(["inventory_drug"], []);
+              }}
+              type="default"
+              danger
+            >
+              <MinusCircleOutlined /> ลบรายการทั้งหมดออก
+            </Button>
+            <Button
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
+              type="primary"
+            >
+              <PlusCircleOutlined /> เพิ่มรายการยา
+            </Button>
+          </Space>
+        )}
+
         <Table dataSource={dataSource} columns={columns} />
       </Space>
       <Form.ErrorList errors={errors} />
