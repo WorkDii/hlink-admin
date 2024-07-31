@@ -4,11 +4,16 @@ import { TitleApp } from "../../components";
 export const Login = () => {
   return (
     <AuthPage
-      type="login"
-      formProps={{}}
       title={<TitleApp collapsed={false}></TitleApp>}
       registerLink={<div></div>}
       forgotPasswordLink={<div></div>}
+      type="login"
+      formProps={{
+        initialValues: {
+          username: "",
+          password: "",
+        },
+      }}
     />
   );
 };
