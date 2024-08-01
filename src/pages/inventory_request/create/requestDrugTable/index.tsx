@@ -123,11 +123,25 @@ export const RequestTableDrug = ({
     },
     {
       title: "Action",
-      render: (_: any, record: { index: number }) => {
+      render: (_: any, { index }: { index: number }) => {
         return (
           <Button
             icon={<DeleteOutlined />}
-            onClick={() => remove(record.index)}
+            onClick={() => {
+              const { id } = form.getFieldValue([
+                "inventory_drug",
+                index,
+                "hospital_drug",
+              ]) as { id: number; name: string; drugcode24: string };
+              const hospital_drug_selected = form.getFieldValue(
+                "hospital_drug_selected"
+              );
+              form.setFieldValue(
+                "hospital_drug_selected",
+                hospital_drug_selected.filter((v: number) => v !== id)
+              );
+              remove(index);
+            }}
           />
         );
       },
@@ -143,6 +157,13 @@ export const RequestTableDrug = ({
           }}
           handleOk={(data: any) => {
             add(data, 0);
+            const hospital_drug_selected = form.getFieldValue(
+              "hospital_drug_selected"
+            );
+            form.setFieldValue("hospital_drug_selected", [
+              ...hospital_drug_selected,
+              data.hospital_drug.id,
+            ]);
             setIsModalOpen(false);
           }}
           form={form}
@@ -152,6 +173,7 @@ export const RequestTableDrug = ({
             <Button
               onClick={() => {
                 form.setFieldValue(["inventory_drug"], []);
+                form.setFieldValue(["hospital_drug_selected"], []);
               }}
               type="default"
               danger
