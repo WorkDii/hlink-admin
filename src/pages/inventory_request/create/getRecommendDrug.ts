@@ -30,7 +30,11 @@ export interface TempRecommendObject {
 
 async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
   const data = await directusClient.request<
-    { usage_rate_30_day_ago: number; hospital_drug: HospitalDrug; id: string }[]
+    {
+      usage_rate_30_day_ago: number;
+      hospital_drug?: HospitalDrug;
+      id: string;
+    }[]
   >(
     // @ts-ignore
     readItems("hospital_drug_rate", {
@@ -80,6 +84,7 @@ async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
       [key: string]: { current_rate: number; hospital_drug: HospitalDrug };
     } = {};
     data.forEach((d) => {
+      if (!d.hospital_drug) return;
       obj[d.hospital_drug.id] = {
         current_rate: d.usage_rate_30_day_ago,
         hospital_drug: d.hospital_drug,
