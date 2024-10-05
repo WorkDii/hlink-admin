@@ -50,3 +50,53 @@ export interface Role {
   app_access: boolean;
   users: string[];
 }
+
+export interface HospitalDrug {
+  id: string;
+  user_created: string;
+  date_created: string;
+  user_updated: string;
+  date_updated: string;
+  drugcode24: string;
+  name: string;
+  is_active: boolean;
+  hcode: string;
+  default_unit: string;
+  ncd_cup: boolean;
+  prepack: number;
+  h_drugcode: string;
+  warehouse: string;
+}
+
+export interface InventoryDrug {
+  id: string;
+  user_created: string;
+  date_created: string;
+  user_updated: string | null;
+  date_updated: string | null;
+  quantity: number;
+  note: string | null;
+  inventory_bill: string;
+  confirm_quantity: number;
+  expire_date: string;
+  pack_ratio: number;
+  lot_no: string | null;
+  cost: string;
+  hospital_drug: HospitalDrug;
+}
+
+
+export interface InventoryBillItem {
+  id: string;
+  user_created: string;
+  date_created: string;
+  user_updated: string | null;
+  date_updated: string | null;
+  bill_id: string;
+  hcode: string;
+  pcucode: string;
+  status: string;
+  request_id: string;
+  inventory_request: string;
+  inventory_drug: InventoryDrug[];
+}

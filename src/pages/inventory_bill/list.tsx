@@ -1,8 +1,9 @@
 import { List, useTable } from "@refinedev/antd";
-import { Table, Tag, Typography } from "antd";
+import { Flex, Table, Tag, Typography } from "antd";
 import BillStatusTag from "../bill_staus";
 const { Text } = Typography;
 import dayjs from "dayjs";
+import DownloadButton from "./downloadButton";
 
 export interface Ou {
   name: string;
@@ -23,15 +24,7 @@ export const InventoryBillList = () => {
   const { tableProps } = useTable({
     syncWithLocation: true,
     meta: {
-      fields: [
-        "*",
-        "status.*",
-        "hcode.*",
-        "pcucode.name",
-        "inventory_drug.quantity",
-        "inventory_drug.hospital_drug.name",
-        "inventory_drug.hospital_drug.default_unit.*",
-      ],
+      fields: ["*", "status.*", "hcode.*", "pcucode.name", "inventory_drug"],
     },
     sorters: { initial: [{ field: "date_created", order: "desc" }] },
   });
@@ -65,14 +58,7 @@ export const InventoryBillList = () => {
           sorter
           render={(v: InventoryDrug[]) => {
             if (v.length === 0) return "-";
-            return v.map((hdrug) => {
-              return (
-                <Tag>
-                  {hdrug.hospital_drug.name} {hdrug.quantity}{" "}
-                  {hdrug.hospital_drug.default_unit?.name}
-                </Tag>
-              );
-            });
+            return v.length + " รายการ";
           }}
         />
         <Table.Column dataIndex={["hcode", "name"]} title="รพ." sorter />
@@ -82,6 +68,27 @@ export const InventoryBillList = () => {
           title="วันที่"
           sorter
           render={(v: string) => dayjs(v).format("DD/MM/YYYY HH:mm:ss")}
+        />
+        <Table.Column
+          dataIndex="id"
+          title="action"
+          sorter
+          render={(id: string, record: any) => {
+            return (
+              <Flex gap="small">
+                <DownloadButton
+                  id={id}
+                  request_id={record.request_id}
+                ></DownloadButton>
+                {/* <ReportDownloadButton
+                    id={id}
+                    pcu={record.pcucode.name}
+                    request_id={record.request_id}
+                    date_created={record.date_created}
+                  ></ReportDownloadButton> */}
+              </Flex>
+            );
+          }}
         />
       </Table>
     </List>
