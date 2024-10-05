@@ -15,7 +15,6 @@ export const getInventoryBillItem = async (id: string) => {
     })
   );
 
-  console.log(data)
   return data.inventory_drug.map((drug) => ({
     id: drug.id,
     bill_id: data.bill_id,

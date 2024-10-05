@@ -92,7 +92,7 @@ const ReportTable = ({ data }: Props) => {
         <View key={i} style={styles.row}>
           <Text style={[styles.colIndex, styles.col]}>{i + 1}</Text>
           <Text style={[styles.colName, styles.col]}>
-            [{row.hospital_drug_drugcode24}] - {row.hospital_drug_name} (PREPACK
+            [{row.hospital_drug_drugcode24} / {row.h_drugcode}] - {row.hospital_drug_name} (PREPACK
             = {wholeNumber(row.current_prepack)})
           </Text>
           <Text style={[styles.colQuantity, styles.col]}>

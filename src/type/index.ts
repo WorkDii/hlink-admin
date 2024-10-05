@@ -100,3 +100,31 @@ export interface InventoryBillItem {
   inventory_request: string;
   inventory_drug: InventoryDrug[];
 }
+
+export interface InventoryRequest {
+  id: string;
+  user_created: string;
+  date_created: string;
+  user_updated: string | null;
+  date_updated: string | null;
+  status: string;
+  request_id: string;
+  hcode: string;
+  pcucode: string;
+  inventory_request_drug: InventoryRequestDrug[];
+}
+
+export interface InventoryRequestDrug {
+  id: string;
+  user_created: string;
+  date_created: string;
+  user_updated: string | null;
+  date_updated: string | null;
+  note: string | null;
+  inventory_request: string;
+  current_rate: number;
+  current_remain: number;
+  quantity: number;
+  current_prepack: number;
+  hospital_drug: HospitalDrug;
+}
