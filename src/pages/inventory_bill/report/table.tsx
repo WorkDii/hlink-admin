@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import PropTypes from "prop-types";
-import { getInventoryRequestItem } from "../getInventoryRequestItem";
 import { wholeNumber } from "@wdii/numth";
+import { getInventoryBillItem } from "../getInventoryBillItem"; 
 
 const styles = StyleSheet.create({
   table: {
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   colName: {
-    width: `${100 - 7 - 10 - 10 - 10}%`,
+    width: `${100 - 7 - 10 - 15}%`,
     margin: 0,
   },
   colQuantity: {
@@ -44,13 +44,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     margin: 0,
   },
-  colRate: {
-    width: "10%",
-    textAlign: "center",
-    margin: 0,
-  },
-  colRemain: {
-    width: "10%",
+  colWarehouse: {
+    width: "15%",
     textAlign: "center",
     margin: 0,
     borderRight: "1px solid gray",
@@ -58,7 +53,7 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
-  data: Awaited<ReturnType<typeof getInventoryRequestItem>>;
+  data: Awaited<ReturnType<typeof getInventoryBillItem>>;
 };
 
 const ReportTable = ({ data }: Props) => {
@@ -81,28 +76,21 @@ const ReportTable = ({ data }: Props) => {
         <Text style={[styles.colQuantity, styles.col, styles.colHeader]}>
           จำนวน{" "}
         </Text>
-        <Text style={[styles.colRate, styles.col, styles.colHeader]}>
-          rate/ด.
-        </Text>
-        <Text style={[styles.colRemain, styles.col, styles.colHeader]}>
-          คงเหลือ
+        <Text style={[styles.colWarehouse, styles.col, styles.colHeader]}>
+          คลัง
         </Text>
       </View>
       {data.map((row, i: any) => (
         <View key={i} style={styles.row}>
           <Text style={[styles.colIndex, styles.col]}>{i + 1}</Text>
           <Text style={[styles.colName, styles.col]}>
-            [{row.hospital_drug_drugcode24}] - {row.hospital_drug_name} (PREPACK
-            = {wholeNumber(row.current_prepack)})
+            [{row.hospital_drug_drugcode24} / { row.h_drugcode}] - {row.hospital_drug_name} 
           </Text>
           <Text style={[styles.colQuantity, styles.col]}>
             <Text style={styles.bold}>{wholeNumber(row.quantity)}</Text>
           </Text>
-          <Text style={[styles.colRate, styles.col]}>
-            {wholeNumber(row.current_rate)}
-          </Text>
-          <Text style={[styles.colRemain, styles.col]}>
-            {wholeNumber(row.current_remain)}
+          <Text style={[styles.colWarehouse, styles.col]}>
+            {row.warehouse}
           </Text>
         </View>
       ))}

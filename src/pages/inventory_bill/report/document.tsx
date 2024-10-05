@@ -2,7 +2,8 @@ import { Document, Page, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import ReportTable from "./table";
 import Signature from "./signature";
 import Note from "./note";
-import { getInventoryRequestItem } from "../getInventoryRequestItem";
+import { getInventoryBillItem } from "../getInventoryBillItem";
+
 
 Font.register({
   family: "Sarabun",
@@ -29,14 +30,14 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
-  data: Awaited<ReturnType<typeof getInventoryRequestItem>>;
+  data: Awaited<ReturnType<typeof getInventoryBillItem>>;
   pcu: string;
-  request_id: string;
+  bill_id: string;
   date_created: string;
 };
 
 // Create Document Component
-export const ReportDrug = ({ data, pcu, request_id, date_created }: Props) => {
+export const ReportDrug = ({ data, pcu, bill_id, date_created }: Props) => {
   return (
     <Document>
       <Page style={styles.body}>
@@ -48,7 +49,7 @@ export const ReportDrug = ({ data, pcu, request_id, date_created }: Props) => {
             fontSize: "12px",
           }}
           render={({ pageNumber, totalPages }) =>
-            `หมายเลขคำขอที่ ${request_id} หน้าที่ ${(pageNumber + "").padStart(
+            `หมายเลขบิลเบิกยา ${bill_id} หน้าที่ ${(pageNumber + "").padStart(
               2,
               "0"
             )} / ${(totalPages + "").padStart(2, "0")}`
@@ -62,7 +63,7 @@ export const ReportDrug = ({ data, pcu, request_id, date_created }: Props) => {
             fontWeight: "bold",
           }}
         >
-          แบบคำขอเบิกยา {pcu}
+          บิลเบิกยา {pcu}
         </Text>
         <Text
           style={{
@@ -71,7 +72,7 @@ export const ReportDrug = ({ data, pcu, request_id, date_created }: Props) => {
             marginBottom: 16,
           }}
         >
-          หมายเลขคำขอที่ {request_id} ณ วันที่{" "}
+          หมายเลขบิลเบิกยา {bill_id} ณ วันที่{" "}
           {new Date(date_created).toLocaleDateString("th-TH", {
             year: "numeric",
             month: "long",
@@ -79,8 +80,6 @@ export const ReportDrug = ({ data, pcu, request_id, date_created }: Props) => {
           })}
         </Text>
         <ReportTable data={data}></ReportTable>
-        <Note />
-        <Signature />
       </Page>
     </Document>
   );

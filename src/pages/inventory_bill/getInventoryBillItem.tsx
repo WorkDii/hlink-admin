@@ -15,6 +15,7 @@ export const getInventoryBillItem = async (id: string) => {
     })
   );
 
+  console.log(data)
   return data.inventory_drug.map((drug) => ({
     id: drug.id,
     bill_id: data.bill_id,
@@ -25,8 +26,10 @@ export const getInventoryBillItem = async (id: string) => {
     hospital_drug_drugcode24: drug.hospital_drug.drugcode24,
     h_drugcode: drug.hospital_drug.h_drugcode,
     quantity: drug.quantity,
+    warehouse: drug.hospital_drug.warehouse,
     confirm_quantity: drug.confirm_quantity,
     inventory_request_id: data.inventory_request,
     request_id: data.request_id,
   }))
+  .sort((a, b) => b.quantity - a.quantity);
 };
