@@ -4,7 +4,7 @@ import { getInventoryBillItem } from "./getInventoryBillItem";
 
 type Props = {
   id: string;
-  request_id: string;
+  bill_id: string;
 };
 
 const columns = [
@@ -24,14 +24,14 @@ const columns = [
   { displayName: "request_id", id: "request_id" },
 ];
 
-export default function DownloadButton({ id, request_id }: Props) {
+export default function DownloadButton({ id, bill_id }: Props) {
   return (
     <CsvDownloader
       text="ดาวน์โหลดข้อมูล CSV"
       datas={async () => {
         return (await getInventoryBillItem(id)) as any;
       }}
-      filename={`invertory_bill_${request_id}_${new Date().getTime()}.csv`}
+      filename={`invertory_bill_${bill_id}_${new Date().getTime()}.csv`}
       columns={columns}
     />
   );

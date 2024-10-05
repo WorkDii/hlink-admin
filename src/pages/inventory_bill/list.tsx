@@ -78,7 +78,7 @@ export const InventoryBillList = () => {
               <Flex gap="small">
                 <DownloadButton
                   id={id}
-                  request_id={record.request_id}
+                  bill_id={record.bill_id}
                 ></DownloadButton>
                 {/* <ReportDownloadButton
                     id={id}
