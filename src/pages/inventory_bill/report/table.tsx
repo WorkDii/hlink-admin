@@ -36,10 +36,20 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   colName: {
-    width: `${100 - 7 - 10 - 15}%`,
+    width: `${100 - 7 - 10 - 15 - 10 - 10}%`,
     margin: 0,
   },
   colQuantity: {
+    width: "10%",
+    textAlign: "center",
+    margin: 0,
+  },
+  colExpireDate: {
+    width: "10%",
+    textAlign: "center",
+    margin: 0,
+  },
+  colLotNo: {
     width: "10%",
     textAlign: "center",
     margin: 0,
@@ -76,6 +86,12 @@ const ReportTable = ({ data }: Props) => {
         <Text style={[styles.colQuantity, styles.col, styles.colHeader]}>
           จำนวน{" "}
         </Text>
+        <Text style={[styles.colExpireDate, styles.col, styles.colHeader]}>
+          วันหมดอายุ
+        </Text>
+        <Text style={[styles.colLotNo, styles.col, styles.colHeader]}>
+          ล็อต
+        </Text>
         <Text style={[styles.colWarehouse, styles.col, styles.colHeader]}>
           คลัง
         </Text>
@@ -88,6 +104,12 @@ const ReportTable = ({ data }: Props) => {
           </Text>
           <Text style={[styles.colQuantity, styles.col]}>
             <Text style={styles.bold}>{wholeNumber(row.quantity)}</Text>
+          </Text>
+          <Text style={[styles.colExpireDate, styles.col]}>
+            {row.expire_date}
+          </Text>
+          <Text style={[styles.colLotNo, styles.col]}>
+            {row.lot_no}
           </Text>
           <Text style={[styles.colWarehouse, styles.col]}>
             {row.warehouse}

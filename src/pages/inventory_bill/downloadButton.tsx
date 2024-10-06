@@ -20,6 +20,8 @@ const columns = [
   { displayName: "h_drugcode", id: "h_drugcode" },
   { displayName: "quantity", id: "quantity" },
   { displayName: "confirm_quantity", id: "confirm_quantity" },
+  { displayName: "expire_date", id: "expire_date" },
+  { displayName: "lot_no", id: "lot_no" },
   { displayName: "inventory_request_id", id: "inventory_request_id" },
   { displayName: "request_id", id: "request_id" },
 ];

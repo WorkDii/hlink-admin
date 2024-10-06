@@ -27,8 +27,10 @@ export const getInventoryBillItem = async (id: string) => {
     quantity: drug.quantity,
     warehouse: drug.hospital_drug.warehouse,
     confirm_quantity: drug.confirm_quantity,
+    expire_date: drug.expire_date,
+    lot_no: drug.lot_no,  
     inventory_request_id: data.inventory_request,
-    request_id: data.request_id,
+    request_id: data.request_id,  
   }))
   .sort((a, b) => b.quantity - a.quantity);
 };
