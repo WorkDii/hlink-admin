@@ -6,7 +6,7 @@ import debounce from "lodash/debounce";
 const { Text } = Typography;
 
 export const UnitList = () => {
-  const { tableProps, searchFormProps, setFilters } = useTable({
+  const { tableProps, searchFormProps, setFilters, setCurrent } = useTable({
     syncWithLocation: true,
     onSearch: (values: any) => {
       return [
@@ -26,12 +26,20 @@ export const UnitList = () => {
   const screens = Grid.useBreakpoint();
 
   const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrent(1);
     if (e.target.value === "") {
       setFilters([], "replace");
     } else {
-      searchFormProps?.onFinish?.({
-        name: e.target.value ?? "",
-      });
+      setFilters(
+        [
+          {
+            field: "search",
+            operator: "eq",
+            value: e.target.value,
+          },
+        ],
+        "merge"
+      );
     }
   };
   const debouncedOnChange = debounce(onSearch, 500);

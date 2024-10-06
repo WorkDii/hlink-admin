@@ -10,14 +10,17 @@ const TrueIcon = () => <span>✅</span>;
 const FalseIcon = () => <span>❌</span>;
 
 export const HospitalDrugList = () => {
-  const { tableProps, setFilters, searchFormProps } = useTable({
+  const { tableProps, searchFormProps, setCurrent, setFilters } = useTable({
     syncWithLocation: true,
     meta: {
       fields: ["*", "default_unit.*", "hcode.name"],
     },
   });
 
+  const screens = Grid.useBreakpoint();
+  
   const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrent(1);
     if (e.target.value === "") {
       setFilters([], "replace");
     } else {
@@ -29,12 +32,11 @@ export const HospitalDrugList = () => {
             value: e.target.value,
           },
         ],
-        "replace"
+        "merge"
       );
     }
   };
   const debouncedOnChange = debounce(onSearch, 500);
-  const screens = Grid.useBreakpoint();
 
   return (
     <List
@@ -53,7 +55,6 @@ export const HospitalDrugList = () => {
                 <Input
                   size="large"
                   prefix={<SearchOutlined className="anticon tertiary" />}
-                  placeholder="Search by ชื่อยา รหัสยา"
                   onChange={debouncedOnChange}
                 />
               </Form.Item>
@@ -80,6 +81,7 @@ export const HospitalDrugList = () => {
         />
         <Table.Column dataIndex="name" title="ชื่อยา" sorter />
         <Table.Column dataIndex="drugcode24" title="รหัสยา 24 หลัก" sorter />
+        <Table.Column dataIndex="h_drugcode" title="รหัสยา รพ." sorter />
         <Table.Column
           dataIndex={["default_unit", "name"]}
           title={"หน่วย"}
@@ -99,6 +101,7 @@ export const HospitalDrugList = () => {
           )}
         />
         <Table.Column dataIndex={"prepack"} title={"PREPACK"} sorter />
+        <Table.Column dataIndex={"warehouse"} title={"คลัง"} sorter  />
       </Table>
     </List>
   );
