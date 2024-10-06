@@ -30,7 +30,7 @@ import {
   HospitalDrugUnitCreate,
   HospitalDrugUnitList,
 } from "./pages/hospital_drug_unit";
-import { InventoryBillCreate, InventoryBillList } from "./pages/inventory_bill";
+import { InventoryBillCreate , InventoryBillList } from "./pages/inventory_bill";
 import { InventoryList } from "./pages/inventory";
 import {
   InventoryRequestCreate,
@@ -77,7 +77,7 @@ function App() {
               {
                 name: "inventory_bill",
                 list: "/inventory_bills",
-                // create: "/inventory_bills/create",
+                create: "/inventory_bills/create",
                 meta: {
                   noStatus: true,
                   label: "บิลเบิกยา",
