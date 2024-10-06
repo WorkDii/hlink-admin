@@ -1,9 +1,10 @@
-import { DateField, FilterDropdown, List, useTable } from "@refinedev/antd";
-import { Input, Space, Table, Grid, Form } from "antd";
+import { DateField, FilterDropdown, List, useTable, TextField } from "@refinedev/antd";
+import { Input, Space, Table, Grid, Form, Checkbox } from "antd";
 import PcuOptionsButton from "../../components/pcuOptionsButton";
 import { useEffect, useState } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { debounce } from "lodash";
+import dayjs from "dayjs";
 
 const { useBreakpoint } = Grid;
 
@@ -20,6 +21,7 @@ export const VisitDrugList = () => {
       initial: [{ field: "dateupdate", order: "desc" }],
     },
   });
+
 
   useEffect(() => {
     setFilters([{ field: "pcucode", operator: "eq", value: pcucode }]);
@@ -90,21 +92,58 @@ export const VisitDrugList = () => {
         setPcucode={setPcucode}
         style={{ marginBottom: 8 }}
       ></PcuOptionsButton>
-      {/* <Checkbox
-        style={{ marginBottom: 16 }}
-        onChange={(e) => {
-          setIsExpectedProblems(e.target.checked);
-        }}
-        checked={isExpectedProblems}
-      >
-        เลือกเฉพาะรายการที่คาดว่ามีปัญหา
-      </Checkbox> */}
       <Table
         {...tableProps}
         rowKey="id"
         pagination={{
           ...tableProps.pagination,
           showSizeChanger: true,
+        }}
+        summary={() => {
+          return (
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0} colSpan={5}>
+              <Checkbox
+                onChange={(e) => {
+                    if (e.target.checked) {
+                      setCurrent(1);
+                    setFilters([
+                      {
+                       operator: "and",
+                       value: [
+                        {
+                          field: "drugtype",
+                          operator: "in",
+                          value: ['01', '10'],
+                        },
+                        {
+                          field: "hospital_drug",
+                          operator: "null",
+                          value: true,
+                        }
+                       ]
+                     }
+                    ], "merge");
+                  } else {
+                    setFilters([], "replace");
+                  }
+                }}
+                style={{ marginRight: 8 }}
+              >
+                แสดงเฉพาะข้อมูลที่น่าจะมีปัญหา
+              </Checkbox>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={3} >
+                <div style={{ textAlign: 'right' }}>
+                  ทั้งหมด: <b>
+                  {tableProps?.pagination && (
+                    `${Number(tableProps?.pagination?.total ?? 0).toLocaleString('th-TH')}`
+                  )}
+                  </b> รายการ
+                </div>
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          );
         }}
       >
         <Table.Column
@@ -143,7 +182,7 @@ export const VisitDrugList = () => {
           title="วันที่"
           sorter
           render={(v) => (
-            <DateField value={v} format="LLL" locales="th"></DateField>
+            dayjs(v).format("DD/MM/YYYY HH:mm:ss")
           )}
         />
       </Table>
