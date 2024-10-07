@@ -191,7 +191,9 @@ export const RequestTableDrug = ({
           </Space>
         )}
 
-        <Table dataSource={dataSource} columns={columns} />
+        <Table dataSource={dataSource} columns={columns} pagination={{
+          showSizeChanger: true,
+        }} />
       </Space>
       <Form.ErrorList errors={errors} />
     </>
