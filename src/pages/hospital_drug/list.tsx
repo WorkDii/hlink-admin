@@ -101,20 +101,7 @@ export const HospitalDrugList = () => {
           )}
         />
         <Table.Column dataIndex={"prepack"} title={"PREPACK"} sorter />
-        <Table.Column dataIndex={"warehouse"} title={"คลัง"} sorter />
-        <Table.Column
-          dataIndex="is_active"
-          title="สถานะ"
-          sorter
-          align="center"
-          render={(value) => (
-            <BooleanField
-              value={value}
-              trueIcon={<TrueIcon />}
-              falseIcon={<FalseIcon />}
-            />
-          )}
-        />
+        <Table.Column dataIndex={"warehouse"} title={"คลัง"} sorter  />
       </Table>
     </List>
   );

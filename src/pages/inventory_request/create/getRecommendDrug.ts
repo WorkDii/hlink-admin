@@ -46,11 +46,6 @@ async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
         ...(fix_hospital_drug
           ? { hospital_drug: { _eq: fix_hospital_drug } }
           : {}),
-        hospital_drug: {
-          is_active: {
-            _eq: true
-          }
-        }
       },
       fields: [
         "id",
