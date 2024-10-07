@@ -26,6 +26,11 @@ export const InventoryBillList = () => {
     syncWithLocation: true,
     meta: {
       fields: ["*", "status.*", "hcode.*", "pcucode.name", "inventory_drug"],
+      deep: {
+        inventory_drug: {
+          _limit: -1,
+        },
+      },
     },
     sorters: { initial: [{ field: "date_created", order: "desc" }] },
   });

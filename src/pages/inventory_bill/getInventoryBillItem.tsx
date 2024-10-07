@@ -12,6 +12,11 @@ export const getInventoryBillItem = async (id: string) => {
         "inventory_drug.*",
         "inventory_drug.hospital_drug.*",
       ],
+      deep: {
+        inventory_drug: {
+          _limit: -1,
+        },
+      },
     })
   );
 
