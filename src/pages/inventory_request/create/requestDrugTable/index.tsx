@@ -21,6 +21,7 @@ import ModalSearchDrug from "./modalSearchDrug";
 import { useWatch } from "antd/es/form/Form";
 import NetAmountRequest from "./netAmountRequest";
 import NetAmountAfterRequest from "./netAmountAfterRequest";
+import { divide } from "lodash";
 
 type Props = {
   fields: FormListFieldData[];
@@ -191,8 +192,24 @@ export const RequestTableDrug = ({
           </Space>
         )}
 
+
         <Table dataSource={dataSource} columns={columns} pagination={{
           showSizeChanger: true,
+        }} summary={() => {
+          return (
+            
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={1} colSpan={9} >
+                <div style={{ textAlign: 'right' }}>
+                  ทั้งหมด: <b>
+                  {dataSource.length && (
+                    `${Number(dataSource.length ?? 0).toLocaleString('th-TH')}`
+                  )}
+                  </b> รายการ
+                </div>
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          );
         }} />
       </Space>
       <Form.ErrorList errors={errors} />

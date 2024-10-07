@@ -4,15 +4,9 @@ import { directusClient } from "../../../directusClient";
 import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity";
 import { PREPACK_UNIT_ID } from "../../../contexts/constants";
 import { dateTime2TimeBangkok } from "../../../utils";
+import { HospitalDrug } from "../../../type";
 
-export interface HospitalDrug {
-  id: string;
-  drugcode24: string;
-  name: string;
-  ncd_cup: boolean;
-  prepack: number;
-  default_unit: DefaultUnit;
-}
+
 
 export interface DefaultUnit {
   id: string;
@@ -43,9 +37,11 @@ async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
         pcucode: {
           _eq: pcucode,
         },
+        
         ...(fix_hospital_drug
           ? { hospital_drug: { _eq: fix_hospital_drug } }
-          : {}),
+          // ตรวจสอบว่ายานี้ยังเปิดใช้งานอยู่หรือไม่
+          : { hospital_drug: { is_active: { _eq: true } } }),
       },
       fields: [
         "id",
