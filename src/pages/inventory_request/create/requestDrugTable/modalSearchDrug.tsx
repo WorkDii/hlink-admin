@@ -26,6 +26,7 @@ export default function ModalSearchDrug({
     id: string;
     name: string;
     drugcode24: string;
+    is_active: boolean;
   }>({
     resource: "hospital_drug",
     meta: {
@@ -89,7 +90,7 @@ export default function ModalSearchDrug({
                 {item.name}
               </div>
               <Button
-                disabled={hospital_drug_selected.includes(item.id)}
+                disabled={hospital_drug_selected.includes(item.id) || !item.is_active}
                 onClick={async () => {
                   setIsAdding(true);
                   try {
@@ -103,7 +104,7 @@ export default function ModalSearchDrug({
                   }
                 }}
               >
-                เพิ่มรายการ
+                เพิ่มรายการ {item.is_active ? "" : "(ยกเลิกการใ)"}
               </Button>
             </List.Item>
           )}
