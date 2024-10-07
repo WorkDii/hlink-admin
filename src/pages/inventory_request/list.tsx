@@ -30,8 +30,12 @@ export const InventoryRequestList = () => {
         "status.*",
         "hcode.name",
         "pcucode.name",
-        "inventory_request_drug",
       ],
+      deep: {
+        inventory_request_drug: {
+          _limit: -1,
+        },
+      },
     },
     sorters: { initial: [{ field: "date_created", order: "desc" }] },
   });

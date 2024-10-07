@@ -13,8 +13,15 @@ export const getInventoryRequestItem = async (id: string) => {
         "inventory_request_drug.*",
         "inventory_request_drug.hospital_drug.*",
       ],
+      limit: -1,
+      deep: {
+        inventory_request_drug: {
+          _limit: -1,
+        },
+      },
     })
   );
+
   return data.inventory_request_drug
     .map((drug) => ({
       id: drug.id,
