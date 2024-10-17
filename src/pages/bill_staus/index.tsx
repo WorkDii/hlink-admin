@@ -1,13 +1,13 @@
 import {
   CheckCircleOutlined,
+  ClockCircleOutlined,
   CloseCircleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
 import { Tag } from "antd";
-import React from "react";
 
 type Props = {
-  id: "pending" | "canceled" | "completed";
+  id: "pending" | "canceled" | "completed" | "in progress";
   name: string;
 };
 
@@ -15,7 +15,7 @@ function BillStatusTag({ id, name }: Props) {
   switch (id) {
     case "pending":
       return (
-        <Tag color="processing" icon={<SyncOutlined />}>
+        <Tag color="default" icon={<ClockCircleOutlined  />}>
           {name}
         </Tag>
       );
@@ -28,7 +28,13 @@ function BillStatusTag({ id, name }: Props) {
     case "completed":
       return (
         <Tag icon={<CheckCircleOutlined />} color="success">
-          {name}{" "}
+          {name}
+        </Tag>
+      );
+    case "in progress":
+      return (
+        <Tag icon={<SyncOutlined />} color="processing">
+          {name}
         </Tag>
       );
     default:
