@@ -124,6 +124,14 @@ function App() {
                   parent: "setting",
                 },
               },
+              {
+                name: "warehouse",
+                meta: {
+                  noStatus: true,
+                  label: "คลังยา",
+                  parent: "setting",
+                },
+              }
             ]}
             options={{
               syncWithLocation: true,

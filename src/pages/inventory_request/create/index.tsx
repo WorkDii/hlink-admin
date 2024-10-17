@@ -12,13 +12,21 @@ const Text = Typography.Text;
 export const InventoryRequestCreate = () => {
   const { formProps, saveButtonProps, form } = useForm();
   const pcucode = useWatch("pcucode", form);
+  const bill_warehouse = useWatch("bill_warehouse", form);
 
   const { selectProps: ouHospitalSelectProps } = useSelect({
     resource: "ou",
     optionLabel: "name",
     filters: [{ field: "drug_stock_parent", operator: "null", value: true }],
   });
-  const { selectProps: ouPCUSelectProps } = useSelect({
+
+  const { selectProps: warehouseSelectProps } = useSelect({
+    resource: "warehouse",
+    optionLabel: "bill_warehouse",
+    optionValue: 'bill_warehouse',
+  });
+
+  const { selectProps: ouPCUSelectProps } = useSelect({ 
     resource: "ou",
     optionLabel: "name",
     filters: [{ field: "drug_stock_parent", operator: "nnull", value: true }],
@@ -27,7 +35,7 @@ export const InventoryRequestCreate = () => {
   useEffect(() => {
     form.setFieldValue("inventory_drug", null);
     if (pcucode) {
-      getRecommendDrug(pcucode).then((v) => {
+      getRecommendDrug(pcucode, bill_warehouse).then((v) => {
         form.setFieldValue(
           "inventory_drug",
           v.filter((v) => v._quantity > 0)
@@ -60,6 +68,22 @@ export const InventoryRequestCreate = () => {
             {...ouHospitalSelectProps}
             onChange={() => {
               form.resetFields(["inventory_drug"]);
+            }}
+          />
+        </Form.Item>
+        <Form.Item
+          label={"คลังยา"}
+          name={["bill_warehouse"]}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Select
+            {...warehouseSelectProps}
+            onChange={() => {
+              form.resetFields(["pcucode"]);
             }}
           />
         </Form.Item>
