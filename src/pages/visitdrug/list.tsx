@@ -114,7 +114,7 @@ export const VisitDrugList = () => {
                         {
                           field: "drugtype",
                           operator: "in",
-                          value: ['01', '10'],
+                          value: ['01','04','10'],
                         },
                         {
                           field: "hospital_drug",
