@@ -1,9 +1,9 @@
-import { Button, Input, List, Modal, Spin, Typography } from "antd";
-import React, { useState } from "react";
-import { useList } from "@refinedev/core";
-import { debounce } from "lodash";
+import { Button, Input, List, Modal, Spin, Tag, Typography } from "antd";
+import { useState } from "react";
 import { useWatch } from "antd/lib/form/Form";
 import { getRecommendDrug } from "../getRecommendDrug";
+import { useSimpleList } from "@refinedev/antd";
+import { HospitalDrug } from "../../../../type";
 
 type Props = {
   isModalOpen: boolean;
@@ -18,97 +18,110 @@ export default function ModalSearchDrug({
   handleCancel,
   form,
 }: Props) {
-  const [search, setSearch] = useState("");
   const hospital_drug_selected = useWatch(["hospital_drug_selected"], form);
   const [isAdding, setIsAdding] = useState(false);
-
-  const { data, isLoading, isFetching } = useList<{
-    id: string;
-    name: string;
-    drugcode24: string;
-    is_active: boolean;
-  }>({
+  const bill_warehouse = useWatch(["bill_warehouse"], form);
+  const [search, setSearch] = useState("")
+  const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({  
     resource: "hospital_drug",
     meta: {
       fields: ["*"],
     },
-    filters: [
-      {
-        operator: "or",
-        value: search
-          ? [
-              {
-                field: "name",
-                operator: "containss",
-                value: search,
-              },
-              {
-                field: "drugcode24",
-                operator: "containss",
-                value: search,
-              },
-            ]
-          : [],
-      },
-    ],
+    filters: {
+      permanent: [
+        {field: "warehouse.bill_warehouse", operator: "eq", value: bill_warehouse}
+      ]
+    },
   });
 
-  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value === "") {
-      setSearch("");
-    } else {
-      setSearch(e.target.value);
-    }
-  };
-  const debouncedOnChange = debounce(onSearch, 500);
-  if (!data) return null;
+
+  function clearSearch() {
+    setSearch("")
+    setCurrent(1)
+    setFilters([], 'replace')
+  }
 
   return (
     <Modal
       title="ค้นหายาที่ต้องการเพิ่ม"
       open={isModalOpen}
-      onCancel={handleCancel}
+      onCancel={() => {
+        handleCancel()
+        clearSearch()
+      }}
       okText="เพิ่มรายการยา"
       cancelText="ยกเลิก"
       footer={null}
       width={800}
     >
       <Input.Search
-        onChange={debouncedOnChange}
-        style={{ marginBottom: "16px" }}
-        loading={isLoading || isFetching}
-      ></Input.Search>
-
-      <Spin size="large" spinning={isLoading || isFetching || isAdding}>
-        <List
-          bordered
-          dataSource={data.data}
-          renderItem={(item) => (
-            <List.Item>
-              <div>
-                <Typography.Text>[{item.drugcode24}] </Typography.Text>
-                {item.name}
-              </div>
-              <Button
-                disabled={hospital_drug_selected.includes(item.id) || !item.is_active}
-                onClick={async () => {
-                  setIsAdding(true);
-                  try {
-                    const pcucode = form.getFieldValue("pcucode");
-                    const data = await getRecommendDrug(pcucode, item.id);
-                    handleOk(data[0]);
-                  } catch (error) {
-                    console.error(error);
-                  } finally {
-                    setIsAdding(false);
+        placeholder="ค้นหายาที่ต้องการเพิ่ม (ชื่อยาหรือรหัสยา 24 หลัก)"
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value)
+          setCurrent(1)
+          if (!e.target.value) {
+            return setFilters([], "replace")
+          }
+          setFilters([
+            {
+              operator: "or",
+              value: [
+                {
+                  field: "name",
+                  operator: "containss",
+                  value: e.target.value,
+                },
+                {
+                  field: "drugcode24",
+                  operator: "containss",
+                  value: e.target.value,
+                }
+              ]
+            }
+          ]);
+        }}
+      />
+      <Spin spinning={isAdding}>
+        <List {...listProps} renderItem={(item: HospitalDrug) => {
+          const { id, name, drugcode24, is_active, warehouse } = item;
+          return <List.Item actions={[
+            <Button
+            disabled={hospital_drug_selected.includes(item.id) || !item.is_active}
+              onClick={async () => {
+                try {
+                setIsAdding(true)
+                const pcucode = form.getFieldValue("pcucode");
+                const data = await getRecommendDrug(pcucode, bill_warehouse, item.id);
+                handleOk(data[0]);
+              } catch (error) {
+                console.error(error);
+              } finally {
+                setIsAdding(false);
+                clearSearch()
+              }
+            }}
+          >
+            เพิ่มรายการ 
+          </Button>
+          ]}>
+            <List.Item.Meta 
+              style={{
+                opacity: item.is_active ? 1 : 0.5
+              }}
+              title={name} 
+              description={
+                <div>
+                  <Typography.Text>[{drugcode24}] </Typography.Text>
+                  <Tag style={{ marginLeft: 8 }}>{warehouse}</Tag>
+                  {
+                    item.is_active ? "" : <Tag style={{ marginLeft: 8 }} color="error">ยกเลิก</Tag>
                   }
-                }}
-              >
-                เพิ่มรายการ {item.is_active ? "" : "(ยกเลิก)"}
-              </Button>
-            </List.Item>
-          )}
-        />
+                </div>
+              } 
+            />
+          </List.Item>
+        }} pagination={{ ...listProps.pagination, align: "end", }} ></List>
       </Spin>
     </Modal>
   );

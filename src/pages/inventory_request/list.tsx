@@ -73,6 +73,7 @@ export const InventoryRequestList = () => {
             }}
           />
           <Table.Column dataIndex={["hcode", "name"]} title="รพ." sorter />
+          <Table.Column dataIndex={["bill_warehouse"]} title="สถานที่เบิกยา" sorter />
           <Table.Column dataIndex={["pcucode", "name"]} title="รพ.สต." sorter />
           <Table.Column
             dataIndex="date_created"

@@ -22,7 +22,7 @@ export interface TempRecommendObject {
   };
 }
 
-async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
+async function getInitialData(pcucode: string, bill_warehouse: string,fix_hospital_drug?: string, ) {
   const data = await directusClient.request<
     {
       usage_rate_30_day_ago: number;
@@ -39,9 +39,18 @@ async function getInitialData(pcucode: string, fix_hospital_drug?: string) {
         },
         
         ...(fix_hospital_drug
-          ? { hospital_drug: { _eq: fix_hospital_drug } }
+          ? {
+            hospital_drug: {
+              _eq: fix_hospital_drug,
+              warehouse: { bill_warehouse: { _eq: bill_warehouse } }
+           } }
           // ตรวจสอบว่ายานี้ยังเปิดใช้งานอยู่หรือไม่
-          : { hospital_drug: { is_active: { _eq: true } } }),
+          : {
+            hospital_drug: {
+              is_active: { _eq: true },
+              warehouse: { bill_warehouse: { _eq: bill_warehouse } }
+            }
+          }),
       },
       fields: [
         "id",
@@ -161,10 +170,11 @@ async function getPcuDateResetDrugStock(pcucode: string) {
 
 export async function getRecommendDrug(
   pcucode: string,
+  bill_warehouse: string,
   fix_hospital_drug?: string
 ) {
   const dateResetStocck = await getPcuDateResetDrugStock(pcucode);
-  const recommendObject = await getInitialData(pcucode, fix_hospital_drug);
+  const recommendObject = await getInitialData(pcucode,bill_warehouse, fix_hospital_drug, );
   const usage = await getUsage(pcucode, recommendObject, dateResetStocck);
   const bought = await getBought(pcucode, usage);
   const recommend = Object.keys(recommendObject).map((key) => {

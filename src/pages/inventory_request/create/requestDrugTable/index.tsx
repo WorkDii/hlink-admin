@@ -12,6 +12,7 @@ import {
   InputNumber,
   Space,
   Table,
+  Typography,
 } from "antd";
 import React, { useState } from "react";
 import UnitColumn from "./unit_column";
@@ -21,7 +22,6 @@ import ModalSearchDrug from "./modalSearchDrug";
 import { useWatch } from "antd/es/form/Form";
 import NetAmountRequest from "./netAmountRequest";
 import NetAmountAfterRequest from "./netAmountAfterRequest";
-import { divide } from "lodash";
 
 type Props = {
   fields: FormListFieldData[];
@@ -56,8 +56,10 @@ export const RequestTableDrug = ({
         ]) as { id: number; name: string; drugcode24: string };
         return (
           <>
-            <div>[{drugcode24}]</div>
             <div>{name}</div>
+            <Typography.Text>
+              [{drugcode24}]
+            </Typography.Text>
           </>
         );
       },

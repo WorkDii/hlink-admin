@@ -12,6 +12,7 @@ export type From = {
   pcucode: string;
   inventory_drug: Awaited<ReturnType<typeof getRecommendDrug>>;
   hospital_drug_selected: string[];
+  bill_warehouse: string;
 };
 export function generateRequestID(pcucode: string, lastBillID?: string) {
   const NUM_DIGIT = 4;
@@ -35,6 +36,7 @@ export async function createDataInventoryRequest(data: From) {
         ...i,
         hospital_drug: i.hospital_drug.id,
       })),
+      bill_warehouse: data.bill_warehouse,
     };
   }
 }
