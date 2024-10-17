@@ -72,7 +72,7 @@ export const InventoryRequestCreate = () => {
           />
         </Form.Item>
         <Form.Item
-          label={"คลังยา"}
+          label={"สถานที่เบิกยา"}
           name={["bill_warehouse"]}
           rules={[
             {
