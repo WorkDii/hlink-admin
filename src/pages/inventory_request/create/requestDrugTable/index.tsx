@@ -197,22 +197,8 @@ export const RequestTableDrug = ({
 
         <Table dataSource={dataSource} columns={columns} pagination={{
           showSizeChanger: true,
-        }} summary={() => {
-          return (
-            
-            <Table.Summary.Row>
-              <Table.Summary.Cell index={1} colSpan={9} >
-                <div style={{ textAlign: 'right' }}>
-                  ทั้งหมด: <b>
-                  {dataSource.length && (
-                    `${Number(dataSource.length ?? 0).toLocaleString('th-TH')}`
-                  )}
-                  </b> รายการ
-                </div>
-              </Table.Summary.Cell>
-            </Table.Summary.Row>
-          );
-        }} />
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} รายการ`
+        }}  />
       </Space>
       <Form.ErrorList errors={errors} />
     </>
