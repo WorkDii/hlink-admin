@@ -5,6 +5,7 @@ const { Text } = Typography;
 import dayjs from "dayjs";
 import DownloadButton from "./downloadButton";
 import ReportDownloadButton from "./report/downloadButton";
+import { InventoryBillItem } from "../../type";
 
 export interface Ou {
   name: string;
@@ -22,7 +23,7 @@ export interface HospitalDrug {
 }
 
 export const InventoryBillList = () => {
-  const { tableProps } = useTable({
+  const { tableProps } = useTable<InventoryBillItem>({
     syncWithLocation: true,
     meta: {
       fields: ["*", "status.*", "hcode.*", "pcucode.name", "inventory_drug"],
@@ -68,6 +69,7 @@ export const InventoryBillList = () => {
           }}
         />
         <Table.Column dataIndex={["hcode", "name"]} title="รพ." sorter />
+        <Table.Column dataIndex={["bill_warehouse"]} title="สถานที่จ่ายยา" sorter />
         <Table.Column dataIndex={["pcucode", "name"]} title="รพ.สต." sorter />
         <Table.Column
           dataIndex="date_created"

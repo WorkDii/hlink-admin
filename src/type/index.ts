@@ -99,6 +99,7 @@ export interface InventoryBillItem {
   request_id: string;
   inventory_request: string;
   inventory_drug: InventoryDrug[];
+  bill_warehouse: string;
 }
 
 export interface InventoryRequest {
