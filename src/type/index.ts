@@ -112,6 +112,7 @@ export interface InventoryRequest {
   hcode: string;
   pcucode: string;
   inventory_request_drug: InventoryRequestDrug[];
+  bill_warehouse: string;
 }
 
 export interface InventoryRequestDrug {
