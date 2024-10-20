@@ -98,6 +98,7 @@ export const VisitDrugList = () => {
         pagination={{
           ...tableProps.pagination,
           showSizeChanger: true,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} รายการ`
         }}
         summary={() => {
           return (
@@ -132,15 +133,6 @@ export const VisitDrugList = () => {
               >
                 แสดงเฉพาะข้อมูลที่น่าจะมีปัญหา
               </Checkbox>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={1} colSpan={3} >
-                <div style={{ textAlign: 'right' }}>
-                  ทั้งหมด: <b>
-                  {tableProps?.pagination && (
-                    `${Number(tableProps?.pagination?.total ?? 0).toLocaleString('th-TH')}`
-                  )}
-                  </b> รายการ
-                </div>
               </Table.Summary.Cell>
             </Table.Summary.Row>
           );
