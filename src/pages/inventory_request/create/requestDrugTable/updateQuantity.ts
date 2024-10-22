@@ -1,6 +1,6 @@
 import { FormInstance } from "antd";
-import { HospitalDrug } from "../getRecommendDrug";
 import { PREPACK_UNIT_ID } from "../../../../contexts/constants";
+import { HospitalDrug } from "../../../../type";
 
 export function updateQuantity(form: FormInstance, index: number) {
   const unit = form.getFieldValue(["inventory_drug", index, "unit"]);
