@@ -4,6 +4,7 @@ import { Typography, Row, Col, Tooltip, Card, Statistic, Progress, List, Alert, 
 import { Bar, Pie, Line as LineChart } from '@ant-design/plots';
 const { Title, Paragraph } = Typography;
 
+// ข้อมูลจำลอง
 const mockData = {
   currentStock: 1500,
   reorderPoint: 500,
@@ -13,29 +14,29 @@ const mockData = {
   totalCost: 50000,
   forecastDemand: 2000,
   topSellingDrugs: [
-    { name: "Drug X", sales: 500 },
-    { name: "Drug Y", sales: 400 },
-    { name: "Drug Z", sales: 300 },
-    { name: "Drug W", sales: 200 },
-    { name: "Drug V", sales: 100 },
+    { name: "ยา X", sales: 500 },
+    { name: "ยา Y", sales: 400 },
+    { name: "ยา Z", sales: 300 },
+    { name: "ยา W", sales: 200 },
+    { name: "ยา V", sales: 100 },
   ],
   lowStockItems: [
-    { name: "Drug A", stock: 10 },
-    { name: "Drug B", stock: 5 },
-    { name: "Drug C", stock: 3 },
+    { name: "ยา A", stock: 10 },
+    { name: "ยา B", stock: 5 },
+    { name: "ยา C", stock: 3 },
   ],
   inventoryTurnover: 4.5,
   supplierPerformance: [
-    { name: "Supplier 1", score: 95 },
-    { name: "Supplier 2", score: 88 },
-    { name: "Supplier 3", score: 92 },
+    { name: "ผู้จัดจำหน่าย 1", score: 95 },
+    { name: "ผู้จัดจำหน่าย 2", score: 88 },
+    { name: "ผู้จัดจำหน่าย 3", score: 92 },
   ],
   drugCategories: [
-    { category: "Antibiotics", value: 30 },
-    { category: "Painkillers", value: 25 },
-    { category: "Cardiovascular", value: 20 },
-    { category: "Respiratory", value: 15 },
-    { category: "Others", value: 10 },
+    { category: "ยาปฏิชีวนะ", value: 30 },
+    { category: "ยาแก้ปวด", value: 25 },
+    { category: "ยาโรคหัวใจและหลอดเลือด", value: 20 },
+    { category: "ยาระบบทางเดินหายใจ", value: 15 },
+    { category: "อื่นๆ", value: 10 },
   ],
   expirationTimeline: [
     { date: "2023-06", count: 10 },
@@ -45,27 +46,27 @@ const mockData = {
     { date: "2023-10", count: 30 },
   ],
   overStockedItems: [
-    { name: "Drug X", stock: 1000, recommendedStock: 500 },
-    { name: "Drug Y", stock: 800, recommendedStock: 400 },
-    { name: "Drug Z", stock: 600, recommendedStock: 300 },
+    { name: "ยา X", stock: 1000, recommendedStock: 500 },
+    { name: "ยา Y", stock: 800, recommendedStock: 400 },
+    { name: "ยา Z", stock: 600, recommendedStock: 300 },
   ],
   stockOutDetails: [
-    { id: 1, name: "Drug A", lastStockOutDate: "2023-05-15", frequency: 2, duration: "3 days" },
-    { id: 2, name: "Drug B", lastStockOutDate: "2023-05-10", frequency: 1, duration: "2 days" },
-    { id: 3, name: "Drug C", lastStockOutDate: "2023-05-05", frequency: 3, duration: "1 day" },
+    { id: 1, name: "ยา A", lastStockOutDate: "2023-05-15", frequency: 2, duration: "3 วัน" },
+    { id: 2, name: "ยา B", lastStockOutDate: "2023-05-10", frequency: 1, duration: "2 วัน" },
+    { id: 3, name: "ยา C", lastStockOutDate: "2023-05-05", frequency: 3, duration: "1 วัน" },
   ],
 };
 
 const expiringItemsData = [
-  { key: 1, name: "Drug A", expirationDate: "2023-12-31", quantity: 100 },
-  { key: 2, name: "Drug B", expirationDate: "2023-11-30", quantity: 50 },
-  { key: 3, name: "Drug C", expirationDate: "2023-10-31", quantity: 75 },
+  { key: 1, name: "ยา A", expirationDate: "2023-12-31", quantity: 100 },
+  { key: 2, name: "ยา B", expirationDate: "2023-11-30", quantity: 50 },
+  { key: 3, name: "ยา C", expirationDate: "2023-10-31", quantity: 75 },
 ];
 
 const columns = [
-  { title: "Name", dataIndex: "name", key: "name" },
-  { title: "Expiration Date", dataIndex: "expirationDate", key: "expirationDate" },
-  { title: "Quantity", dataIndex: "quantity", key: "quantity" },
+  { title: "ชื่อ", dataIndex: "name", key: "name" },
+  { title: "วันหมดอายุ", dataIndex: "expirationDate", key: "expirationDate" },
+  { title: "จำนวน", dataIndex: "quantity", key: "quantity" },
 ];
 
 export const Dashboard: React.FC = () => {
@@ -80,35 +81,35 @@ export const Dashboard: React.FC = () => {
   };
 
   const stockOutColumns = [
-    { title: "Drug Name", dataIndex: "name", key: "name" },
-    { title: "Last Stock-out Date", dataIndex: "lastStockOutDate", key: "lastStockOutDate" },
-    { title: "Frequency (Last 30 days)", dataIndex: "frequency", key: "frequency" },
-    { title: "Average Duration", dataIndex: "duration", key: "duration" },
+    { title: "ชื่อยา", dataIndex: "name", key: "name" },
+    { title: "วันที่สินค้าหมดครั้งล่าสุด", dataIndex: "lastStockOutDate", key: "lastStockOutDate" },
+    { title: "ความถี่ (30 วันที่ผ่านมา)", dataIndex: "frequency", key: "frequency" },
+    { title: "ระยะเวลาเฉลี่ย", dataIndex: "duration", key: "duration" },
   ];
 
   return (
     <>
-      <Title level={2}>Pharmacy Inventory Dashboard</Title>
+      <Title level={2}>แดชบอร์ดคลังยา</Title>
       <Row gutter={[16, 16]}>
         <Col span={6}>
-          <Tooltip title="Total number of items currently in stock across all categories">
+          <Tooltip title="จำนวนรวมของรายการสินค้าที่มีอยู่ในสต็อกทั้งหมดในทุกหมวดหมู่">
             <Card>
               <Statistic
-                title="Current Stock Levels"
+                title="ระดับสต็อกปัจจุบัน"
                 value={mockData.currentStock}
-                suffix="items"
+                suffix="รายการ"
                 prefix={<InfoCircleOutlined />}
               />
             </Card>
           </Tooltip>
         </Col>
         <Col span={6}>
-          <Tooltip title="The stock level at which a reorder should be triggered. Calculated based on usage patterns and lead times.">
+          <Tooltip title="ระดับสต็อกที่ควรสั่งซื้อเพิ่ม คำนวณจากรูปแบบการใช้งานและระยะเวลาการสั่งซื้อ">
             <Card>
               <Statistic
-                title="Reorder Point"
+                title="จุดสั่งซื้อใหม่"
                 value={mockData.reorderPoint}
-                suffix="items"
+                suffix="รายการ"
                 valueStyle={{ color: mockData.currentStock <= mockData.reorderPoint ? "#cf1322" : "#3f8600" }}
                 prefix={<InfoCircleOutlined />}
               />
@@ -116,12 +117,12 @@ export const Dashboard: React.FC = () => {
           </Tooltip>
         </Col>
         <Col span={6}>
-          <Tooltip title="Number of items that will expire within the next 30 days">
+          <Tooltip title="จำนวนรายการที่จะหมดอายุภายใน 30 วันข้างหน้า">
             <Card>
               <Statistic
-                title="Items Expiring Soon"
+                title="รายการที่ใกล้หมดอายุ"
                 value={mockData.expiringItems}
-                suffix="items"
+                suffix="รายการ"
                 valueStyle={{ color: "#faad14" }}
                 prefix={<InfoCircleOutlined />}
               />
@@ -129,10 +130,10 @@ export const Dashboard: React.FC = () => {
           </Tooltip>
         </Col>
         <Col span={6}>
-          <Tooltip title="Percentage change in usage compared to the previous period">
+          <Tooltip title="เปอร์เซ็นต์การเปลี่ยนแปลงการใช้งานเทียบกับช่วงก่อนหน้า">
             <Card>
               <Statistic
-                title="Usage Trend"
+                title="แนวโน้มการใช้งาน"
                 value={mockData.usageTrend}
                 prefix={mockData.usageTrend > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
                 suffix="%"
@@ -144,35 +145,35 @@ export const Dashboard: React.FC = () => {
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={8}>
-          <Tooltip title="Number of times an item was requested but unavailable in the last 30 days">
-            <Card title="Stock-outs" onClick={showStockOutModal} style={{ cursor: 'pointer' }}>
+          <Tooltip title="จำนวนครั้งที่มีการร้องขอสินค้าแต่ไม่มีในสต็อกในช่วง 30 วันที่ผ่านมา">
+            <Card title="สินค้าหมด" onClick={showStockOutModal} style={{ cursor: 'pointer' }}>
               <Statistic
-                title="Total Stock-outs"
+                title="จำนวนครั้งที่สินค้าหมด"
                 value={mockData.stockOuts}
                 valueStyle={{ color: "#cf1322" }}
                 prefix={<InfoCircleOutlined />}
               />
-              <Paragraph>Click for details</Paragraph>
+              <Paragraph>คลิกเพื่อดูรายละเอียด</Paragraph>
             </Card>
           </Tooltip>
         </Col>
         <Col span={8}>
-          <Tooltip title="Total value of current inventory at cost price">
-            <Card title="Cost Analysis">
+          <Tooltip title="มูลค่ารวมของสินค้าคงคลังปัจจุบันตามราคาทุน">
+            <Card title="การวิเคราะห์ต้นทุน">
               <Statistic
-                title="Total Inventory Cost"
+                title="ต้นทุนสินค้าคงคลังรวม"
                 value={mockData.totalCost}
-                prefix="$"
+                prefix="฿"
               />
             </Card>
           </Tooltip>
         </Col>
         <Col span={8}>
-          <Card title="Forecast Demand">
-            <Tooltip title="Predicted demand for the next 30 days based on historical data and trends">
-              <Statistic value={mockData.forecastDemand} suffix="items" prefix={<InfoCircleOutlined />} />
+          <Card title="การคาดการณ์ความต้องการ">
+            <Tooltip title="ความต้องการที่คาดการณ์สำหรับ 30 วันข้างหน้าตามข้อมูลในอดีตและแนวโน้ม">
+              <Statistic value={mockData.forecastDemand} suffix="รายการ" prefix={<InfoCircleOutlined />} />
             </Tooltip>
-            <Paragraph>Current stock vs Forecast:</Paragraph>
+            <Paragraph>สต็อกปัจจุบันเทียบกับการคาดการณ์:</Paragraph>
             <Progress
               percent={Math.round((mockData.currentStock / mockData.forecastDemand) * 100)}
               status="active"
@@ -183,8 +184,8 @@ export const Dashboard: React.FC = () => {
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={12}>
-          <Card title="Top Selling Drugs">
-            <Paragraph>Sales volume in the last 30 days:</Paragraph>
+          <Card title="ยาขายดี">
+            <Paragraph>ปริมาณการขายใน 30 วันที่ผ่านมา:</Paragraph>
             <Bar
               data={mockData.topSellingDrugs}
               xField="sales"
@@ -196,8 +197,8 @@ export const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col span={12}>
-          <Card title="Drug Category Distribution">
-            <Paragraph>Percentage of inventory by category:</Paragraph>
+          <Card title="การกระจายตัวของหมวดหมู่ยา">
+            <Paragraph>เปอร์เซ็นต์ของสินค้าคงคลังตามหมวดหมู่:</Paragraph>
             <Pie
               data={mockData.drugCategories}
               angleField="value"
@@ -210,44 +211,44 @@ export const Dashboard: React.FC = () => {
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={8}>
-          <Card title="Low Stock Alerts">
-            <Paragraph>Items below 20% of their reorder point:</Paragraph>
+          <Card title="แจ้งเตือนสต็อกต่ำ">
+            <Paragraph>รายการที่ต่ำกว่า 20% ของจุดสั่งซื้อใหม่:</Paragraph>
             <List
               dataSource={mockData.lowStockItems}
               renderItem={(item) => (
                 <List.Item>
-                  <Alert message={`${item.name}: ${item.stock} units left`} type="warning" showIcon />
+                  <Alert message={`${item.name}: เหลือ ${item.stock} หน่วย`} type="warning" showIcon />
                 </List.Item>
               )}
             />
           </Card>
         </Col>
         <Col span={8}>
-          <Tooltip title="Calculated as: Cost of Goods Sold / Average Inventory. Higher is generally better, indicating efficient inventory management.">
-            <Card title="Inventory Turnover">
+          <Tooltip title="คำนวณจาก: ต้นทุนสินค้าที่ขาย / สินค้าคงเหลือเฉลี่ย ยิ่งสูงยิ่งดี แสดงถึงการจัดการสินค้าคงคลังที่มีประสิทธิภาพ">
+            <Card title="อัตราการหมุนเวียนสินค้าคงคลัง">
               <Statistic
-                title="Annual Turnover Ratio"
+                title="อัตราการหมุนเวียนต่อปี"
                 value={mockData.inventoryTurnover}
                 precision={2}
                 valueStyle={{ color: mockData.inventoryTurnover > 4 ? '#3f8600' : '#cf1322' }}
-                suffix="times/year"
+                suffix="ครั้ง/ปี"
                 prefix={<InfoCircleOutlined />}
               />
               <Paragraph>
-                {mockData.inventoryTurnover > 4 ? "Good turnover rate" : "Turnover rate needs improvement"}
+                {mockData.inventoryTurnover > 4 ? "อัตราการหมุนเวียนดี" : "ควรปรับปรุงอัตราการหมุนเวียน"}
               </Paragraph>
             </Card>
           </Tooltip>
         </Col>
         <Col span={8}>
-          <Card title="Over Stock Alerts">
-            <Paragraph>Items exceeding recommended stock levels:</Paragraph>
+          <Card title="แจ้งเตือนสต็อกเกิน">
+            <Paragraph>รายการที่เกินระดับสต็อกที่แนะนำ:</Paragraph>
             <List
               dataSource={mockData.overStockedItems}
               renderItem={(item) => (
                 <List.Item>
                   <Alert
-                    message={`${item.name}: ${item.stock} units (${Math.round((item.stock / item.recommendedStock - 1) * 100)}% over)`}
+                    message={`${item.name}: ${item.stock} หน่วย (เกิน ${Math.round((item.stock / item.recommendedStock - 1) * 100)}%)`}
                     type="warning"
                     showIcon
                   />
@@ -259,8 +260,8 @@ export const Dashboard: React.FC = () => {
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={24}>
-          <Card title="Expiration Date Timeline">
-            <Paragraph>Number of items expiring each month:</Paragraph>
+          <Card title="ไทม์ไลน์วันหมดอายุ">
+            <Paragraph>จำนวนรายการที่หมดอายุในแต่ละเดือน:</Paragraph>
             <LineChart
               data={mockData.expirationTimeline}
               xField="date"
@@ -273,13 +274,13 @@ export const Dashboard: React.FC = () => {
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={24}>
-          <Card title="Supplier Performance">
-            <Paragraph>Based on delivery time, order accuracy, and quality:</Paragraph>
+          <Card title="ประสิทธิภาพของผู้จัดจำหน่าย">
+            <Paragraph>ประเมินจากเวลาการจัดส่ง ความถูกต้องของคำสั่งซื้อ และคุณภาพ:</Paragraph>
             <Table
               dataSource={mockData.supplierPerformance}
               columns={[
-                { title: 'Supplier', dataIndex: 'name', key: 'name' },
-                { title: 'Score', dataIndex: 'score', key: 'score' },
+                { title: 'ผู้จัดจำหน่าย', dataIndex: 'name', key: 'name' },
+                { title: 'คะแนน', dataIndex: 'score', key: 'score' },
               ]}
               pagination={false}
             />
@@ -288,7 +289,7 @@ export const Dashboard: React.FC = () => {
       </Row>
 
       <Modal
-        title="Stock-out Details"
+        title="รายละเอียดสินค้าหมด"
         visible={isStockOutModalVisible}
         onCancel={handleStockOutModalClose}
         footer={null}
