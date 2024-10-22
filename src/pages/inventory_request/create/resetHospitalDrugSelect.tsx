@@ -1,5 +1,5 @@
 import { FormInstance } from "antd";
-import { HospitalDrug } from "./getRecommendDrug";
+import { HospitalDrug } from "../../../type";
 
 export function resetHospitalDrugSelect(form: FormInstance) {
   const allInventoryDrug: { hospital_drug: HospitalDrug }[] =
