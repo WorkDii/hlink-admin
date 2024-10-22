@@ -27,6 +27,11 @@ export default function ModalSearchDrug({
     meta: {
       fields: ["*"],
     },
+    sorters: {
+      initial: [
+        {field: "name", order: "asc"}
+]
+    },
     filters: {
       permanent: [
         {field: "warehouse.bill_warehouse", operator: "eq", value: bill_warehouse}
