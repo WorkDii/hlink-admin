@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { InfoCircleOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, ArrowUpOutlined, ArrowDownOutlined, MedicineBoxOutlined, ShoppingCartOutlined, WarningOutlined } from '@ant-design/icons';
 import { Typography, Row, Col, Tooltip, Card, Statistic, Progress, List, Alert, Table, Modal } from 'antd';
 import { Bar, Pie, Line as LineChart } from '@ant-design/plots';
+import PcuOptionsButton from '../components/pcuOptionsButton';
 const { Title, Paragraph } = Typography;
 
 // ข้อมูลจำลอง
@@ -90,28 +91,29 @@ export const Dashboard: React.FC = () => {
   return (
     <>
       <Title level={2}>แดชบอร์ดคลังยา</Title>
+      <PcuOptionsButton setPcucode={() => {}} pcucode={undefined} style={{ marginBottom: 16 }} />
       <Row gutter={[16, 16]}>
         <Col span={6}>
-          <Tooltip title="จำนวนรวมของรายการสินค้าที่มีอยู่ในสต็อกทั้งหมดในทุกหมวดหมู่">
+          <Tooltip title="จำนวนรวมของรายการยาที่มีอยู่ในคลังยา">
             <Card>
               <Statistic
-                title="ระดับสต็อกปัจจุบัน"
+                title="จำนวนรวมของรายการยาที่มีอยู่ในคลังยา"
                 value={mockData.currentStock}
                 suffix="รายการ"
-                prefix={<InfoCircleOutlined />}
+                prefix={<MedicineBoxOutlined />}
               />
             </Card>
           </Tooltip>
         </Col>
         <Col span={6}>
-          <Tooltip title="ระดับสต็อกที่ควรสั่งซื้อเพิ่ม คำนวณจากรูปแบบการใช้งานและระยะเวลาการสั่งซื้อ">
+          <Tooltip title="ระดับสต็อกที่ควรสั่งซื้อเพิ่ม (มีสต็อกยาน้อยกว่าปริมาณที่คาดการณ์จะใช้ใน 30 วันข้างหน้า)">
             <Card>
               <Statistic
                 title="จุดสั่งซื้อใหม่"
                 value={mockData.reorderPoint}
                 suffix="รายการ"
                 valueStyle={{ color: mockData.currentStock <= mockData.reorderPoint ? "#cf1322" : "#3f8600" }}
-                prefix={<InfoCircleOutlined />}
+                prefix={<ShoppingCartOutlined />}
               />
             </Card>
           </Tooltip>
@@ -124,20 +126,7 @@ export const Dashboard: React.FC = () => {
                 value={mockData.expiringItems}
                 suffix="รายการ"
                 valueStyle={{ color: "#faad14" }}
-                prefix={<InfoCircleOutlined />}
-              />
-            </Card>
-          </Tooltip>
-        </Col>
-        <Col span={6}>
-          <Tooltip title="เปอร์เซ็นต์การเปลี่ยนแปลงการใช้งานเทียบกับช่วงก่อนหน้า">
-            <Card>
-              <Statistic
-                title="แนวโน้มการใช้งาน"
-                value={mockData.usageTrend}
-                prefix={mockData.usageTrend > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                suffix="%"
-                valueStyle={{ color: mockData.usageTrend > 0 ? "#3f8600" : "#cf1322" }}
+                prefix={<WarningOutlined />}
               />
             </Card>
           </Tooltip>
@@ -145,7 +134,7 @@ export const Dashboard: React.FC = () => {
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={8}>
-          <Tooltip title="จำนวนครั้งที่มีการร้องขอสินค้าแต่ไม่มีในสต็อกในช่วง 30 วันที่ผ่านมา">
+          <Tooltip title="รายการยาที่ไม่มีในคลังยา หรือสต็อกติดลบ">
             <Card title="สินค้าหมด" onClick={showStockOutModal} style={{ cursor: 'pointer' }}>
               <Statistic
                 title="จำนวนครั้งที่สินค้าหมด"
@@ -167,46 +156,6 @@ export const Dashboard: React.FC = () => {
               />
             </Card>
           </Tooltip>
-        </Col>
-        <Col span={8}>
-          <Card title="การคาดการณ์ความต้องการ">
-            <Tooltip title="ความต้องการที่คาดการณ์สำหรับ 30 วันข้างหน้าตามข้อมูลในอดีตและแนวโน้ม">
-              <Statistic value={mockData.forecastDemand} suffix="รายการ" prefix={<InfoCircleOutlined />} />
-            </Tooltip>
-            <Paragraph>สต็อกปัจจุบันเทียบกับการคาดการณ์:</Paragraph>
-            <Progress
-              percent={Math.round((mockData.currentStock / mockData.forecastDemand) * 100)}
-              status="active"
-              style={{ marginTop: "10px" }}
-            />
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={12}>
-          <Card title="ยาขายดี">
-            <Paragraph>ปริมาณการขายใน 30 วันที่ผ่านมา:</Paragraph>
-            <Bar
-              data={mockData.topSellingDrugs}
-              xField="sales"
-              yField="name"
-              seriesField="name"
-              legend={false}
-              barBackground={{ style: { fill: 'rgba(0,0,0,0.1)' } }}
-            />
-          </Card>
-        </Col>
-        <Col span={12}>
-          <Card title="การกระจายตัวของหมวดหมู่ยา">
-            <Paragraph>เปอร์เซ็นต์ของสินค้าคงคลังตามหมวดหมู่:</Paragraph>
-            <Pie
-              data={mockData.drugCategories}
-              angleField="value"
-              colorField="category"
-              radius={0.8}
-              label={{ type: 'outer' }}
-            />
-          </Card>
         </Col>
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
@@ -268,21 +217,6 @@ export const Dashboard: React.FC = () => {
               yField="count"
               point={{ size: 5, shape: 'diamond' }}
               label={{ style: { fill: '#aaa' } }}
-            />
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={24}>
-          <Card title="ประสิทธิภาพของผู้จัดจำหน่าย">
-            <Paragraph>ประเมินจากเวลาการจัดส่ง ความถูกต้องของคำสั่งซื้อ และคุณภาพ:</Paragraph>
-            <Table
-              dataSource={mockData.supplierPerformance}
-              columns={[
-                { title: 'ผู้จัดจำหน่าย', dataIndex: 'name', key: 'name' },
-                { title: 'คะแนน', dataIndex: 'score', key: 'score' },
-              ]}
-              pagination={false}
             />
           </Card>
         </Col>
