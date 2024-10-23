@@ -68,6 +68,20 @@ const mockData = {
     { name: "ยา I", usage: 600 },
     { name: "ยา J", usage: 550 },
   ],
+  drugDispensingTrend: [
+    { date: '2023-01-01', count: 100 },
+    { date: '2023-02-01', count: 120 },
+    { date: '2023-03-01', count: 150 },
+    { date: '2023-04-01', count: 130 },
+    { date: '2023-05-01', count: 160 },
+    { date: '2023-06-01', count: 180 },
+    { date: '2023-07-01', count: 200 },
+    { date: '2023-08-01', count: 220 },
+    { date: '2023-09-01', count: 240 },
+    { date: '2023-10-01', count: 260 },
+    { date: '2023-11-01', count: 280 },
+    { date: '2023-12-01', count: 300 },
+  ],
 };
 
 export const Dashboard: React.FC = () => {
@@ -234,6 +248,42 @@ export const Dashboard: React.FC = () => {
                   autoHide: false,
                   autoEllipsis: true
                 }
+              }}
+            />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+        <Col span={24}>
+          <Card title="แนวโน้มการจ่ายยา">
+            <LineChart
+              data={mockData.drugDispensingTrend}
+              xField="date"
+              yField="count"
+              xAxis={{
+                type: 'time',
+                tickCount: 5,
+              }}
+              yAxis={{
+                title: {
+                  text: 'จำนวนการจ่ายยา',
+                },
+              }}
+              tooltip={{
+                formatter: (datum: any) => {
+                  return { name: 'จำนวนการจ่ายยา', value: datum.count };
+                },
+              }}
+              point={{
+                size: 5,
+                shape: 'diamond',
+              }}
+              slider={{
+                start: 0,
+                end: 1,
+                trendCfg: {
+                  isArea: true,
+                },
               }}
             />
           </Card>
