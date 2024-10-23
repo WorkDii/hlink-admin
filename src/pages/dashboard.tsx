@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { InfoCircleOutlined, ArrowUpOutlined, ArrowDownOutlined, MedicineBoxOutlined, ShoppingCartOutlined, WarningOutlined } from '@ant-design/icons';
 import { Typography, Row, Col, Tooltip, Card, Statistic, Progress, List, Alert, Table, Modal } from 'antd';
-import { Bar, Pie, Line as LineChart } from '@ant-design/plots';
+import { Bar, Pie, Line as LineChart, Column } from '@ant-design/plots';
 import PcuOptionsButton from '../components/pcuOptionsButton';
 const { Title, Paragraph } = Typography;
 
@@ -56,19 +56,19 @@ const mockData = {
     { id: 2, name: "ยา B", lastStockOutDate: "2023-05-10", frequency: 1, duration: "2 วัน" },
     { id: 3, name: "ยา C", lastStockOutDate: "2023-05-05", frequency: 3, duration: "1 วัน" },
   ],
+  topUsedDrugs: [
+    { name: "ยา A", usage: 1000 },
+    { name: "ยา B", usage: 950 },
+    { name: "ยา C", usage: 900 },
+    { name: "ยา D", usage: 850 },
+    { name: "ยา E", usage: 800 },
+    { name: "ยา F", usage: 750 },
+    { name: "ยา G", usage: 700 },
+    { name: "ยา H", usage: 650 },
+    { name: "ยา I", usage: 600 },
+    { name: "ยา J", usage: 550 },
+  ],
 };
-
-const expiringItemsData = [
-  { key: 1, name: "ยา A", expirationDate: "2023-12-31", quantity: 100 },
-  { key: 2, name: "ยา B", expirationDate: "2023-11-30", quantity: 50 },
-  { key: 3, name: "ยา C", expirationDate: "2023-10-31", quantity: 75 },
-];
-
-const columns = [
-  { title: "ชื่อ", dataIndex: "name", key: "name" },
-  { title: "วันหมดอายุ", dataIndex: "expirationDate", key: "expirationDate" },
-  { title: "จำนวน", dataIndex: "quantity", key: "quantity" },
-];
 
 export const Dashboard: React.FC = () => {
   const [isStockOutModalVisible, setIsStockOutModalVisible] = useState(false);
@@ -217,6 +217,24 @@ export const Dashboard: React.FC = () => {
               yField="count"
               point={{ size: 5, shape: 'diamond' }}
               label={{ style: { fill: '#aaa' } }}
+            />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+        <Col span={24}>
+          <Card title="10 อันดับยาที่มีการใช้งานสูงสุด">
+            <Column
+              data={mockData.topUsedDrugs}
+              xField="name"
+              yField="usage"
+              xAxis={{
+                label: {
+                  autoRotate: true,
+                  autoHide: false,
+                  autoEllipsis: true
+                }
+              }}
             />
           </Card>
         </Col>
