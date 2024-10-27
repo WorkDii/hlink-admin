@@ -125,6 +125,7 @@ export const Dashboard: React.FC = () => {
         <ReorderPointCard totalReorderPoint={totalReroderPoint} />
         <StockOutCard stockOuts={stockOuts} />
         <DrugRemainingCostCard drugRemainingCost={drugRemainingCost} />
+        <DrugReserveRateCard pcucode={pcucode} />
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={8}>
@@ -202,24 +203,7 @@ export const Dashboard: React.FC = () => {
           </Card>
         </Col>
       </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={24}>
-          <Card title="10 อันดับยาที่มีการใช้งานสูงสุด">
-            <Column
-              data={mockData.topUsedDrugs}
-              xField="name"
-              yField="usage"
-              xAxis={{
-                label: {
-                  autoRotate: true,
-                  autoHide: false,
-                  autoEllipsis: true
-                }
-              }}
-            />
-          </Card>
-        </Col>
-      </Row>
+      
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
         <Col span={24}>
           <Card title="แนวโน้มการจ่ายยา">

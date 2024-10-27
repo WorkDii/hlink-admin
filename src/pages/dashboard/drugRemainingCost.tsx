@@ -16,7 +16,7 @@ export const DrugRemainingCostCard: React.FC<DrugRemainingCostCardProps> =  ({ d
             <Card>
               <Statistic
                 title="มูลค่ารวมของยาคงคลัง"
-                value={drugRemainingCost}
+                value={drugRemainingCost.toFixed(2)}
                 suffix="บาท"
                 prefix={'฿'}
               />
