@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InfoCircleOutlined, ArrowUpOutlined, ArrowDownOutlined, MedicineBoxOutlined, ShoppingCartOutlined, WarningOutlined } from '@ant-design/icons';
-import { Typography, Row, Col, Tooltip, Card, Statistic, Progress, List, Alert, Table, Modal } from 'antd';
+import { Typography, Row, Col, Tooltip, Card, Statistic, Progress, List, Alert, Table, Modal, Spin } from 'antd';
 import { Bar, Pie, Line as LineChart, Column } from '@ant-design/plots';
-import PcuOptionsButton from '../components/pcuOptionsButton';
+import PcuOptionsButton from '../../components/pcuOptionsButton';
+import { CurrentStockCard } from './currentStock';
+import { GetHospitalDrugStatistic, getHospitalDrugStatistic, useData } from './index.controller';
+import { ReorderPointCard } from './reorderPoint';
+import { StockOutCard } from './stockOut';
+import { DrugReserveRateCard } from './drugReserveRate';
+import { DrugRemainingCostCard } from './drugRemainingCost';
 const { Title, Paragraph } = Typography;
 
 // ข้อมูลจำลอง
@@ -85,81 +91,42 @@ const mockData = {
 };
 
 export const Dashboard: React.FC = () => {
-  const [isStockOutModalVisible, setIsStockOutModalVisible] = useState(false);
+  const [pcucode, setPcucode] = useState<string | undefined>(undefined);
+  const { data, loading, error, totalDrug, totalReroderPoint, stockOuts, drugRemainingCost } = useData(pcucode)
 
-  const showStockOutModal = () => {
-    setIsStockOutModalVisible(true);
-  };
-
-  const handleStockOutModalClose = () => {
-    setIsStockOutModalVisible(false);
-  };
-
-  const stockOutColumns = [
-    { title: "ชื่อยา", dataIndex: "name", key: "name" },
-    { title: "วันที่สินค้าหมดครั้งล่าสุด", dataIndex: "lastStockOutDate", key: "lastStockOutDate" },
-    { title: "ความถี่ (30 วันที่ผ่านมา)", dataIndex: "frequency", key: "frequency" },
-    { title: "ระยะเวลาเฉลี่ย", dataIndex: "duration", key: "duration" },
-  ];
+  // Add this line to calculate the reserve rate (you may need to adjust this calculation based on your actual data)
+  const reserveRate = totalDrug / (totalReroderPoint || 1);
 
   return (
     <>
       <Title level={2}>แดชบอร์ดคลังยา</Title>
-      <PcuOptionsButton setPcucode={() => {}} pcucode={undefined} style={{ marginBottom: 16 }} />
+      <PcuOptionsButton setPcucode={setPcucode} pcucode={pcucode} style={{ marginBottom: 16 }} />
+      {loading ? (
+        <Row gutter={[16, 16]} justify="center" align="middle" style={{ minHeight: '200px' }}>
+          <Col>
+            <Spin size="large" />
+          </Col>
+        </Row>
+      ) : error ? (
+        <Row gutter={[16, 16]} justify="center" align="middle" style={{ minHeight: '200px' }}>
+          <Col>
+            <Alert
+              message="Error"
+              description="An error occurred while loading the dashboard data."
+              type="error"
+              showIcon
+            />
+          </Col>
+        </Row>
+        ) : (
+            <>
       <Row gutter={[16, 16]}>
-        <Col span={6}>
-          <Tooltip title="จำนวนรวมของรายการยาที่มีอยู่ในคลังยา">
-            <Card>
-              <Statistic
-                title="จำนวนรวมของรายการยาที่มีอยู่ในคลังยา"
-                value={mockData.currentStock}
-                suffix="รายการ"
-                prefix={<MedicineBoxOutlined />}
-              />
-            </Card>
-          </Tooltip>
-        </Col>
-        <Col span={6}>
-          <Tooltip title="ระดับสต็อกที่ควรสั่งซื้อเพิ่ม (มีสต็อกยาน้อยกว่าปริมาณที่คาดการณ์จะใช้ใน 30 วันข้างหน้า)">
-            <Card>
-              <Statistic
-                title="จุดสั่งซื้อใหม่"
-                value={mockData.reorderPoint}
-                suffix="รายการ"
-                valueStyle={{ color: mockData.currentStock <= mockData.reorderPoint ? "#cf1322" : "#3f8600" }}
-                prefix={<ShoppingCartOutlined />}
-              />
-            </Card>
-          </Tooltip>
-        </Col>
-        <Col span={6}>
-          <Tooltip title="จำนวนรายการที่จะหมดอายุภายใน 30 วันข้างหน้า">
-            <Card>
-              <Statistic
-                title="รายการที่ใกล้หมดอายุ"
-                value={mockData.expiringItems}
-                suffix="รายการ"
-                valueStyle={{ color: "#faad14" }}
-                prefix={<WarningOutlined />}
-              />
-            </Card>
-          </Tooltip>
-        </Col>
+        <CurrentStockCard totalDrug={totalDrug} />
+        <ReorderPointCard totalReorderPoint={totalReroderPoint} />
+        <StockOutCard stockOuts={stockOuts} />
+        <DrugRemainingCostCard drugRemainingCost={drugRemainingCost} />
       </Row>
       <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={8}>
-          <Tooltip title="รายการยาที่ไม่มีในคลังยา หรือสต็อกติดลบ">
-            <Card title="สินค้าหมด" onClick={showStockOutModal} style={{ cursor: 'pointer' }}>
-              <Statistic
-                title="จำนวนครั้งที่สินค้าหมด"
-                value={mockData.stockOuts}
-                valueStyle={{ color: "#cf1322" }}
-                prefix={<InfoCircleOutlined />}
-              />
-              <Paragraph>คลิกเพื่อดูรายละเอียด</Paragraph>
-            </Card>
-          </Tooltip>
-        </Col>
         <Col span={8}>
           <Tooltip title="มูลค่ารวมของสินค้าคงคลังปัจจุบันตามราคาทุน">
             <Card title="การวิเคราะห์ต้นทุน">
@@ -288,21 +255,9 @@ export const Dashboard: React.FC = () => {
             />
           </Card>
         </Col>
-      </Row>
-
-      <Modal
-        title="รายละเอียดสินค้าหมด"
-        visible={isStockOutModalVisible}
-        onCancel={handleStockOutModalClose}
-        footer={null}
-        width={800}
-      >
-        <Table
-          dataSource={mockData.stockOutDetails}
-          columns={stockOutColumns}
-          pagination={false}
-        />
-      </Modal>
+              </Row>
+              </>
+      )}
     </>
   );
 };

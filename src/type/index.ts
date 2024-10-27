@@ -66,6 +66,15 @@ export interface HospitalDrug {
   prepack: number;
   h_drugcode: string;
   warehouse: string;
+  cost: string
+}
+
+export interface HospitalDrugRate {
+  id: string;
+  pcucode: string;
+  usage_rate_30_day_ago: number;
+  hospital_drug: string;
+  date_updated: string;
 }
 
 export interface InventoryDrug {
