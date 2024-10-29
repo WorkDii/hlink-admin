@@ -37,6 +37,8 @@ import {
   InventoryRequestList,
 } from "./pages/inventory_request";
 import { ConfigProvider } from "./contexts/configProvider";
+import {Dashboard} from "./pages/dashboard";
+import { DashboardOutlined } from "@ant-design/icons";
 
 function App() {
   return (
@@ -57,6 +59,14 @@ function App() {
             routerProvider={routerBindings}
             authProvider={authProvider}
             resources={[
+              {
+                name: "dashboard",
+                list: "/dashboard",
+                meta: {
+                  label: "Dashboard",
+                  icon: <DashboardOutlined />, 
+                },
+              },
               {
                 name: "inventory",
                 list: "/inventories",
@@ -131,7 +141,8 @@ function App() {
                   label: "คลังยา",
                   parent: "setting",
                 },
-              }
+              },
+              
             ]}
             options={{
               syncWithLocation: true,
@@ -161,8 +172,9 @@ function App() {
               >
                 <Route
                   index
-                  element={<NavigateToResource resource="inventory" />}
+                  element={<NavigateToResource resource="dashboard" />}
                 />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/units">
                   <Route index element={<UnitList />} />
                 </Route>
