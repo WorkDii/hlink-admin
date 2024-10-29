@@ -1,17 +1,13 @@
 import { StringChain } from "lodash";
-import { directusClient,  } from "../../directusClient";
+import { directusClient, } from "../../directusClient";
 import { aggregate, readItem, readItems } from "@directus/sdk";
-import { HospitalDrug, HospitalDrugRate } from "../../type";
+import { HospitalDrug, HospitalDrugRate, Ou } from "../../type";
 
 
 export type GetHospitalDrugStatistic = Awaited<ReturnType<typeof getHospitalDrugStatistic>>
-export async function getHospitalDrugStatistic(pcucode: string) { 
-  const ou = await directusClient.request<{ date_reset_drug_stock: StringChain, warehouse: {id: number,warehouse_id: string}[] }>(
-    // @ts-ignore
-    readItem("ou", pcucode, {
-      fields: ['date_reset_drug_stock', 'warehouse.*']
-    })
-  )
+export type OuWithWarehouse = Ou & { warehouse: { id: number, warehouse_id: string }[] }
+
+export async function getHospitalDrugStatistic(ou: OuWithWarehouse) {
   const inventoryDrug = await directusClient.request(
     // @ts-ignore
     aggregate("inventory_drug", {
@@ -24,7 +20,7 @@ export async function getHospitalDrugStatistic(pcucode: string) {
         filter: {
           inventory_bill: {
             pcucode: {
-              _eq: pcucode,
+              _eq: ou.id,
             },
           },
         },
@@ -43,7 +39,7 @@ export async function getHospitalDrugStatistic(pcucode: string) {
         limit: -1,
         filter: {
           pcucode: {
-            _eq: pcucode,
+            _eq: ou.id,
           },
           dateupdate: {
             _gte: ou.date_reset_drug_stock,
@@ -71,7 +67,7 @@ export async function getHospitalDrugStatistic(pcucode: string) {
       limit: -1,
       filter: {
         pcucode: {
-          _eq: pcucode,
+          _eq: ou.id,
         },
       }
     })
@@ -95,26 +91,45 @@ export async function getHospitalDrugStatistic(pcucode: string) {
 
 import { useState, useEffect } from 'react';
 
+
+export const useOu = (pcucode: string | undefined) => {
+  const [ou, setOu] = useState<OuWithWarehouse | null>(null);
+  useEffect(() => {
+    if (!pcucode) return;
+    directusClient.request<OuWithWarehouse>(
+      // @ts-ignore
+      readItem("ou", pcucode, {
+        fields: ['*', 'warehouse.*']
+      })
+    ).then((result) => {
+      setOu(result)
+    })
+  }, [pcucode]);
+  return { ou }
+}
+
+
 export const useData = (pcucode: string | undefined) => {
+  const { ou } = useOu(pcucode)
   const [data, setData] = useState<GetHospitalDrugStatistic>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [totalDrug, setTotalDrug] = useState(0);
   const [totalReroderPoint, setTotalReroderPoint] = useState(0);
-  const [stockOuts, setStockOuts] = useState<GetHospitalDrugStatistic>([]); 
+  const [stockOuts, setStockOuts] = useState<GetHospitalDrugStatistic>([]);
   const [drugRemainingCost, setDrugRemainingCost] = useState(0);
   useEffect(() => {
     const fetchData = async () => {
-      if (!pcucode) return;
+      if (!ou) return;
       try {
         setLoading(true);
-        const result = await getHospitalDrugStatistic(pcucode);
+        const result = await getHospitalDrugStatistic(ou);
         setData(result);
         setTotalDrug(result.filter((item) => item.buy_quantity > 0).length)
         setTotalReroderPoint(result.filter((item) => item.remaining_quantity < item.usage_rate_30_day_ago).length)
         setStockOuts(result.filter((item) => item.remaining_quantity < 0))
         setDrugRemainingCost(result.reduce((acc, item) => acc + item.remaining_quantity * Number(item.cost || 0), 0))
-      } catch (err) { 
+      } catch (err) {
         setError(err instanceof Error ? err : new Error('An error occurred'));
       } finally {
         setLoading(false);
@@ -122,7 +137,7 @@ export const useData = (pcucode: string | undefined) => {
     };
 
     fetchData();
-  }, [pcucode]);
+  }, [ou]);
 
   return { data, loading, error, totalDrug, totalReroderPoint, stockOuts, drugRemainingCost };
 };

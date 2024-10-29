@@ -9,6 +9,7 @@ import { ReorderPointCard } from './reorderPoint';
 import { StockOutCard } from './stockOut';
 import { DrugReserveRateCard } from './drugReserveRate';
 import { DrugRemainingCostCard } from './drugRemainingCost';
+import { TopTenDrugCard } from './topTenDrug';
 const { Title, Paragraph } = Typography;
 
 // ข้อมูลจำลอง
@@ -118,129 +119,134 @@ export const Dashboard: React.FC = () => {
             />
           </Col>
         </Row>
-        ) : (
-            <>
-      <Row gutter={[16, 16]}>
-        <CurrentStockCard totalDrug={totalDrug} />
-        <ReorderPointCard totalReorderPoint={totalReroderPoint} />
-        <StockOutCard stockOuts={stockOuts} />
-        <DrugRemainingCostCard drugRemainingCost={drugRemainingCost} />
-        <DrugReserveRateCard pcucode={pcucode} />
-      </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={8}>
-          <Tooltip title="มูลค่ารวมของสินค้าคงคลังปัจจุบันตามราคาทุน">
-            <Card title="การวิเคราะห์ต้นทุน">
-              <Statistic
-                title="ต้นทุนสินค้าคงคลังรวม"
-                value={mockData.totalCost}
-                prefix="฿"
-              />
-            </Card>
-          </Tooltip>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={8}>
-          <Card title="แจ้งเตือนสต็อกต่ำ">
-            <Paragraph>รายการที่ต่ำกว่า 20% ของจุดสั่งซื้อใหม่:</Paragraph>
-            <List
-              dataSource={mockData.lowStockItems}
-              renderItem={(item) => (
-                <List.Item>
-                  <Alert message={`${item.name}: เหลือ ${item.stock} หน่วย`} type="warning" showIcon />
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Tooltip title="คำนวณจาก: ต้นทุนสินค้าที่ขาย / สินค้าคงเหลือเฉลี่ย ยิ่งสูงยิ่งดี แสดงถึงการจัดการสินค้าคงคลังที่มีประสิทธิภาพ">
-            <Card title="อัตราการหมุนเวียนสินค้าคงคลัง">
-              <Statistic
-                title="อัตราการหมุนเวียนต่อปี"
-                value={mockData.inventoryTurnover}
-                precision={2}
-                valueStyle={{ color: mockData.inventoryTurnover > 4 ? '#3f8600' : '#cf1322' }}
-                suffix="ครั้ง/ปี"
-                prefix={<InfoCircleOutlined />}
-              />
-              <Paragraph>
-                {mockData.inventoryTurnover > 4 ? "อัตราการหมุนเวียนดี" : "ควรปรับปรุงอัตราการหมุนเวียน"}
-              </Paragraph>
-            </Card>
-          </Tooltip>
-        </Col>
-        <Col span={8}>
-          <Card title="แจ้งเตือนสต็อกเกิน">
-            <Paragraph>รายการที่เกินระดับสต็อกที่แนะนำ:</Paragraph>
-            <List
-              dataSource={mockData.overStockedItems}
-              renderItem={(item) => (
-                <List.Item>
-                  <Alert
-                    message={`${item.name}: ${item.stock} หน่วย (เกิน ${Math.round((item.stock / item.recommendedStock - 1) * 100)}%)`}
-                    type="warning"
-                    showIcon
+      ) : (
+        <>
+          <Row gutter={[16, 16]}>
+            <CurrentStockCard totalDrug={totalDrug} />
+            <ReorderPointCard totalReorderPoint={totalReroderPoint} />
+            <StockOutCard stockOuts={stockOuts} />
+            <DrugRemainingCostCard drugRemainingCost={drugRemainingCost} />
+            <DrugReserveRateCard pcucode={pcucode} />
+          </Row>
+          <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+            <TopTenDrugCard data={data} />
+          </Row>
+          {/* Under Development */}
+          <div style={{ opacity: 0.4 }}>
+            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+              <Col span={8}>
+                <Tooltip title="มูลค่ารวมของสินค้าคงคลังปัจจุบันตามราคาทุน">
+                  <Card title="การวิเคราะห์ต้นทุน">
+                    <Statistic
+                      title="ต้นทุนสินค้าคงคลังรวม"
+                      value={mockData.totalCost}
+                      prefix="฿"
+                    />
+                  </Card>
+                </Tooltip>
+              </Col>
+            </Row>
+            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+              <Col span={8}>
+                <Card title="แจ้งเตือนสต็อกต่ำ">
+                  <Paragraph>รายการที่ต่ำกว่า 20% ของจุดสั่งซื้อใหม่:</Paragraph>
+                  <List
+                    dataSource={mockData.lowStockItems}
+                    renderItem={(item) => (
+                      <List.Item>
+                        <Alert message={`${item.name}: เหลือ ${item.stock} หน่วย`} type="warning" showIcon />
+                      </List.Item>
+                    )}
                   />
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={24}>
-          <Card title="ไทม์ไลน์วันหมดอายุ">
-            <Paragraph>จำนวนรายการที่หมดอายุในแต่ละเดือน:</Paragraph>
-            <LineChart
-              data={mockData.expirationTimeline}
-              xField="date"
-              yField="count"
-              point={{ size: 5, shape: 'diamond' }}
-              label={{ style: { fill: '#aaa' } }}
-            />
-          </Card>
-        </Col>
-      </Row>
-      
-      <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
-        <Col span={24}>
-          <Card title="แนวโน้มการจ่ายยา">
-            <LineChart
-              data={mockData.drugDispensingTrend}
-              xField="date"
-              yField="count"
-              xAxis={{
-                type: 'time',
-                tickCount: 5,
-              }}
-              yAxis={{
-                title: {
-                  text: 'จำนวนการจ่ายยา',
-                },
-              }}
-              tooltip={{
-                formatter: (datum: any) => {
-                  return { name: 'จำนวนการจ่ายยา', value: datum.count };
-                },
-              }}
-              point={{
-                size: 5,
-                shape: 'diamond',
-              }}
-              slider={{
-                start: 0,
-                end: 1,
-                trendCfg: {
-                  isArea: true,
-                },
-              }}
-            />
-          </Card>
-        </Col>
-              </Row>
-              </>
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Tooltip title="คำนวณจาก: ต้นทุนสินค้าที่ขาย / สินค้าคงเหลือเฉลี่ย ยิ่งสูงยิ่งดี แสดงถึงการจัดการสินค้าคงคลังที่มีประสิทธิภาพ">
+                  <Card title="อัตราการหมุนเวียนสินค้าคงคลัง">
+                    <Statistic
+                      title="อัตราการหมุนเวียนต่อปี"
+                      value={mockData.inventoryTurnover}
+                      precision={2}
+                      valueStyle={{ color: mockData.inventoryTurnover > 4 ? '#3f8600' : '#cf1322' }}
+                      suffix="ครั้ง/ปี"
+                      prefix={<InfoCircleOutlined />}
+                    />
+                    <Paragraph>
+                      {mockData.inventoryTurnover > 4 ? "อัตราการหมุนเวียนดี" : "ควรปรับปรุงอัตราการหมุนเวียน"}
+                    </Paragraph>
+                  </Card>
+                </Tooltip>
+              </Col>
+              <Col span={8}>
+                <Card title="แจ้งเตือนสต็อกเกิน">
+                  <Paragraph>รายการที่เกินระดับสต็อกที่แนะนำ:</Paragraph>
+                  <List
+                    dataSource={mockData.overStockedItems}
+                    renderItem={(item) => (
+                      <List.Item>
+                        <Alert
+                          message={`${item.name}: ${item.stock} หน่วย (เกิน ${Math.round((item.stock / item.recommendedStock - 1) * 100)}%)`}
+                          type="warning"
+                          showIcon
+                        />
+                      </List.Item>
+                    )}
+                  />
+                </Card>
+              </Col>
+            </Row>
+            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+              <Col span={24}>
+                <Card title="ไทม์ไลน์วันหมดอายุ">
+                  <Paragraph>จำนวนรายการที่หมดอายุในแต่ละเดือน:</Paragraph>
+                  <LineChart
+                    data={mockData.expirationTimeline}
+                    xField="date"
+                    yField="count"
+                    point={{ size: 5, shape: 'diamond' }}
+                    label={{ style: { fill: '#aaa' } }}
+                  />
+                </Card>
+              </Col>
+            </Row>
+            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+              <Col span={24}>
+                <Card title="แนวโน้มการจ่ายยา">
+                  <LineChart
+                    data={mockData.drugDispensingTrend}
+                    xField="date"
+                    yField="count"
+                    xAxis={{
+                      type: 'time',
+                      tickCount: 5,
+                    }}
+                    yAxis={{
+                      title: {
+                        text: 'จำนวนการจ่ายยา',
+                      },
+                    }}
+                    tooltip={{
+                      formatter: (datum: any) => {
+                        return { name: 'จำนวนการจ่ายยา', value: datum.count };
+                      },
+                    }}
+                    point={{
+                      size: 5,
+                      shape: 'diamond',
+                    }}
+                    slider={{
+                      start: 0,
+                      end: 1,
+                      trendCfg: {
+                        isArea: true,
+                      },
+                    }}
+                  />
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        </>
       )}
     </>
   );
