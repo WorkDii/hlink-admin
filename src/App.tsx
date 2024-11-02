@@ -30,15 +30,16 @@ import {
   HospitalDrugUnitCreate,
   HospitalDrugUnitList,
 } from "./pages/hospital_drug_unit";
-import { InventoryBillCreate , InventoryBillList } from "./pages/inventory_bill";
+import { InventoryBillCreate, InventoryBillList } from "./pages/inventory_bill";
 import { InventoryList } from "./pages/inventory";
 import {
   InventoryRequestCreate,
   InventoryRequestList,
 } from "./pages/inventory_request";
 import { ConfigProvider } from "./contexts/configProvider";
-import {Dashboard} from "./pages/dashboard";
+import { Dashboard } from "./pages/dashboard";
 import { DashboardOutlined } from "@ant-design/icons";
+import { DrugProblemList } from "./pages/drug_problem";
 
 function App() {
   return (
@@ -64,7 +65,7 @@ function App() {
                 list: "/dashboard",
                 meta: {
                   label: "Dashboard",
-                  icon: <DashboardOutlined />, 
+                  icon: <DashboardOutlined />,
                 },
               },
               {
@@ -118,6 +119,15 @@ function App() {
                 },
               },
               {
+                name: "drug_problem",
+                list: "/drug_problems",
+                meta: {
+                  noStatus: true,
+                  label: "รายการยาที่ยังไม่ได้ Sync",
+                  parent: "setting",
+                },
+              },
+              {
                 name: "unit",
                 list: "/units",
                 meta: {
@@ -142,7 +152,7 @@ function App() {
                   parent: "setting",
                 },
               },
-              
+
             ]}
             options={{
               syncWithLocation: true,
@@ -198,6 +208,9 @@ function App() {
                 <Route path="/hospital_drug_units">
                   <Route index element={<HospitalDrugUnitList />} />
                   <Route path="create" element={<HospitalDrugUnitCreate />} />
+                </Route>
+                <Route path="/drug_problems">
+                  <Route index element={<DrugProblemList />} />
                 </Route>
                 <Route path="*" element={<ErrorComponent />} />
               </Route>
