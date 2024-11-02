@@ -104,6 +104,7 @@ async function getUsage(
   obj: TempRecommendObject,
   dateResetStocck?: string
 ) {
+  if (Object.keys(obj).length === 0) return {};
   const data = await directusClient.request<
     { hospital_drug: string; sum: { unit: string } }[]
   >(
@@ -134,6 +135,7 @@ async function getUsage(
   return obj;
 }
 async function getBought(pcucode: string, obj: TempRecommendObject) {
+  if (Object.keys(obj).length === 0) return {};
   const data = await directusClient.request<
     { hospital_drug: string; sum: { quantity: string } }[]
   >(
@@ -174,7 +176,7 @@ export async function getRecommendDrug(
   fix_hospital_drug?: string
 ) {
   const dateResetStocck = await getPcuDateResetDrugStock(pcucode);
-  const recommendObject = await getInitialData(pcucode,bill_warehouse, fix_hospital_drug, );
+  const recommendObject = await getInitialData(pcucode, bill_warehouse, fix_hospital_drug);
   const usage = await getUsage(pcucode, recommendObject, dateResetStocck);
   const bought = await getBought(pcucode, usage);
   const recommend = Object.keys(recommendObject).map((key) => {
