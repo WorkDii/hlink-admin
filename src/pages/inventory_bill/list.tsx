@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import DownloadButton from "./downloadCSV/downloadButton";
 import ReportDownloadButton from "./report/downloadButton";
 import { InventoryBillItem } from "../../type";
+import DownloadImportJHCIS from "./jhcis/downloadImportJHCIS";
 
 export interface Ou {
   name: string;
@@ -89,11 +90,15 @@ export const InventoryBillList = () => {
                   bill_id={record.bill_id}
                 ></DownloadButton>
                 <ReportDownloadButton
-                    id={id}
-                    pcu={record.pcucode.name}
-                    bill_id={record.bill_id}
-                    date_created={record.date_created}
-                  ></ReportDownloadButton>
+                  id={id}
+                  pcu={record.pcucode.name}
+                  bill_id={record.bill_id}
+                  date_created={record.date_created}
+                ></ReportDownloadButton>
+                <DownloadImportJHCIS
+                  id={id}
+                  bill_id={record.bill_id}
+                ></DownloadImportJHCIS>
               </Flex>
             );
           }}

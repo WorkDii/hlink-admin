@@ -140,3 +140,16 @@ export interface InventoryRequestDrug {
   current_prepack: number;
   hospital_drug: HospitalDrug;
 }
+
+export interface Cdrug {
+  id: string;
+  drugcode: string;
+  drugname: string;
+  unitsell?: string;
+  unitusage?: string;
+  drugcode24: string;
+  tmtcode?: string;
+  pcucode: string;
+  lotunit?: string;
+  packunit?: string;
+}
