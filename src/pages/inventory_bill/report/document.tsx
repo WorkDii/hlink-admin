@@ -2,7 +2,7 @@ import { Document, Page, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import ReportTable from "./table";
 import Signature from "./signature";
 import Note from "./note";
-import { getInventoryBillItem } from "../getInventoryBillItem";
+import { getInventoryBillItem } from "../downloadCSV/getInventoryBillItem";
 
 
 Font.register({

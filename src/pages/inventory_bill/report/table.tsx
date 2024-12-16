@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import PropTypes from "prop-types";
 import { wholeNumber } from "@wdii/numth";
-import { getInventoryBillItem } from "../getInventoryBillItem"; 
+import { getInventoryBillItem } from "../downloadCSV/getInventoryBillItem";
 
 const styles = StyleSheet.create({
   table: {
@@ -100,7 +100,7 @@ const ReportTable = ({ data }: Props) => {
         <View key={i} style={styles.row}>
           <Text style={[styles.colIndex, styles.col]}>{i + 1}</Text>
           <Text style={[styles.colName, styles.col]}>
-            [{row.hospital_drug_drugcode24} / { row.h_drugcode}] - {row.hospital_drug_name} 
+            [{row.hospital_drug_drugcode24} / {row.h_drugcode}] - {row.hospital_drug_name}
           </Text>
           <Text style={[styles.colQuantity, styles.col]}>
             <Text style={styles.bold}>{wholeNumber(row.quantity)}</Text>

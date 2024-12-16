@@ -3,7 +3,7 @@ import { Flex, Table, Tag, Typography } from "antd";
 import BillStatusTag from "../bill_staus";
 const { Text } = Typography;
 import dayjs from "dayjs";
-import DownloadButton from "./downloadButton";
+import DownloadButton from "./downloadCSV/downloadButton";
 import ReportDownloadButton from "./report/downloadButton";
 import { InventoryBillItem } from "../../type";
 

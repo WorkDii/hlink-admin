@@ -4,7 +4,7 @@ import { ReportDrug } from "./document";
 import { saveAs } from "file-saver";
 import { Button } from "antd";
 import { FilePdfOutlined, LoadingOutlined } from "@ant-design/icons";
-import { getInventoryBillItem } from "../getInventoryBillItem";
+import { getInventoryBillItem } from "../downloadCSV/getInventoryBillItem";
 
 type Props = {
   pcu: string;
