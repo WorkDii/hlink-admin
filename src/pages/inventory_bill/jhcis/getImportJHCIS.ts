@@ -12,7 +12,7 @@ export const getImportJHCIS = async (id: string) => {
     }, limit: -1
   })
   )
-  return data.map((item) => {
+  return data.sort((a, b) => a.hospital_drug_name > b.hospital_drug_name ? 1 : -1).map((item) => {
     const c = cdrug.find((cdrug) => cdrug.drugcode24 === item.hospital_drug_drugcode24);
     return {
       pcucode: item.pcucode,
