@@ -25,7 +25,9 @@ export default function DownloadImportJHCIS({ id, bill_id }: Props) {
   return (
     <CsvDownloader
       text="นำเข้า JHCIS"
-      datas={getImportJHCIS(id) as any}
+      datas={async () => {
+        return (await getImportJHCIS(id)) as any;
+      }}
       filename={`invertory_bill_${bill_id}_${new Date().getTime()}.csv`}
       columns={columns}
     />
