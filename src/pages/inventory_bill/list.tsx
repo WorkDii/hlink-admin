@@ -98,6 +98,7 @@ export const InventoryBillList = () => {
                 <DownloadImportJHCIS
                   id={id}
                   bill_id={record.bill_id}
+                  date_created={dayjs(record.date_created).format("DD_MM_YYYY")}
                 ></DownloadImportJHCIS>
               </Flex>
             );

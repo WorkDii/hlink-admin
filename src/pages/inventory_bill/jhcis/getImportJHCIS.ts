@@ -25,6 +25,12 @@ export const getImportJHCIS = async (id: string) => {
       pack_price: parseFloat(item.cost)/(item.confirm_quantity/item.pack_ratio),
       count_in_pack: item.pack_ratio,
       unit_used: c?.packunit || c?.unitusage || "???",
+      drug_name: c?.drugname,
+      drug_code: c?.drugcode,
+      drug_code24: c?.drugcode24,
+      hospital_drug_name: item.hospital_drug_name,
+      hospital_drug_drugcode24: item.hospital_drug_drugcode24,
     };
   });
 };
+
