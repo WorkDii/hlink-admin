@@ -22,8 +22,8 @@ const columns = [
   { displayName: "ชื่อยา (ตามฐานข้อมูล jhcis แต่ละที่)", id: "drug_name" },
   { displayName: "รหัสยา (ตามฐานข้อมูล jhcis แต่ละที่)", id: "drug_code" },
   { displayName: "รหัสยา 24 ตัว (ตามฐานข้อมูล jhcis แต่ละที่)", id: "drug_code24" },
-  { displayName: "ชื่อยา (ตามฐานข้อมูล hlink)", id: "hospital_drug_name" },
-  { displayName: "รหัสยา (ตามฐานข้อมูล hlink)", id: "hospital_drug_drugcode24" },
+  { displayName: "ชื่อยา (ตามฐานข้อมูล HDS)", id: "hospital_drug_name" },
+  { displayName: "รหัสยา (ตามฐานข้อมูล HDS)", id: "hospital_drug_drugcode24" },
 ];
 
 export default function DownloadImportJHCIS({ id, bill_id, date_created }: Props) {

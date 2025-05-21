@@ -10,7 +10,7 @@ export const TitleApp = ({ collapsed, text }: Props) => {
   return (
     <ThemedTitleV2
       collapsed={collapsed}
-      text={text || "HLink Admin"}
+      text={text || "HDS Admin"}
       icon={<MdOutlineDatasetLinked size={26} />}
     />
   );
