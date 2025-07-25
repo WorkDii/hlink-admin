@@ -22,7 +22,7 @@ export interface TempRecommendObject {
   };
 }
 
-async function getInitialData(pcucode: string, bill_warehouse: string,fix_hospital_drug?: string, ) {
+async function getInitialData(pcucode: string, bill_warehouse: string, fix_hospital_drug?: string,) {
   const data = await directusClient.request<
     {
       usage_rate_30_day_ago: number;
@@ -37,13 +37,14 @@ async function getInitialData(pcucode: string, bill_warehouse: string,fix_hospit
         pcucode: {
           _eq: pcucode,
         },
-        
+
         ...(fix_hospital_drug
           ? {
             hospital_drug: {
               _eq: fix_hospital_drug,
               warehouse: { bill_warehouse: { _eq: bill_warehouse } }
-           } }
+            }
+          }
           // ตรวจสอบว่ายานี้ยังเปิดใช้งานอยู่หรือไม่
           : {
             hospital_drug: {
@@ -55,8 +56,8 @@ async function getInitialData(pcucode: string, bill_warehouse: string,fix_hospit
       fields: [
         "id",
         "usage_rate_30_day_ago",
-        "hospital_drug.*",
-        "hospital_drug.default_unit.*",
+        "hospital_drug",
+        { hospital_drug: ["*", { default_unit: ["*"] }] },
       ],
     })
   );
@@ -74,7 +75,7 @@ async function getInitialData(pcucode: string, bill_warehouse: string,fix_hospit
             _eq: fix_hospital_drug,
           },
         },
-        fields: ["*", "default_unit.*"],
+        fields: ["*", { default_unit: ["*"] }],
       })
     );
 
@@ -119,8 +120,8 @@ async function getUsage(
           // นับการใช้เฉพาะข้อมูลยาหลังจากการ reset stock
           dateupdate: dateResetStocck
             ? {
-                _gte: dateTime2TimeBangkok(dateResetStocck),
-              }
+              _gte: dateTime2TimeBangkok(dateResetStocck),
+            }
             : undefined,
         },
       },

@@ -29,6 +29,7 @@ async function getDrugReserveRate(pcucode: string, date: Dayjs) {
   const ou = await directusClient.request<{ date_reset_drug_stock: string, warehouse: { id: number, warehouse_id: string }[] }>(
     // @ts-ignore
     readItem("ou", pcucode, {
+      // @ts-ignore
       fields: ['date_reset_drug_stock', 'warehouse.*']
     })
   )
@@ -48,14 +49,14 @@ async function getDrugReserveRate(pcucode: string, date: Dayjs) {
   hospitalDrug.forEach((item) => {
     costDrug[item.id] = Number(item.cost)
   })
-  
+
   const inventoryDrug = await directusClient.request<InventoryDrug[]>(
     // @ts-ignore
     aggregate("inventory_drug", {
       aggregate: {
         sum: ['confirm_quantity']
       },
-      groupBy: [ 'hospital_drug'],
+      groupBy: ['hospital_drug'],
       query: {
         limit: -1,
         filter: {
@@ -133,29 +134,29 @@ async function getDrugReserveRate(pcucode: string, date: Dayjs) {
 
   const visitDrugCost = visitDrug.reduce((acc, item) => {
     return acc + costDrug[item.hospital_drug] * Number(item.sum.unit)
-  }, 0) 
+  }, 0)
 
-  return (inventoryDrugCost-visitDrugCost) / visitDrug1MonthCost;
+  return (inventoryDrugCost - visitDrugCost) / visitDrug1MonthCost;
 }
 export const DrugReserveRateCard: React.FC<DrugReserveRateCardProps> = ({ pcucode }) => {
   const [reserveRate, setReserveRate] = useState(0);
   const [date, setDate] = useState(dayjs());
-  const isGoodRate = reserveRate >= 1 && reserveRate <= 2 ;
+  const isGoodRate = reserveRate >= 1 && reserveRate <= 2;
 
   useEffect(() => {
-    if(pcucode && date ) { 
-      getDrugReserveRate(pcucode,  date).then(setReserveRate);
+    if (pcucode && date) {
+      getDrugReserveRate(pcucode, date).then(setReserveRate);
     }
   }, [pcucode, date]);
   return (
-    <Col span={8}>  
+    <Col span={8}>
       <Tooltip title="มูลค่ายาคงเหลือทั้งหมดใน รพ.สต. / มูลค่าที่ใช้ไปใน 30 วันที่ผ่านมา">
-      <Card>
-        <Statistic
-            title={ 
+        <Card>
+          <Statistic
+            title={
               <div>
                 อัตราการสำรองยา ณ วันที่
-                <DatePicker 
+                <DatePicker
                   style={{ marginBottom: 16, width: '100%' }}
                   onChange={(date) => {
                     setDate(date);
@@ -167,13 +168,13 @@ export const DrugReserveRateCard: React.FC<DrugReserveRateCardProps> = ({ pcucod
 
               </div>
             }
-          value={reserveRate.toFixed(2)}
-          precision={2}
-          valueStyle={{ color: isGoodRate ? '#3f8600' : '#cf1322' }}
-          prefix={<InfoCircleOutlined />}
-          suffix="เท่า"
+            value={reserveRate.toFixed(2)}
+            precision={2}
+            valueStyle={{ color: isGoodRate ? '#3f8600' : '#cf1322' }}
+            prefix={<InfoCircleOutlined />}
+            suffix="เท่า"
           />
-      </Card>
+        </Card>
       </Tooltip>
     </Col>
   );

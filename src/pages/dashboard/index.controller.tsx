@@ -97,9 +97,8 @@ export const useOu = (pcucode: string | undefined) => {
   useEffect(() => {
     if (!pcucode) return;
     directusClient.request<OuWithWarehouse>(
-      // @ts-ignore
       readItem("ou", pcucode, {
-        fields: ['*', 'warehouse.*']
+        fields: ['*', { 'warehouse': ['id', 'warehouse_id'] }]
       })
     ).then((result) => {
       setOu(result)

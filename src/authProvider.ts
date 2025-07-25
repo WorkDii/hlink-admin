@@ -55,7 +55,7 @@ export const authProvider: AuthProvider = {
       last_name?: string;
       avatar?: string;
       email: string;
-    }>(readMe({ fields: ["*.*"] }));
+    }>(readMe({ fields: ["*"] }));
     if (me) {
       return me;
     }
