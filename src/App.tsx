@@ -38,6 +38,7 @@ import {
 } from "./pages/inventory_request";
 import { ConfigProvider } from "./contexts/configProvider";
 import { Dashboard } from "./pages/dashboard";
+import { InventoryDashboard } from "./pages/dashboard/inventory-dashboard";
 import { DashboardOutlined } from "@ant-design/icons";
 import { DrugProblemList } from "./pages/drug_problem";
 
@@ -65,6 +66,14 @@ function App() {
                 list: "/dashboard",
                 meta: {
                   label: "Dashboard",
+                  icon: <DashboardOutlined />,
+                },
+              },
+              {
+                name: "inventory-dashboard",
+                list: "/inventory-dashboard",
+                meta: {
+                  label: "Dashboard คลังยา",
                   icon: <DashboardOutlined />,
                 },
               },
@@ -185,6 +194,7 @@ function App() {
                   element={<NavigateToResource resource="dashboard" />}
                 />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/inventory-dashboard" element={<InventoryDashboard />} />
                 <Route path="/units">
                   <Route index element={<UnitList />} />
                 </Route>
