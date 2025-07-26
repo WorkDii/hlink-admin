@@ -72,6 +72,28 @@ export interface InventoryDashboardData {
     remaining: number;
     lastUsedDate: string;
   }>;
+  // New fields for drug ratio history
+  totalDrugRatioHistory: Array<{
+    date: string;
+    avgDrugRatio: number;
+    totalDrugs: number;
+    criticalDrugs: number;
+    lowDrugs: number;
+    optimalDrugs: number;
+    excessDrugs: number;
+  }>;
+  drugRatioHistoryByDrug: Array<{
+    drugName: string;
+    drugCode: string;
+    drugType: string;
+    history: Array<{
+      date: string;
+      drugRatio: number;
+      remaining: number;
+      issued30day: number;
+      status: 'critical' | 'low' | 'optimal' | 'excess';
+    }>;
+  }>;
 }
 
 export type OuWithWarehouse = Ou & { warehouse: { id: number, warehouse_id: string }[] }
@@ -105,7 +127,9 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       inventoryByType: [],
       stockMovementAnalysis: [],
       lowStockAlert: [],
-      drugsWithoutHospitalData: []
+      drugsWithoutHospitalData: [],
+      totalDrugRatioHistory: [],
+      drugRatioHistoryByDrug: []
     };
   }
 
@@ -140,7 +164,9 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       inventoryByType: [],
       stockMovementAnalysis: [],
       lowStockAlert: [],
-      drugsWithoutHospitalData: []
+      drugsWithoutHospitalData: [],
+      totalDrugRatioHistory: [],
+      drugRatioHistoryByDrug: []
     };
   }
   // Calculate total inventory value
@@ -275,6 +301,120 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     }))
     .sort((a, b) => b.issued30day - a.issued30day);
 
+  // Calculate drug ratio history (all available data)
+  // Get all historical data
+  const historicalData = await directusClient.request(
+    readItems("inventory_drug_detail", {
+      filter: {
+        pcucode: { _eq: ou.id },
+        drugtype: { _in: ['01', '04', '10'] },
+        hospital_drug: {
+          _nnull: true
+        }
+      },
+      fields: ['*', {
+        hospital_drug: ['id', 'name', 'cost']
+      }],
+      limit: -1
+    })
+  );
+
+  // Group historical data by date
+  const dataByDate = (historicalData || []).reduce((groups, item) => {
+    const date = item.date ? item.date.toString() : '';
+    if (date && !groups[date]) {
+      groups[date] = [];
+    }
+    if (date) {
+      groups[date].push(item);
+    }
+    return groups;
+  }, {} as Record<string, typeof historicalData>);
+
+  // Calculate total drug ratio history
+  const totalDrugRatioHistory = Object.entries(dataByDate)
+    .map(([date, items]) => {
+      const ratios = items.map(item => {
+        const issued30day = item.issued30day ?? 0;
+        return issued30day > 0 ? item.remaining / issued30day : item.remaining > 0 ? 999 : 0;
+      });
+
+      const avgDrugRatio = ratios.length > 0 ? ratios.reduce((sum, ratio) => sum + ratio, 0) / ratios.length : 0;
+
+      // Categorize drugs by ratio status
+      const criticalDrugs = ratios.filter(ratio => ratio < 0.5 && ratio > 0).length;
+      const lowDrugs = ratios.filter(ratio => ratio >= 0.5 && ratio < 1.2).length;
+      const optimalDrugs = ratios.filter(ratio => ratio >= 1.2 && ratio < 2.0).length;
+      const excessDrugs = ratios.filter(ratio => ratio >= 2.0 && ratio < 999).length;
+
+      return {
+        date,
+        avgDrugRatio,
+        totalDrugs: items.length,
+        criticalDrugs,
+        lowDrugs,
+        optimalDrugs,
+        excessDrugs
+      };
+    })
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Calculate drug ratio history by each drug (top 10 most issued drugs)
+  const topDrugs = inventoryDetails
+    .filter(item => typeof item.hospital_drug === "object" && item.hospital_drug !== null && !!item.hospital_drug.name)
+    .sort((a, b) => (b.issued30day ?? 0) - (a.issued30day ?? 0))
+    .slice(0, 10);
+
+  const drugRatioHistoryByDrug = await Promise.all(
+    topDrugs.map(async (drug) => {
+      const drugHistory = await directusClient.request(
+        readItems("inventory_drug_detail", {
+          filter: {
+            pcucode: { _eq: ou.id },
+            drugcode: { _eq: drug.drugcode },
+            hospital_drug: {
+              _nnull: true
+            }
+          },
+          fields: ['date', 'remaining', 'issued30day'],
+          sort: ['date'],
+          limit: -1
+        })
+      );
+
+      const history = (drugHistory || []).map(item => {
+        const issued30day = item.issued30day ?? 0;
+        const drugRatio = issued30day > 0 ? item.remaining / issued30day : item.remaining > 0 ? 999 : 0;
+
+        let status: 'critical' | 'low' | 'optimal' | 'excess';
+        if (drugRatio >= 2.0 && drugRatio < 999) {
+          status = 'excess';
+        } else if (drugRatio >= 1.2 && drugRatio < 2.0) {
+          status = 'optimal';
+        } else if (drugRatio >= 0.5 && drugRatio < 1.2) {
+          status = 'low';
+        } else {
+          status = 'critical';
+        }
+
+        return {
+          date: item.date ? item.date.toString() : '',
+          drugRatio,
+          remaining: item.remaining,
+          issued30day,
+          status
+        };
+      });
+
+      return {
+        drugName: (drug.hospital_drug as { name: string }).name,
+        drugCode: drug.drugcode || '',
+        drugType: getDrugTypeName(drug.drugtype || ''),
+        history
+      };
+    })
+  );
+
   return {
     totalInventoryValue,
     totalItems,
@@ -285,7 +425,9 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     inventoryByType,
     stockMovementAnalysis,
     lowStockAlert,
-    drugsWithoutHospitalData
+    drugsWithoutHospitalData,
+    totalDrugRatioHistory,
+    drugRatioHistoryByDrug
   };
 }
 

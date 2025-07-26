@@ -10,7 +10,8 @@ import {
   Table,
   Spin,
   Progress,
-  Tag
+  Tag,
+  Select
 } from 'antd';
 import {
   MedicineBoxOutlined,
@@ -19,13 +20,15 @@ import {
   ArrowUpOutlined,
   ArrowDownOutlined,
   DollarOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  LineChartOutlined
 } from '@ant-design/icons';
-import { Pie, Bar } from '@ant-design/plots';
+import { Pie, Bar, Line } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
 import { useInventoryDashboardData, InventoryDashboardData } from './controller';
 
 const { Title } = Typography;
+const { Option } = Select;
 
 interface InventoryMetricCardProps {
   title: string;
@@ -58,52 +61,139 @@ const InventoryMetricCard: React.FC<InventoryMetricCardProps> = ({
   </Col>
 );
 
-interface InventoryByTypeChartProps {
-  data: InventoryDashboardData['inventoryByType'];
+interface TotalDrugRatioHistoryChartProps {
+  data: InventoryDashboardData['totalDrugRatioHistory'];
 }
 
-const InventoryByTypeChart: React.FC<InventoryByTypeChartProps> = ({ data }) => {
-  const pieConfig = {
+const TotalDrugRatioHistoryChart: React.FC<TotalDrugRatioHistoryChartProps> = ({ data }) => {
+  console.log(3333333333, data);
+  const lineConfig = {
     data,
-    angleField: 'totalValue',
-    colorField: 'drugtype',
-    radius: 0.8,
-    label: {
-      type: 'outer',
-      content: '{name}: ฿{value}',
+    xField: 'date',
+    yField: 'avgDrugRatio',
+    point: {
+      size: 5,
+      shape: 'diamond',
     },
-    interactions: [{ type: 'element-active' }],
+    label: {
+      style: {
+        fill: '#aaa',
+      },
+    },
+    tooltip: {
+      showMarkers: true,
+      formatter: (datum: any) => ({
+        name: 'อัตราส่วนยาเฉลี่ย',
+        value: `${datum.avgDrugRatio.toFixed(2)}`,
+      }),
+    },
+    yAxis: {
+      title: {
+        text: 'อัตราส่วนยา (คงเหลือ/การใช้งาน)',
+      },
+    },
+    xAxis: {
+      title: {
+        text: 'วันที่',
+      },
+    },
   };
 
   return (
     <Col span={12}>
-      <Card title="มูลค่าคลังยาตามประเภท">
-        <Pie {...pieConfig} />
+      <Card title="ประวัติอัตราส่วนยาเฉลี่ยรวม" extra={<LineChartOutlined />}>
+        <Line {...lineConfig} />
       </Card>
     </Col>
   );
 };
 
-interface TopIssuedDrugsChartProps {
-  data: InventoryDashboardData['topIssuedDrugs'];
+interface DrugRatioHistoryByDrugChartProps {
+  data: InventoryDashboardData['drugRatioHistoryByDrug'];
 }
 
-const TopIssuedDrugsChart: React.FC<TopIssuedDrugsChartProps> = ({ data }) => {
-  const barConfig = {
-    data,
-    xField: 'issued',
-    yField: 'name',
-    seriesField: 'drugtype',
-    legend: { position: 'top-left' as const },
-    barStyle: {
-      radius: [0, 4, 4, 0],
+const DrugRatioHistoryByDrugChart: React.FC<DrugRatioHistoryByDrugChartProps> = ({ data }) => {
+  const [selectedDrug, setSelectedDrug] = useState<string>(data.length > 0 ? data[0].drugName : '');
+
+  const selectedDrugData = data.find(drug => drug.drugName === selectedDrug);
+
+  const lineConfig = {
+    data: selectedDrugData?.history || [],
+    xField: 'date',
+    yField: 'drugRatio',
+    point: {
+      size: 5,
+      shape: 'diamond',
+    },
+    color: (datum: any) => {
+      switch (datum.status) {
+        case 'critical': return '#ff4d4f';
+        case 'low': return '#faad14';
+        case 'optimal': return '#52c41a';
+        case 'excess': return '#1890ff';
+        default: return '#d9d9d9';
+      }
+    },
+    tooltip: {
+      showMarkers: true,
+      formatter: (datum: any) => [
+        { name: 'อัตราส่วนยา', value: datum.drugRatio.toFixed(2) },
+        { name: 'คงเหลือ', value: datum.remaining.toLocaleString() },
+        { name: 'การใช้งาน 30 วัน', value: datum.issued30day.toLocaleString() },
+        {
+          name: 'สถานะ', value: datum.status === 'critical' ? 'วิกฤต' :
+            datum.status === 'low' ? 'ต่ำ' :
+              datum.status === 'optimal' ? 'เหมาะสม' : 'สต็อกเกิน'
+        }
+      ],
+    },
+    yAxis: {
+      title: {
+        text: 'อัตราส่วนยา (คงเหลือ/การใช้งาน)',
+      },
+    },
+    xAxis: {
+      title: {
+        text: 'วันที่',
+      },
     },
   };
 
   return (
     <Col span={12}>
-      <Card title="ยาที่จ่ายมากที่สุด (Top 10)">
-        <Bar {...barConfig} />
+      <Card
+        title="ประวัติอัตราส่วนยาแต่ละรายการ"
+        extra={
+          <Select
+            value={selectedDrug}
+            onChange={setSelectedDrug}
+            style={{ width: 250 }}
+            placeholder="เลือกยา"
+          >
+            {data.map(drug => (
+              <Option key={drug.drugName} value={drug.drugName}>
+                {drug.drugName}
+              </Option>
+            ))}
+          </Select>
+        }
+      >
+        <Line {...lineConfig} />
+        {selectedDrugData && (
+          <div style={{ marginTop: 16, padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
+            <Row gutter={16}>
+              <Col span={8}>
+                <strong>รหัสยา:</strong> {selectedDrugData.drugCode}
+              </Col>
+              <Col span={8}>
+                <strong>ประเภทยา:</strong> {selectedDrugData.drugType}
+              </Col>
+              <Col span={8}>
+                <strong>จำนวนข้อมูล:</strong> {selectedDrugData.history.length} รายการ
+              </Col>
+            </Row>
+          </div>
+        )}
       </Card>
     </Col>
   );
@@ -281,30 +371,54 @@ const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ data }) => {
   );
 };
 
-interface InventoryTypeListProps {
-  data: InventoryDashboardData['inventoryByType'];
+interface DrugRatioSummaryProps {
+  data: InventoryDashboardData['totalDrugRatioHistory'];
 }
 
-const InventoryTypeList: React.FC<InventoryTypeListProps> = ({ data }) => {
+const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
+  const latestData = data.length > 0 ? data[data.length - 1] : null;
+
+  if (!latestData) {
+    return (
+      <Col span={8}>
+        <Card title="สรุปสถานะอัตราส่วนยา">
+          <Alert message="ไม่พบข้อมูล" type="info" />
+        </Card>
+      </Col>
+    );
+  }
+
+  const statusItems = [
+    { label: 'วิกฤต', count: latestData.criticalDrugs, color: '#ff4d4f' },
+    { label: 'ต่ำ', count: latestData.lowDrugs, color: '#faad14' },
+    { label: 'เหมาะสม', count: latestData.optimalDrugs, color: '#52c41a' },
+    { label: 'สต็อกเกิน', count: latestData.excessDrugs, color: '#1890ff' },
+  ];
+
   return (
     <Col span={8}>
-      <Card title="คลังยาตามประเภท">
+      <Card title="สรุปสถานะอัตราส่วนยา (วันล่าสุด)">
         <List
-          dataSource={data.slice(0, 8)}
+          dataSource={statusItems}
           renderItem={(item) => (
             <List.Item>
               <List.Item.Meta
-                title={item.drugtype}
-                description={
-                  <div>
-                    <div>จำนวน: {item.itemCount.toLocaleString()} รายการ</div>
-                    <div>มูลค่า: ฿{item.totalValue.toLocaleString()}</div>
+                title={
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{item.label}</span>
+                    <Tag color={item.color} style={{ minWidth: 50, textAlign: 'center' }}>
+                      {item.count}
+                    </Tag>
                   </div>
                 }
+                description={`${((item.count / latestData.totalDrugs) * 100).toFixed(1)}% ของยาทั้งหมด`}
               />
             </List.Item>
           )}
         />
+        <div style={{ marginTop: 16, textAlign: 'center', padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
+          <strong>อัตราส่วนยาเฉลี่ย: {latestData.avgDrugRatio.toFixed(2)}</strong>
+        </div>
       </Card>
     </Col>
   );
@@ -547,16 +661,16 @@ export const InventoryDashboard: React.FC = () => {
         />
       </Row>
 
-      {/* Charts */}
+      {/* Drug Ratio History Charts */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <InventoryByTypeChart data={data.inventoryByType} />
-        <TopIssuedDrugsChart data={data.topIssuedDrugs} />
+        <TotalDrugRatioHistoryChart data={data.totalDrugRatioHistory} />
+        <DrugRatioHistoryByDrugChart data={data.drugRatioHistoryByDrug} />
       </Row>
 
       {/* Analysis Cards */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <LowStockAlerts data={data.lowStockAlert} />
-        <InventoryTypeList data={data.inventoryByType} />
+        <DrugRatioSummary data={data.totalDrugRatioHistory} />
         <ReserveAnalysis avgReserveRatio={data.avgReserveRatio} />
       </Row>
 
