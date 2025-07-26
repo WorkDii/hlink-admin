@@ -124,7 +124,7 @@ const DrugRatioHistoryByDrugChart: React.FC<DrugRatioHistoryByDrugChartProps> = 
   const [selectedDrug, setSelectedDrug] = useState<string>(data.length > 0 ? data[0].drugName : '');
 
   const selectedDrugData = data.find(drug => drug.drugName === selectedDrug);
-
+  console.log(5555555, selectedDrugData);
   const lineConfig = {
     data: selectedDrugData?.history || [],
     xField: 'date',
@@ -132,28 +132,6 @@ const DrugRatioHistoryByDrugChart: React.FC<DrugRatioHistoryByDrugChartProps> = 
     point: {
       size: 5,
       shape: 'diamond',
-    },
-    color: (datum: any) => {
-      switch (datum.status) {
-        case 'critical': return '#ff4d4f';
-        case 'low': return '#faad14';
-        case 'optimal': return '#52c41a';
-        case 'excess': return '#1890ff';
-        default: return '#d9d9d9';
-      }
-    },
-    tooltip: {
-      showMarkers: true,
-      formatter: (datum: any) => [
-        { name: 'อัตราส่วนยา', value: datum.drugRatio.toFixed(2) },
-        { name: 'คงเหลือ', value: datum.remaining.toLocaleString() },
-        { name: 'การใช้งาน 30 วัน', value: datum.issued30day.toLocaleString() },
-        {
-          name: 'สถานะ', value: datum.status === 'critical' ? 'วิกฤต' :
-            datum.status === 'low' ? 'ต่ำ' :
-              datum.status === 'optimal' ? 'เหมาะสม' : 'สต็อกเกิน'
-        }
-      ],
     },
     yAxis: {
       title: {
@@ -170,7 +148,7 @@ const DrugRatioHistoryByDrugChart: React.FC<DrugRatioHistoryByDrugChartProps> = 
   return (
     <Col span={12}>
       <Card
-        title="ประวัติอัตราส่วนยาแต่ละรายการ"
+        title="ประวัติอัตราส่วนยาแต่ละรายการ (Top 50)"
         extra={
           <Select
             value={selectedDrug}

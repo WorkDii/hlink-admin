@@ -173,10 +173,9 @@ export const getDrugRatioHistoryByDrug = async (pcucode: string, topDrugs: Inven
         const issued30day = item.issued30day ?? 0;
         const drugRatio = issued30day > 0 ? item.remaining / issued30day : item.remaining > 0 ? 999 : 0;
         const status = getDrugRatioStatusForHistory(drugRatio);
-
         return {
           date: item.date ? item.date.toString() : '',
-          drugRatio,
+          drugRatio: Math.floor(drugRatio * 100) / 100,
           remaining: item.remaining,
           issued30day,
           status
@@ -289,7 +288,7 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     const topDrugsForHistory = inventoryDetails
       .filter(item => typeof item.hospital_drug === "object" && item.hospital_drug !== null && !!item.hospital_drug.name)
       .sort((a, b) => (b.issued30day ?? 0) - (a.issued30day ?? 0))
-      .slice(0, 10);
+      .slice(0, 50);
 
     const drugRatioHistoryByDrug = await getDrugRatioHistoryByDrug(ou.id, topDrugsForHistory);
 
