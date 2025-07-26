@@ -15,7 +15,6 @@ import {
 } from 'antd';
 import {
   MedicineBoxOutlined,
-  ShoppingCartOutlined,
   WarningOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
@@ -23,10 +22,11 @@ import {
   InfoCircleOutlined,
   LineChartOutlined
 } from '@ant-design/icons';
-import { Pie, Bar, Line } from '@ant-design/plots';
+import { Line } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
-import { useInventoryDashboardData, InventoryDashboardData } from './controller';
-import { getDrugRatioStatus } from '../../utils';
+import { getDrugRatioStatus, getDrugTypeName } from './utils';
+import { useInventoryDashboardData } from './hooks';
+import { InventoryDashboardData } from './types';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -545,16 +545,6 @@ const DrugsWithoutHospitalData: React.FC<DrugsWithoutHospitalDataProps> = ({ dat
       </Card>
     </Col>
   );
-};
-
-// Helper function to get drug type name
-const getDrugTypeName = (drugtype: string): string => {
-  const drugTypeMap: { [key: string]: string } = {
-    '01': 'ยาแผนปัจจุบัน',
-    '04': 'ยา คุมกำเนิด',
-    '10': 'ยาสมุนไพร',
-  };
-  return drugTypeMap[drugtype] || 'ไม่ระบุ';
 };
 
 export const InventoryDashboard: React.FC = () => {
