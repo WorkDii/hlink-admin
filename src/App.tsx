@@ -38,9 +38,9 @@ import {
 } from "./pages/inventory_request";
 import { ConfigProvider } from "./contexts/configProvider";
 import { Dashboard } from "./pages/dashboard";
-import { InventoryDashboard } from "./pages/dashboard/inventory-dashboard";
 import { DashboardOutlined } from "@ant-design/icons";
 import { DrugProblemList } from "./pages/drug_problem";
+import { InventoryDashboard } from "./pages/inventory-dashboard";
 
 function App() {
   return (

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { directusClient } from "../../directusClient";
-import { readItems, readItem } from "@directus/sdk";
 import { Ou } from "../../type";
+import { readItems, readItem } from '@tspvivek/refine-directus';
 
 export interface InventoryDrugDetail {
   id: string;
   pcucode: string;
   drugcode: string;
-  drugtype: string; 
+  drugtype: string;
   unitsellcode: string;
   unitsellname: string;
   date: string;
@@ -19,7 +19,7 @@ export interface InventoryDrugDetail {
     id: string;
     name: string;
     cost: number;
-  };
+  } | null;
 }
 
 export interface InventoryDashboardData {
@@ -27,7 +27,7 @@ export interface InventoryDashboardData {
   totalItems: number;
   lowStockItems: number;
   stockOutItems: number;
-  avgTurnoverRate: number;
+  avgReserveRatio: number;
   topIssuedDrugs: Array<{
     name: string;
     issued: number;
@@ -44,12 +44,12 @@ export interface InventoryDashboardData {
     received: number;
     issued: number;
     remaining: number;
-    turnoverRate: number;
+    reserveRatio: number;
   }>;
   lowStockAlert: Array<{
     name: string;
     remaining: number;
-    turnoverRate: number;
+    reserveRatio: number;
     status: 'low' | 'critical';
   }>;
 }
@@ -57,32 +57,27 @@ export interface InventoryDashboardData {
 export type OuWithWarehouse = Ou & { warehouse: { id: number, warehouse_id: string }[] }
 
 export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<InventoryDashboardData> {
-  // Get detailed inventory data
-  const inventoryDetails = await directusClient.request<InventoryDrugDetail[]>(
-    // @ts-ignore
+  // First, get the last available date for this OU from inventory_drug_detail
+  const lastDateResult = await directusClient.request(
     readItems("inventory_drug_detail", {
-      limit: -1,
       filter: {
-        pcucode: {
-          _eq: ou.id,
-        },
+        pcucode: { _eq: ou.id },
+        drugtype: { _in: ['01', '05', '10'] }
       },
-      fields: [
-        '*',
-        {
-          hospital_drug: ['id', 'name', 'cost']
-        }
-      ]
+      sort: ['-date'],
+      limit: 1,
+      fields: ['date'],
     })
   );
 
-  if (!inventoryDetails || inventoryDetails.length === 0) {
+  // If no data exists for this OU, return empty dashboard
+  if (!lastDateResult || lastDateResult.length === 0) {
     return {
       totalInventoryValue: 0,
       totalItems: 0,
       lowStockItems: 0,
       stockOutItems: 0,
-      avgTurnoverRate: 0,
+      avgReserveRatio: 0,
       topIssuedDrugs: [],
       inventoryByType: [],
       stockMovementAnalysis: [],
@@ -90,37 +85,73 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     };
   }
 
+  const lastDate = lastDateResult[0].date;
+
+  // Get detailed inventory data for the last date only
+  const inventoryDetails = await directusClient.request(
+    readItems("inventory_drug_detail", {
+      filter: {
+        pcucode: { _eq: ou.id },
+        drugtype: { _in: ['01', '05', '10'] },
+        date: { _eq: lastDate }
+      },
+      fields: ['*', {
+        hospital_drug: ['id', 'name', 'cost']
+      }],
+      limit: -1
+    })
+  );
+
+  console.log(`Using data from date: ${lastDate}`, inventoryDetails);
+
+  if (!inventoryDetails || inventoryDetails.length === 0) {
+    return {
+      totalInventoryValue: 0,
+      totalItems: 0,
+      lowStockItems: 0,
+      stockOutItems: 0,
+      avgReserveRatio: 0,
+      topIssuedDrugs: [],
+      inventoryByType: [],
+      stockMovementAnalysis: [],
+      lowStockAlert: []
+    };
+  }
+
+  // console.log(inventoryDetails);
   // Calculate total inventory value
   const totalInventoryValue = inventoryDetails.reduce((sum, item) => {
-    const cost = item.hospital_drug?.cost || 0;
+    const cost =
+      typeof item.hospital_drug === "object" && item.hospital_drug !== null
+        ? item.hospital_drug.cost ?? 0
+        : 0;
     return sum + (item.remaining * cost);
   }, 0);
 
   // Count items
   const totalItems = inventoryDetails.length;
   const stockOutItems = inventoryDetails.filter(item => item.remaining <= 0).length;
-  
-  // Calculate turnover rates and identify low stock
-  const itemsWithTurnover = inventoryDetails.map(item => ({
+
+  // Calculate reserve ratios (remaining/issued * 30 days)
+  const itemsWithReserveRatio = inventoryDetails.map(item => ({
     ...item,
-    turnoverRate: item.beginning > 0 ? item.issued / item.beginning : 0
+    reserveRatio: item.issued > 0 ? (item.remaining / item.issued) * 30 : item.remaining > 0 ? 999 : 0
   }));
 
-  const avgTurnoverRate = itemsWithTurnover.reduce((sum, item) => sum + item.turnoverRate, 0) / itemsWithTurnover.length;
-  
-  // Low stock threshold based on turnover rate
-  const lowStockItems = itemsWithTurnover.filter(item => {
-    const threshold = item.turnoverRate * 30; // 30 days worth
-    return item.remaining < threshold && item.remaining > 0;
+  const avgReserveRatio = itemsWithReserveRatio.reduce((sum, item) => sum + item.reserveRatio, 0) / itemsWithReserveRatio.length;
+
+  // Low stock items: those with less than 30 days of reserve
+  const lowStockItems = itemsWithReserveRatio.filter(item => {
+    return item.reserveRatio < 30 && item.remaining > 0;
   }).length;
 
   // Top issued drugs
   const topIssuedDrugs = inventoryDetails
-    .filter(item => item.hospital_drug?.name)
+    .filter(item => typeof item.hospital_drug === "object" && item.hospital_drug !== null && !!item.hospital_drug.name)
     .sort((a, b) => b.issued - a.issued)
     .slice(0, 10)
     .map(item => ({
-      name: item.hospital_drug.name,
+      name: (item.hospital_drug as { name: string }).name,
       issued: item.issued,
       drugtype: item.drugtype || 'ไม่ระบุ'
     }));
@@ -131,7 +162,10 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     if (!groups[type]) {
       groups[type] = { totalValue: 0, itemCount: 0 };
     }
-    const cost = item.hospital_drug?.cost || 0;
+    const cost =
+      typeof item.hospital_drug === "object" && item.hospital_drug !== null
+        ? item.hospital_drug.cost ?? 0
+        : 0;
     groups[type].totalValue += item.remaining * cost;
     groups[type].itemCount += 1;
     return groups;
@@ -146,32 +180,37 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     .sort((a, b) => b.totalValue - a.totalValue);
 
   // Stock movement analysis
-  const stockMovementAnalysis = inventoryDetails
-    .filter(item => item.hospital_drug?.name)
+  const stockMovementAnalysis = itemsWithReserveRatio
+    .filter(item => typeof item.hospital_drug === "object" && item.hospital_drug !== null && !!item.hospital_drug.name)
     .sort((a, b) => b.issued - a.issued)
     .slice(0, 20)
     .map(item => ({
-      name: item.hospital_drug.name,
+      name: (item.hospital_drug as { name: string }).name,
       beginning: item.beginning,
       received: item.received,
       issued: item.issued,
       remaining: item.remaining,
-      turnoverRate: item.beginning > 0 ? item.issued / item.beginning : 0
+      reserveRatio: item.reserveRatio
     }));
 
-  // Low stock alerts
-  const lowStockAlert = itemsWithTurnover
+  // Low stock alerts - items with less than 30 days reserve
+  const lowStockAlert = itemsWithReserveRatio
     .filter(item => {
-      const threshold = item.turnoverRate * 30; // 30 days worth
-      return item.remaining < threshold && item.remaining > 0 && item.hospital_drug?.name;
+      return (
+        item.reserveRatio < 30 &&
+        item.remaining > 0 &&
+        typeof item.hospital_drug === "object" &&
+        item.hospital_drug !== null &&
+        !!item.hospital_drug.name
+      );
     })
-    .sort((a, b) => a.remaining - b.remaining)
+    .sort((a, b) => a.reserveRatio - b.reserveRatio)
     .slice(0, 10)
     .map(item => ({
-      name: item.hospital_drug.name,
+      name: (item.hospital_drug as { name: string }).name,
       remaining: item.remaining,
-      turnoverRate: item.turnoverRate,
-      status: (item.remaining < item.turnoverRate * 10 ? 'critical' : 'low') as 'low' | 'critical'
+      reserveRatio: item.reserveRatio,
+      status: (item.reserveRatio < 15 ? 'critical' : 'low') as 'low' | 'critical'
     }));
 
   return {
@@ -179,7 +218,7 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     totalItems,
     lowStockItems,
     stockOutItems,
-    avgTurnoverRate,
+    avgReserveRatio,
     topIssuedDrugs,
     inventoryByType,
     stockMovementAnalysis,
@@ -188,7 +227,7 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
 }
 
 export const useInventoryDashboardData = (pcucode: string | undefined) => {
-  const [data, setData] = useState<InventoryDashboardData | null>(null);
+  const [data, setData] = useState<Awaited<ReturnType<typeof getInventoryDashboardData>> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [ou, setOu] = useState<OuWithWarehouse | null>(null);
@@ -197,7 +236,6 @@ export const useInventoryDashboardData = (pcucode: string | undefined) => {
   useEffect(() => {
     if (!pcucode) return;
     directusClient.request<OuWithWarehouse>(
-      // @ts-ignore
       readItem("ou", pcucode, {
         fields: ['*', { 'warehouse': ['id', 'warehouse_id'] }]
       })
@@ -214,7 +252,7 @@ export const useInventoryDashboardData = (pcucode: string | undefined) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!ou) return;
-      
+
       try {
         setLoading(true);
         setError(null);

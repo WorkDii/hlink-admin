@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { 
-  Typography, 
-  Row, 
-  Col, 
-  Card, 
-  Statistic, 
-  List, 
-  Alert, 
-  Table, 
-  Spin, 
+import {
+  Typography,
+  Row,
+  Col,
+  Card,
+  Statistic,
+  List,
+  Alert,
+  Table,
+  Spin,
   Progress,
   Tag
 } from 'antd';
-import { 
-  MedicineBoxOutlined, 
-  ShoppingCartOutlined, 
+import {
+  MedicineBoxOutlined,
+  ShoppingCartOutlined,
   WarningOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
@@ -23,7 +23,7 @@ import {
 } from '@ant-design/icons';
 import { Pie, Bar } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
-import { useInventoryDashboardData, InventoryDashboardData } from './inventory-dashboard.controller';
+import { useInventoryDashboardData, InventoryDashboardData } from './controller';
 
 const { Title } = Typography;
 
@@ -146,15 +146,15 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
       render: (value: number) => value.toLocaleString(),
     },
     {
-      title: 'อัตราหมุนเวียน',
-      dataIndex: 'turnoverRate',
-      key: 'turnoverRate',
+      title: 'อัตราสำรองยา (วัน)',
+      dataIndex: 'reserveRatio',
+      key: 'reserveRatio',
       render: (value: number) => (
         <Progress
-          percent={Math.min(value * 100, 100)}
+          percent={Math.min((value / 90) * 100, 100)}
           size="small"
-          format={() => `${(value * 100).toFixed(1)}%`}
-          strokeColor={value > 0.5 ? '#52c41a' : value > 0.2 ? '#faad14' : '#ff4d4f'}
+          format={() => `${value.toFixed(1)} วัน`}
+          strokeColor={value > 60 ? '#52c41a' : value > 30 ? '#faad14' : '#ff4d4f'}
         />
       ),
     },
@@ -192,7 +192,7 @@ const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ data }) => {
                   <div>
                     <strong>{item.name}</strong>
                     <br />
-                    <small>เหลือ: {item.remaining.toLocaleString()} หน่วย</small>
+                    <small>เหลือ: {item.remaining.toLocaleString()} หน่วย ({item.reserveRatio.toFixed(1)} วัน)</small>
                   </div>
                 }
                 type={item.status === 'critical' ? 'error' : 'warning'}
@@ -240,41 +240,40 @@ const InventoryTypeList: React.FC<InventoryTypeListProps> = ({ data }) => {
   );
 };
 
-interface TurnoverAnalysisProps {
-  avgTurnoverRate: number;
+interface ReserveAnalysisProps {
+  avgReserveRatio: number;
 }
 
-const TurnoverAnalysis: React.FC<TurnoverAnalysisProps> = ({ avgTurnoverRate }) => {
-  const turnoverPercentage = avgTurnoverRate * 100;
-  const turnoverStatus = turnoverPercentage > 50 ? 'excellent' : turnoverPercentage > 30 ? 'good' : 'needs-improvement';
-  
+const ReserveAnalysis: React.FC<ReserveAnalysisProps> = ({ avgReserveRatio }) => {
+  const reserveStatus = avgReserveRatio > 60 ? 'excellent' : avgReserveRatio > 30 ? 'good' : 'needs-improvement';
+
   return (
     <Col span={8}>
-      <Card title="วิเคราะห์อัตราหมุนเวียน">
+      <Card title="วิเคราะห์อัตราสำรองยา">
         <div style={{ textAlign: 'center', marginBottom: 16 }}>
           <Progress
             type="circle"
-            percent={Math.min(turnoverPercentage, 100)}
-            format={() => `${turnoverPercentage.toFixed(1)}%`}
+            percent={Math.min((avgReserveRatio / 90) * 100, 100)}
+            format={() => `${avgReserveRatio.toFixed(1)} วัน`}
             strokeColor={
-              turnoverStatus === 'excellent' ? '#52c41a' :
-              turnoverStatus === 'good' ? '#faad14' : '#ff4d4f'
+              reserveStatus === 'excellent' ? '#52c41a' :
+                reserveStatus === 'good' ? '#faad14' : '#ff4d4f'
             }
           />
         </div>
         <div style={{ textAlign: 'center' }}>
           <Tag
             color={
-              turnoverStatus === 'excellent' ? 'green' :
-              turnoverStatus === 'good' ? 'orange' : 'red'
+              reserveStatus === 'excellent' ? 'green' :
+                reserveStatus === 'good' ? 'orange' : 'red'
             }
             icon={
-              turnoverStatus === 'excellent' ? <ArrowUpOutlined /> :
-              turnoverStatus === 'good' ? <InfoCircleOutlined /> : <ArrowDownOutlined />
+              reserveStatus === 'excellent' ? <ArrowUpOutlined /> :
+                reserveStatus === 'good' ? <InfoCircleOutlined /> : <ArrowDownOutlined />
             }
           >
-            {turnoverStatus === 'excellent' ? 'ดีเยี่ยม' :
-             turnoverStatus === 'good' ? 'ดี' : 'ต้องปรับปรุง'}
+            {reserveStatus === 'excellent' ? 'ดีเยี่ยม' :
+              reserveStatus === 'good' ? 'ดี' : 'ต้องปรับปรุง'}
           </Tag>
         </div>
       </Card>
@@ -342,7 +341,7 @@ export const InventoryDashboard: React.FC = () => {
     <div>
       <Title level={2}>แดชบอร์ดคลังยา (จากข้อมูลรายละเอียด)</Title>
       <PcuOptionsButton setPcucode={setPcucode} pcucode={pcucode} style={{ marginBottom: 16 }} />
-      
+
       {/* Key Metrics */}
       <Row gutter={[16, 16]}>
         <InventoryMetricCard
@@ -386,7 +385,7 @@ export const InventoryDashboard: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <LowStockAlerts data={data.lowStockAlert} />
         <InventoryTypeList data={data.inventoryByType} />
-        <TurnoverAnalysis avgTurnoverRate={data.avgTurnoverRate} />
+        <ReserveAnalysis avgReserveRatio={data.avgReserveRatio} />
       </Row>
 
       {/* Stock Movement Table */}
