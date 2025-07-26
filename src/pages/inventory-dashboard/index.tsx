@@ -26,6 +26,7 @@ import {
 import { Pie, Bar, Line } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
 import { useInventoryDashboardData, InventoryDashboardData } from './controller';
+import { getDrugRatioStatus } from '../../utils';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -291,25 +292,7 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
         }
 
         // กรณีมีการใช้งาน
-        let color = '#ff4d4f'; // red
-        let status = 'ต่ำ';
-
-        if (ratio >= 2.0) {
-          color = '#faad14'; // orange - สต็อกเกิน
-          status = 'สต็อกเกิน';
-        } else if (ratio >= 1.2 && ratio < 2.0) {
-          color = '#52c41a'; // green - เหมาะสม
-          status = 'เหมาะสม';
-        } else if (ratio >= 0.8 && ratio < 1.2) {
-          color = '#faad14'; // orange - ใกล้หมด
-          status = 'ใกล้หมด';
-        } else if (ratio >= 0.5 && ratio < 0.8) {
-          color = '#faad14'; // orange - ต่ำ
-          status = 'ต่ำ';
-        } else {
-          color = '#ff4d4f'; // red - วิกฤต
-          status = 'วิกฤต';
-        }
+        const { color, status } = getDrugRatioStatus(ratio);
 
         return (
           <div>
@@ -396,10 +379,10 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
   }
 
   const statusItems = [
-    { label: 'วิกฤต', count: latestData.criticalDrugs, color: '#ff4d4f' },
-    { label: 'ต่ำ', count: latestData.lowDrugs, color: '#faad14' },
-    { label: 'เหมาะสม', count: latestData.optimalDrugs, color: '#52c41a' },
-    { label: 'สต็อกเกิน', count: latestData.excessDrugs, color: '#1890ff' },
+    { label: 'วิกฤต', count: latestData.critical, color: '#ff4d4f' },
+    { label: 'ต่ำ', count: latestData.low, color: '#faad14' },
+    { label: 'เหมาะสม', count: latestData.optimal, color: '#52c41a' },
+    { label: 'สต็อกเกิน', count: latestData.excess, color: '#1890ff' },
   ];
 
   return (
@@ -418,7 +401,7 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
                     </Tag>
                   </div>
                 }
-                description={`${((item.count / latestData.totalDrugs) * 100).toFixed(1)}% ของยาทั้งหมด`}
+                description={`${((item.count / latestData.totalDrungs) * 100).toFixed(2)}% ของยาทั้งหมด`}
               />
             </List.Item>
           )}

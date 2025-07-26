@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { directusClient } from "../../directusClient";
 import { Ou } from "../../type";
 import { readItems, readItem } from '@tspvivek/refine-directus';
+import { getDrugRatioStatus } from '../../utils';
 
 // Drug type mapping function
 const getDrugTypeName = (drugtype: string): string => {
@@ -78,6 +79,11 @@ export interface InventoryDashboardData {
     totalRemain: number;
     totalIssued30day: number;
     ratio: number;
+    critical: number;
+    low: number;
+    optimal: number;
+    excess: number;
+    totalDrungs: number;
   }>;
   drugRatioHistoryByDrug: Array<{
     drugName: string;
@@ -332,14 +338,45 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
   // Calculate total drug ratio history
   const totalDrugRatioHistory = Object.entries(dataByDate)
     .map(([date, items]) => {
-      const totalRemain = items.reduce((sum, item) => sum + Number(item.remaining), 0);
-      const totalIssued30day = items.reduce((sum, item) => sum + Number(item.issued30day), 0);
+      let totalRemain = 0;
+      let totalIssued30day = 0;
+      let critical = 0;
+      let low = 0;
+      let optimal = 0;
+      let excess = 0;
+
+      items.forEach(item => {
+        totalRemain += Number(item.remaining);
+        totalIssued30day += Number(item.issued30day);
+        const drugRatio = item.issued30day ?? 0 > 0 ? item.remaining / Number(item.issued30day) : item.remaining > 0 ? 999 : 0;
+        const { key } = getDrugRatioStatus(drugRatio);
+        switch (key) {
+          case 'critical':
+            critical += 1;
+            break;
+          case 'low':
+            low += 1;
+            break;
+          case 'optimal':
+            optimal += 1;
+            break;
+          case 'excess':
+            excess += 1;
+            break;
+        }
+      });
+
       const totalRatio = totalIssued30day > 0 ? totalRemain / totalIssued30day : 0;
       return {
         date,
         totalRemain,
         totalIssued30day,
-        ratio: Math.floor(totalRatio * 100) / 100
+        ratio: Math.floor(totalRatio * 100) / 100,
+        critical,
+        low,
+        optimal,
+        excess,
+        totalDrungs: items.length
       };
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
