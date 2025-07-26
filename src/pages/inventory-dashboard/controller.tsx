@@ -75,12 +75,9 @@ export interface InventoryDashboardData {
   // New fields for drug ratio history
   totalDrugRatioHistory: Array<{
     date: string;
-    avgDrugRatio: number;
-    totalDrugs: number;
-    criticalDrugs: number;
-    lowDrugs: number;
-    optimalDrugs: number;
-    excessDrugs: number;
+    totalRemain: number;
+    totalIssued30day: number;
+    ratio: number;
   }>;
   drugRatioHistoryByDrug: Array<{
     drugName: string;
@@ -331,30 +328,18 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     return groups;
   }, {} as Record<string, typeof historicalData>);
 
+
   // Calculate total drug ratio history
   const totalDrugRatioHistory = Object.entries(dataByDate)
     .map(([date, items]) => {
-      const ratios = items.map(item => {
-        const issued30day = item.issued30day ?? 0;
-        return issued30day > 0 ? item.remaining / issued30day : item.remaining > 0 ? 999 : 0;
-      });
-
-      const avgDrugRatio = ratios.length > 0 ? ratios.reduce((sum, ratio) => sum + ratio, 0) / ratios.length : 0;
-
-      // Categorize drugs by ratio status
-      const criticalDrugs = ratios.filter(ratio => ratio < 0.5 && ratio > 0).length;
-      const lowDrugs = ratios.filter(ratio => ratio >= 0.5 && ratio < 1.2).length;
-      const optimalDrugs = ratios.filter(ratio => ratio >= 1.2 && ratio < 2.0).length;
-      const excessDrugs = ratios.filter(ratio => ratio >= 2.0 && ratio < 999).length;
-
+      const totalRemain = items.reduce((sum, item) => sum + Number(item.remaining), 0);
+      const totalIssued30day = items.reduce((sum, item) => sum + Number(item.issued30day), 0);
+      const totalRatio = totalIssued30day > 0 ? totalRemain / totalIssued30day : 0;
       return {
         date,
-        avgDrugRatio,
-        totalDrugs: items.length,
-        criticalDrugs,
-        lowDrugs,
-        optimalDrugs,
-        excessDrugs
+        totalRemain,
+        totalIssued30day,
+        ratio: Math.floor(totalRatio * 100) / 100
       };
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());

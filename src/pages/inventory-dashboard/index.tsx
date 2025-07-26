@@ -66,37 +66,44 @@ interface TotalDrugRatioHistoryChartProps {
 }
 
 const TotalDrugRatioHistoryChart: React.FC<TotalDrugRatioHistoryChartProps> = ({ data }) => {
-  console.log(3333333333, data);
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <Col span={12}>
+        <Card title="ประวัติอัตราส่วนยาเฉลี่ยรวม" extra={<LineChartOutlined />}>
+          <div style={{ textAlign: 'center', color: '#aaa', padding: '32px 0' }}>
+            ไม่มีข้อมูล
+          </div>
+        </Card>
+      </Col>
+    );
+  }
+
   const lineConfig = {
     data,
     xField: 'date',
-    yField: 'avgDrugRatio',
+    yField: 'ratio',
     point: {
       size: 5,
       shape: 'diamond',
-    },
-    label: {
-      style: {
-        fill: '#aaa',
-      },
-    },
-    tooltip: {
-      showMarkers: true,
-      formatter: (datum: any) => ({
-        name: 'อัตราส่วนยาเฉลี่ย',
-        value: `${datum.avgDrugRatio.toFixed(2)}`,
-      }),
     },
     yAxis: {
       title: {
         text: 'อัตราส่วนยา (คงเหลือ/การใช้งาน)',
       },
+      min: 0,
     },
     xAxis: {
       title: {
         text: 'วันที่',
       },
+      label: {
+        autoHide: true,
+        autoRotate: true,
+      },
     },
+    smooth: true,
+    animation: false,
+    color: '#1890ff',
   };
 
   return (
@@ -417,7 +424,7 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
           )}
         />
         <div style={{ marginTop: 16, textAlign: 'center', padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
-          <strong>อัตราส่วนยาเฉลี่ย: {latestData.avgDrugRatio.toFixed(2)}</strong>
+          <strong>อัตราส่วนยาเฉลี่ย: {latestData.ratio.toFixed(2)}</strong>
         </div>
       </Card>
     </Col>
