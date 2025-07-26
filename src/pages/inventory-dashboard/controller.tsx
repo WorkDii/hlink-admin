@@ -55,6 +55,7 @@ export interface InventoryDashboardData {
     remainingValue: number;
     unitPrice: number;
     issued30day: number;
+    drugRatio: number;
   }>;
   lowStockAlert: Array<{
     name: string;
@@ -197,13 +198,17 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     .sort((a, b) => (b.issued30day ?? 0) - (a.issued30day ?? 0))
     .map(item => {
       const cost = (item.hospital_drug as { cost?: number }).cost ?? 0;
+      const issued30day = item.issued30day ?? 0;
+      const drugRatio = issued30day > 0 ? item.remaining / issued30day : item.remaining > 0 ? 999 : 0;
+
       return {
         name: (item.hospital_drug as { name: string }).name,
         drugtype_name: getDrugTypeName(item.drugtype || ''),
         remaining: item.remaining,
         remainingValue: item.remaining * cost,
         unitPrice: cost,
-        issued30day: item.issued30day ?? 0
+        issued30day: issued30day,
+        drugRatio: drugRatio
       };
     });
 

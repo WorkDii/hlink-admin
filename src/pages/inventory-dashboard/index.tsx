@@ -156,6 +156,78 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
       render: (value: string) => Number(value).toLocaleString('th-TH'),
       sorter: (a: any, b: any) => Number(a.issued30day) - Number(b.issued30day),
     },
+    {
+      title: 'อัตราส่วนยา (คงเหลือ/การใช้งาน)',
+      dataIndex: 'drugRatio',
+      key: 'drugRatio',
+      render: (value: string, record: any) => {
+        const ratio = Number(value);
+        const issued30day = Number(record.issued30day);
+
+        // กรณีไม่มีการใช้งาน
+        if (issued30day === 0) {
+          if (record.remaining > 0) {
+            return (
+              <div>
+                <span style={{ color: '#ff4d4f', fontWeight: 'bold' }}>
+                  ไม่มีการใช้งาน
+                </span>
+                <br />
+                <small style={{ color: '#ff4d4f' }}>
+                  มีสต็อก {record.remaining.toLocaleString('th-TH')} หน่วย
+                </small>
+              </div>
+            );
+          } else {
+            return (
+              <div>
+                <span style={{ color: '#d9d9d9', fontWeight: 'bold' }}>
+                  ไม่มีการใช้งาน
+                </span>
+                <br />
+                <small style={{ color: '#d9d9d9' }}>
+                  ไม่มีสต็อก
+                </small>
+              </div>
+            );
+          }
+        }
+
+        // กรณีมีการใช้งาน
+        let color = '#ff4d4f'; // red
+        let status = 'ต่ำ';
+
+        if (ratio >= 2.0) {
+          color = '#faad14'; // orange - สต็อกเกิน
+          status = 'สต็อกเกิน';
+        } else if (ratio >= 1.2 && ratio < 2.0) {
+          color = '#52c41a'; // green - เหมาะสม
+          status = 'เหมาะสม';
+        } else if (ratio >= 0.8 && ratio < 1.2) {
+          color = '#faad14'; // orange - ใกล้หมด
+          status = 'ใกล้หมด';
+        } else if (ratio >= 0.5 && ratio < 0.8) {
+          color = '#faad14'; // orange - ต่ำ
+          status = 'ต่ำ';
+        } else {
+          color = '#ff4d4f'; // red - วิกฤต
+          status = 'วิกฤต';
+        }
+
+        return (
+          <div>
+            <span style={{ color, fontWeight: 'bold' }}>
+              {ratio.toFixed(2)}
+            </span>
+            <br />
+            <small style={{ color }}>
+              {status}
+            </small>
+          </div>
+        );
+      },
+      sorter: (a: any, b: any) => Number(a.drugRatio) - Number(b.drugRatio),
+    },
   ];
 
   return (
@@ -166,7 +238,7 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
           dataSource={data}
           rowKey="name"
           pagination={{ pageSize: 20 }}
-          scroll={{ x: 1000 }}
+          scroll={{ x: 1200 }}
         />
       </Card>
     </Col>
