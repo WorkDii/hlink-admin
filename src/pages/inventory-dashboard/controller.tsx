@@ -64,6 +64,14 @@ export interface InventoryDashboardData {
     reserveRatio: number;
     status: 'low' | 'critical';
   }>;
+  drugsWithoutHospitalData: Array<{
+    drugcode: string;
+    drugtype: string;
+    unitsellname: string;
+    issued30day: number;
+    remaining: number;
+    lastUsedDate: string;
+  }>;
 }
 
 export type OuWithWarehouse = Ou & { warehouse: { id: number, warehouse_id: string }[] }
@@ -96,7 +104,8 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       topIssuedDrugs: [],
       inventoryByType: [],
       stockMovementAnalysis: [],
-      lowStockAlert: []
+      lowStockAlert: [],
+      drugsWithoutHospitalData: []
     };
   }
 
@@ -130,7 +139,8 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       topIssuedDrugs: [],
       inventoryByType: [],
       stockMovementAnalysis: [],
-      lowStockAlert: []
+      lowStockAlert: [],
+      drugsWithoutHospitalData: []
     };
   }
   // Calculate total inventory value
@@ -236,6 +246,35 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       status: (item.reserveRatio < 15 ? 'critical' : 'low') as 'low' | 'critical'
     }));
 
+  // Fetch drugs without hospital data
+  const drugsWithoutHospitalDataRaw = await directusClient.request(
+    readItems("inventory_drug_detail", {
+      filter: {
+        pcucode: { _eq: ou.id },
+        drugtype: { _in: ['01', '04', '10'] },
+        date: { _eq: lastDate },
+        hospital_drug: {
+          _null: true
+        }
+      },
+      fields: ['drugcode', 'drugtype', 'unitsellname', 'issued30day', 'remaining', 'date'],
+      limit: -1
+    })
+  );
+
+  // Process drugs without hospital data - only include those with usage
+  const drugsWithoutHospitalData = (drugsWithoutHospitalDataRaw || [])
+    .filter(item => (item.issued30day || 0) > 0)
+    .map(item => ({
+      drugcode: item.drugcode || '',
+      drugtype: item.drugtype || '',
+      unitsellname: item.unitsellname || '',
+      issued30day: item.issued30day || 0,
+      remaining: item.remaining || 0,
+      lastUsedDate: item.date ? item.date.toString() : ''
+    }))
+    .sort((a, b) => b.issued30day - a.issued30day);
+
   return {
     totalInventoryValue,
     totalItems,
@@ -245,7 +284,8 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     topIssuedDrugs,
     inventoryByType,
     stockMovementAnalysis,
-    lowStockAlert
+    lowStockAlert,
+    drugsWithoutHospitalData
   };
 }
 

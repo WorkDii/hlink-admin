@@ -351,6 +351,108 @@ const ReserveAnalysis: React.FC<ReserveAnalysisProps> = ({ avgReserveRatio }) =>
   );
 };
 
+interface DrugsWithoutHospitalDataProps {
+  data: InventoryDashboardData['drugsWithoutHospitalData'];
+}
+
+const DrugsWithoutHospitalData: React.FC<DrugsWithoutHospitalDataProps> = ({ data }) => {
+  const columns = [
+    {
+      title: 'รหัสยา',
+      dataIndex: 'drugcode',
+      key: 'drugcode',
+      width: '15%',
+    },
+    {
+      title: 'ชื่อยา',
+      dataIndex: 'unitsellname',
+      key: 'unitsellname',
+      width: '30%',
+    },
+    {
+      title: 'ประเภทยา',
+      dataIndex: 'drugtype',
+      key: 'drugtype',
+      width: '15%',
+      render: (value: string) => getDrugTypeName(value),
+    },
+    {
+      title: 'จำนวนคงเหลือ',
+      dataIndex: 'remaining',
+      key: 'remaining',
+      width: '15%',
+      render: (value: string) => Number(value).toLocaleString('th-TH'),
+      sorter: (a: any, b: any) => a.remaining - b.remaining,
+    },
+    {
+      title: 'ปริมาณการใช้งาน 30 วันย้อนหลัง',
+      dataIndex: 'issued30day',
+      key: 'issued30day',
+      width: '15%',
+      render: (value: string) => Number(value).toLocaleString('th-TH'),
+      sorter: (a: any, b: any) => a.issued30day - b.issued30day,
+    },
+    {
+      title: 'วันที่อัปเดตล่าสุด',
+      dataIndex: 'lastUsedDate',
+      key: 'lastUsedDate',
+      width: '10%',
+      render: (value: string) => new Date(value).toLocaleDateString('th-TH'),
+    },
+  ];
+
+  return (
+    <Col span={24}>
+      <Card
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <WarningOutlined style={{ color: '#faad14' }} />
+            รายการยาที่มีการใช้งาน แต่ยังไม่ได้ลิงค์ข้อมูลกับระบบคลังยา
+            <Tag color="orange" style={{ marginLeft: 8 }}>
+              {data.length} รายการ
+            </Tag>
+          </div>
+        }
+      >
+        {data.length === 0 ? (
+          <Alert
+            message="ไม่พบรายการยาที่ต้องลิงค์ข้อมูล"
+            description="ยาทั้งหมดมีการลิงค์ข้อมูลกับระบบคลังยาแล้ว"
+            type="success"
+            showIcon
+          />
+        ) : (
+          <Alert
+            message="พบรายการยาที่ต้องลิงค์ข้อมูล"
+            description={`มี ${data.length} รายการยาที่มีการใช้งานแต่ยังไม่ได้ลิงค์ข้อมูลกับระบบคลังยา กรุณาตรวจสอบและลิงค์ข้อมูลให้ครบถ้วน`}
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
+        <Table
+          columns={columns}
+          dataSource={data}
+          rowKey="drugcode"
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: 1000 }}
+          size="small"
+        />
+      </Card>
+    </Col>
+  );
+};
+
+// Helper function to get drug type name
+const getDrugTypeName = (drugtype: string): string => {
+  const drugTypeMap: { [key: string]: string } = {
+    '01': 'ยาแผนปัจจุบัน',
+    '04': 'ยา คุมกำเนิด',
+    '10': 'ยาสมุนไพร',
+  };
+  return drugTypeMap[drugtype] || 'ไม่ระบุ';
+};
+
 export const InventoryDashboard: React.FC = () => {
   const [pcucode, setPcucode] = useState<string | undefined>(undefined);
   const { data, loading, error } = useInventoryDashboardData(pcucode);
@@ -437,11 +539,11 @@ export const InventoryDashboard: React.FC = () => {
           color="#faad14"
         />
         <InventoryMetricCard
-          title="รายการหมดสต็อก"
-          value={data.stockOutItems}
-          icon={<ShoppingCartOutlined />}
+          title="รายการยาที่ต้องลิงค์ข้อมูล"
+          value={data.drugsWithoutHospitalData.length}
+          icon={<InfoCircleOutlined />}
           suffix=" รายการ"
-          color="#ff4d4f"
+          color="#faad14"
         />
       </Row>
 
@@ -456,6 +558,11 @@ export const InventoryDashboard: React.FC = () => {
         <LowStockAlerts data={data.lowStockAlert} />
         <InventoryTypeList data={data.inventoryByType} />
         <ReserveAnalysis avgReserveRatio={data.avgReserveRatio} />
+      </Row>
+
+      {/* Drugs Without Hospital Data */}
+      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+        <DrugsWithoutHospitalData data={data.drugsWithoutHospitalData} />
       </Row>
 
       {/* Stock Movement Table */}
