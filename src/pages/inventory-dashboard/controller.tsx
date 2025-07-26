@@ -24,6 +24,7 @@ export interface InventoryDrugDetail {
   beginning: number;
   received: number;
   issued: number;
+  issued30day?: number; // Add issued30day as optional, since we use it
   remaining: number;
   hospital_drug: {
     id: string;
@@ -40,7 +41,7 @@ export interface InventoryDashboardData {
   avgReserveRatio: number;
   topIssuedDrugs: Array<{
     name: string;
-    issued: number;
+    issued30day: number;
     drugtype: string;
   }>;
   inventoryByType: Array<{
@@ -145,11 +146,14 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
   const totalItems = inventoryDetails.length;
   const stockOutItems = inventoryDetails.filter(item => item.remaining <= 0).length;
 
-  // Calculate reserve ratios (remaining/issued * 30 days)
-  const itemsWithReserveRatio = inventoryDetails.map(item => ({
-    ...item,
-    reserveRatio: item.issued > 0 ? (item.remaining / item.issued) * 30 : item.remaining > 0 ? 999 : 0
-  }));
+  // Calculate reserve ratios (remaining/issued30day * 30 days)
+  const itemsWithReserveRatio = inventoryDetails.map(item => {
+    const issued30day = item.issued30day ?? 0;
+    return {
+      ...item,
+      reserveRatio: issued30day > 0 ? (item.remaining / issued30day) * 30 : item.remaining > 0 ? 999 : 0
+    };
+  });
 
   const avgReserveRatio = itemsWithReserveRatio.reduce((sum, item) => sum + item.reserveRatio, 0) / itemsWithReserveRatio.length;
 
@@ -158,14 +162,14 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     return item.reserveRatio < 30 && item.remaining > 0;
   }).length;
 
-  // Top issued drugs
+  // Top issued drugs (use issued30day, not issued)
   const topIssuedDrugs = inventoryDetails
     .filter(item => typeof item.hospital_drug === "object" && item.hospital_drug !== null && !!item.hospital_drug.name)
-    .sort((a, b) => b.issued - a.issued)
+    .sort((a, b) => (b.issued30day ?? 0) - (a.issued30day ?? 0))
     .slice(0, 10)
     .map(item => ({
       name: (item.hospital_drug as { name: string }).name,
-      issued: item.issued,
+      issued30day: item.issued30day ?? 0,
       drugtype: item.drugtype || 'ไม่ระบุ'
     }));
 
