@@ -3,6 +3,16 @@ import { directusClient } from "../../directusClient";
 import { Ou } from "../../type";
 import { readItems, readItem } from '@tspvivek/refine-directus';
 
+// Drug type mapping function
+const getDrugTypeName = (drugtype: string): string => {
+  const drugTypeMap: { [key: string]: string } = {
+    '01': 'ยาแผนปัจจุบัน',
+    '04': 'ยา คุมกำเนิด',
+    '10': 'ยาสมุนไพร',
+  };
+  return drugTypeMap[drugtype] || 'ไม่ระบุ';
+};
+
 export interface InventoryDrugDetail {
   id: string;
   pcucode: string;
@@ -40,11 +50,11 @@ export interface InventoryDashboardData {
   }>;
   stockMovementAnalysis: Array<{
     name: string;
-    beginning: number;
-    received: number;
-    issued: number;
+    drugtype_name: string;
     remaining: number;
-    reserveRatio: number;
+    remainingValue: number;
+    unitPrice: number;
+    issued30day: number;
   }>;
   lowStockAlert: Array<{
     name: string;
@@ -62,7 +72,10 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     readItems("inventory_drug_detail", {
       filter: {
         pcucode: { _eq: ou.id },
-        drugtype: { _in: ['01', '05', '10'] }
+        drugtype: { _in: ['01', '04', '10'] },
+        hospital_drug: {
+          _nnull: true
+        }
       },
       sort: ['-date'],
       limit: 1,
@@ -92,8 +105,11 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     readItems("inventory_drug_detail", {
       filter: {
         pcucode: { _eq: ou.id },
-        drugtype: { _in: ['01', '05', '10'] },
-        date: { _eq: lastDate }
+        drugtype: { _in: ['01', '04', '10'] },
+        date: { _eq: lastDate },
+        hospital_drug: {
+          _nnull: true
+        }
       },
       fields: ['*', {
         hospital_drug: ['id', 'name', 'cost']
@@ -101,8 +117,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       limit: -1
     })
   );
-
-  console.log(`Using data from date: ${lastDate}`, inventoryDetails);
 
   if (!inventoryDetails || inventoryDetails.length === 0) {
     return {
@@ -117,13 +131,11 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       lowStockAlert: []
     };
   }
-
-  // console.log(inventoryDetails);
   // Calculate total inventory value
   const totalInventoryValue = inventoryDetails.reduce((sum, item) => {
     const cost =
       typeof item.hospital_drug === "object" && item.hospital_drug !== null
-        ? item.hospital_drug.cost ?? 0
+        ? (item.hospital_drug as { cost?: number }).cost ?? 0
         : 0;
     return sum + (item.remaining * cost);
   }, 0);
@@ -182,16 +194,18 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
   // Stock movement analysis
   const stockMovementAnalysis = itemsWithReserveRatio
     .filter(item => typeof item.hospital_drug === "object" && item.hospital_drug !== null && !!item.hospital_drug.name)
-    .sort((a, b) => b.issued - a.issued)
-    .slice(0, 20)
-    .map(item => ({
-      name: (item.hospital_drug as { name: string }).name,
-      beginning: item.beginning,
-      received: item.received,
-      issued: item.issued,
-      remaining: item.remaining,
-      reserveRatio: item.reserveRatio
-    }));
+    .sort((a, b) => (b.issued30day ?? 0) - (a.issued30day ?? 0))
+    .map(item => {
+      const cost = (item.hospital_drug as { cost?: number }).cost ?? 0;
+      return {
+        name: (item.hospital_drug as { name: string }).name,
+        drugtype_name: getDrugTypeName(item.drugtype || ''),
+        remaining: item.remaining,
+        remainingValue: item.remaining * cost,
+        unitPrice: cost,
+        issued30day: item.issued30day ?? 0
+      };
+    });
 
   // Low stock alerts - items with less than 30 days reserve
   const lowStockAlert = itemsWithReserveRatio

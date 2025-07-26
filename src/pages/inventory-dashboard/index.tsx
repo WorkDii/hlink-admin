@@ -119,56 +119,54 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
       title: 'ชื่อยา',
       dataIndex: 'name',
       key: 'name',
-      width: '25%',
+      width: '20%',
     },
     {
-      title: 'คงเหลือเริ่มต้น',
-      dataIndex: 'beginning',
-      key: 'beginning',
-      render: (value: number) => value.toLocaleString(),
+      title: 'ประเภทยา',
+      dataIndex: 'drugtype_name',
+      key: 'drugtype_name',
+      width: '15%',
+      sorter: (a: any, b: any) => a.drugtype_name.localeCompare(b.drugtype_name),
     },
     {
-      title: 'รับเข้า',
-      dataIndex: 'received',
-      key: 'received',
-      render: (value: number) => value.toLocaleString(),
-    },
-    {
-      title: 'จ่ายออก',
-      dataIndex: 'issued',
-      key: 'issued',
-      render: (value: number) => value.toLocaleString(),
-    },
-    {
-      title: 'คงเหลือ',
+      title: 'จำนวนคงเหลือ',
       dataIndex: 'remaining',
       key: 'remaining',
-      render: (value: number) => value.toLocaleString(),
+      render: (value: string) => Number(value).toLocaleString('th-TH'),
+      sorter: (a: any, b: any) => Number(a.remaining) - Number(b.remaining),
     },
     {
-      title: 'อัตราสำรองยา (วัน)',
-      dataIndex: 'reserveRatio',
-      key: 'reserveRatio',
-      render: (value: number) => (
-        <Progress
-          percent={Math.min((value / 90) * 100, 100)}
-          size="small"
-          format={() => `${value.toFixed(1)} วัน`}
-          strokeColor={value > 60 ? '#52c41a' : value > 30 ? '#faad14' : '#ff4d4f'}
-        />
-      ),
+      title: 'ราคาต่อหน่วย',
+      dataIndex: 'unitPrice',
+      key: 'unitPrice',
+      render: (value: string) => `฿${Number(value).toLocaleString('th-TH')}`,
+      sorter: (a: any, b: any) => Number(a.unitPrice) - Number(b.unitPrice),
+    },
+    {
+      title: 'มูลค่าคงเหลือ',
+      dataIndex: 'remainingValue',
+      key: 'remainingValue',
+      render: (value: string) => `฿${Number(value).toLocaleString('th-TH')}`,
+      sorter: (a: any, b: any) => Number(a.remainingValue) - Number(b.remainingValue),
+    },
+    {
+      title: 'ปริมาณการใช้งาน 30 วันย้อนหลัง',
+      dataIndex: 'issued30day',
+      key: 'issued30day',
+      render: (value: string) => Number(value).toLocaleString('th-TH'),
+      sorter: (a: any, b: any) => Number(a.issued30day) - Number(b.issued30day),
     },
   ];
 
   return (
     <Col span={24}>
-      <Card title="การเคลื่อนไหวของสต็อก (Top 20)">
+      <Card title="การเคลื่อนไหวของสต็อก">
         <Table
           columns={columns}
           dataSource={data}
           rowKey="name"
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: 800 }}
+          pagination={{ pageSize: 20 }}
+          scroll={{ x: 1000 }}
         />
       </Card>
     </Col>
