@@ -25,7 +25,6 @@ export interface InventoryDashboardData {
   totalItems: number;
   lowStockItems: number;
   stockOutItems: number;
-  avgReserveRatio: number;
   topIssuedDrugs: Array<{
     name: string;
     issued30day: number;

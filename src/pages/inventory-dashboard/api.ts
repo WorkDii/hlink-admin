@@ -202,14 +202,12 @@ export const calculateBasicMetrics = (inventoryDetails: InventoryDrugDetail[]) =
   const totalItems = inventoryDetails.length;
   const stockOutItems = inventoryDetails.filter(item => item.remaining <= 0).length;
 
-  const avgReserveRatio = itemsWithReserveRatio.reduce((sum, item) => sum + item.reserveRatio, 0) / itemsWithReserveRatio.length;
   const lowStockItems = itemsWithReserveRatio.filter(item => item.reserveRatio < 30 && item.remaining > 0).length;
 
   return {
     totalInventoryValue,
     totalItems,
     stockOutItems,
-    avgReserveRatio,
     lowStockItems,
     itemsWithReserveRatio
   };
@@ -230,7 +228,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
         totalItems: 0,
         lowStockItems: 0,
         stockOutItems: 0,
-        avgReserveRatio: 0,
         topIssuedDrugs: [],
         inventoryByType: [],
         stockMovementAnalysis: [],
@@ -250,7 +247,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
         totalItems: 0,
         lowStockItems: 0,
         stockOutItems: 0,
-        avgReserveRatio: 0,
         topIssuedDrugs: [],
         inventoryByType: [],
         stockMovementAnalysis: [],
@@ -266,7 +262,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       totalInventoryValue,
       totalItems,
       stockOutItems,
-      avgReserveRatio,
       lowStockItems,
       itemsWithReserveRatio
     } = calculateBasicMetrics(inventoryDetails);
@@ -297,7 +292,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       totalItems,
       lowStockItems,
       stockOutItems,
-      avgReserveRatio,
       topIssuedDrugs,
       inventoryByType,
       stockMovementAnalysis,

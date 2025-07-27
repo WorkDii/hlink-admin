@@ -9,15 +9,12 @@ import {
   Alert,
   Table,
   Spin,
-  Progress,
   Tag,
   Select
 } from 'antd';
 import {
   MedicineBoxOutlined,
   WarningOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
   DollarOutlined,
   InfoCircleOutlined,
   LineChartOutlined
@@ -124,7 +121,7 @@ const DrugRatioHistoryByDrugChart: React.FC<DrugRatioHistoryByDrugChartProps> = 
   const [selectedDrug, setSelectedDrug] = useState<string>(data.length > 0 ? data[0].drugName : '');
 
   const selectedDrugData = data.find(drug => drug.drugName === selectedDrug);
-  console.log(5555555, selectedDrugData);
+
   const lineConfig = {
     data: selectedDrugData?.history || [],
     xField: 'date',
@@ -392,46 +389,7 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
   );
 };
 
-interface ReserveAnalysisProps {
-  avgReserveRatio: number;
-}
 
-const ReserveAnalysis: React.FC<ReserveAnalysisProps> = ({ avgReserveRatio }) => {
-  const reserveStatus = avgReserveRatio > 60 ? 'excellent' : avgReserveRatio > 30 ? 'good' : 'needs-improvement';
-
-  return (
-    <Col span={8}>
-      <Card title="วิเคราะห์อัตราสำรองยา">
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <Progress
-            type="circle"
-            percent={Math.min((avgReserveRatio / 90) * 100, 100)}
-            format={() => `${avgReserveRatio.toFixed(1)} วัน`}
-            strokeColor={
-              reserveStatus === 'excellent' ? '#52c41a' :
-                reserveStatus === 'good' ? '#faad14' : '#ff4d4f'
-            }
-          />
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <Tag
-            color={
-              reserveStatus === 'excellent' ? 'green' :
-                reserveStatus === 'good' ? 'orange' : 'red'
-            }
-            icon={
-              reserveStatus === 'excellent' ? <ArrowUpOutlined /> :
-                reserveStatus === 'good' ? <InfoCircleOutlined /> : <ArrowDownOutlined />
-            }
-          >
-            {reserveStatus === 'excellent' ? 'ดีเยี่ยม' :
-              reserveStatus === 'good' ? 'ดี' : 'ต้องปรับปรุง'}
-          </Tag>
-        </div>
-      </Card>
-    </Col>
-  );
-};
 
 interface DrugsWithoutHospitalDataProps {
   data: InventoryDashboardData['drugsWithoutHospitalData'];
@@ -629,7 +587,6 @@ export const InventoryDashboard: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <LowStockAlerts data={data.lowStockAlert} />
         <DrugRatioSummary data={data.totalDrugRatioHistory} />
-        <ReserveAnalysis avgReserveRatio={data.avgReserveRatio} />
       </Row>
 
       {/* Drugs Without Hospital Data */}
