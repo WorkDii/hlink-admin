@@ -11,11 +11,10 @@ import {
   getTopIssuedDrugs,
   groupInventoryByType,
   generateStockMovementAnalysis,
-  generateLowStockAlerts,
   calculateDrugRatioStats,
   getDrugRatioStatusForHistory,
   getDrugTypeName,
-  getSimpleStockStatus
+  getStockStatus
 } from './utils';
 
 /**
@@ -204,7 +203,7 @@ export const calculateBasicMetrics = (inventoryDetails: InventoryDrugDetail[]) =
   const stockOutItems = inventoryDetails.filter(item => item.remaining <= 0).length;
 
   const lowStockItems = itemsWithReserveRatio.filter(item =>
-    item.remaining > 0 && getSimpleStockStatus(item.reserveRatio) !== 'sufficient'
+    item.remaining > 0 && (getStockStatus(item.reserveRatio) === 'critical' || getStockStatus(item.reserveRatio) === 'low')
   ).length;
 
   return {
@@ -234,7 +233,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
         topIssuedDrugs: [],
         inventoryByType: [],
         stockMovementAnalysis: [],
-        lowStockAlert: [],
         drugsWithoutHospitalData: [],
         totalDrugRatioHistory: [],
         drugRatioHistoryByDrug: []
@@ -253,7 +251,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
         topIssuedDrugs: [],
         inventoryByType: [],
         stockMovementAnalysis: [],
-        lowStockAlert: [],
         drugsWithoutHospitalData: [],
         totalDrugRatioHistory: [],
         drugRatioHistoryByDrug: []
@@ -273,7 +270,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
     const topIssuedDrugs = getTopIssuedDrugs(inventoryDetails);
     const inventoryByType = groupInventoryByType(inventoryDetails);
     const stockMovementAnalysis = generateStockMovementAnalysis(itemsWithReserveRatio);
-    const lowStockAlert = generateLowStockAlerts(itemsWithReserveRatio);
 
     // Fetch drugs without hospital data
     const drugsWithoutHospitalData = await getDrugsWithoutHospitalData(ou.id, lastDate);
@@ -298,7 +294,6 @@ export async function getInventoryDashboardData(ou: OuWithWarehouse): Promise<In
       topIssuedDrugs,
       inventoryByType,
       stockMovementAnalysis,
-      lowStockAlert,
       drugsWithoutHospitalData,
       totalDrugRatioHistory,
       drugRatioHistoryByDrug

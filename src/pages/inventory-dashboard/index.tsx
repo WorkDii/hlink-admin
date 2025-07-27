@@ -105,7 +105,7 @@ const TotalDrugRatioHistoryChart: React.FC<TotalDrugRatioHistoryChartProps> = ({
   };
 
   return (
-    <Col span={12}>
+    <Col span={24}>
       <Card title="ประวัติอัตราส่วนยาเฉลี่ยรวม" extra={<LineChartOutlined />}>
         <Line {...lineConfig} />
       </Card>
@@ -143,7 +143,7 @@ const DrugRatioHistoryByDrugChart: React.FC<DrugRatioHistoryByDrugChartProps> = 
   };
 
   return (
-    <Col span={12}>
+    <Col span={16}>
       <Card
         title="ประวัติอัตราส่วนยาแต่ละรายการ (Top 50)"
         extra={
@@ -294,95 +294,7 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
   );
 };
 
-interface LowStockAlertsProps {
-  data: InventoryDashboardData['lowStockAlert'];
-}
 
-const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ data }) => {
-  const criticalItems = data.filter(item => item.status === 'critical');
-  const lowItems = data.filter(item => item.status === 'low');
-
-  return (
-    <Col span={8}>
-      <Card
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <WarningOutlined />
-            แจ้งเตือนสต็อกต่ำ
-            <Tag color="red" style={{ marginLeft: 8 }}>
-              {criticalItems.length} วิกฤต
-            </Tag>
-            <Tag color="orange">
-              {lowItems.length} ต่ำ
-            </Tag>
-          </div>
-        }
-      >
-        {data.length === 0 ? (
-          <Alert
-            message="ไม่มีรายการสต็อกต่ำ"
-            description="สต็อกยาทั้งหมดอยู่ในระดับที่เหมาะสม"
-            type="success"
-            showIcon
-          />
-        ) : (
-          <>
-            {/* Summary section */}
-            <div style={{ marginBottom: 16, padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#ff4d4f' }}>
-                      {criticalItems.length}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>รายการวิกฤต</div>
-                    <div style={{ fontSize: '10px', color: '#999' }}>&lt; 7 วัน</div>
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#faad14' }}>
-                      {lowItems.length}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>รายการต่ำ</div>
-                    <div style={{ fontSize: '10px', color: '#999' }}>7-30 วัน</div>
-                  </div>
-                </Col>
-              </Row>
-            </div>
-
-            <List
-              dataSource={data}
-              renderItem={(item) => (
-                <List.Item>
-                  <Alert
-                    message={
-                      <div>
-                        <strong>{item.name}</strong>
-                        <br />
-                        <small>
-                          เหลือ: {item.remaining.toLocaleString('th-TH')} หน่วย
-                          ({formatReserveRatioInMonths(item.reserveRatio)})
-                        </small>
-                      </div>
-                    }
-                    type={item.status === 'critical' ? 'error' : 'warning'}
-                    showIcon
-                    action={
-                      <Tag color={item.status === 'critical' ? 'red' : 'orange'}>
-                        {item.status === 'critical' ? 'วิกฤต' : 'ต่ำ'}
-                      </Tag>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
-          </>
-        )}
-      </Card>
-    </Col>
-  );
-};
 
 interface DrugRatioSummaryProps {
   data: InventoryDashboardData['totalDrugRatioHistory'];
@@ -409,7 +321,7 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
   ];
 
   return (
-    <Col span={8}>
+    <Col span={6}>
       <Card title="สรุปสถานะสต็อก (วันล่าสุด)">
         <List
           dataSource={statusItems}
@@ -654,15 +566,14 @@ export const InventoryDashboard: React.FC = () => {
         />
       </Row>
 
-      {/* Drug Ratio History Charts */}
+      {/* Total Drug Ratio History Chart - Full Width */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <TotalDrugRatioHistoryChart data={data.totalDrugRatioHistory} />
-        <DrugRatioHistoryByDrugChart data={data.drugRatioHistoryByDrug} />
       </Row>
 
-      {/* Analysis Cards */}
+      {/* Drug Ratio by Drug Chart and Summary */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <LowStockAlerts data={data.lowStockAlert} />
+        <DrugRatioHistoryByDrugChart data={data.drugRatioHistoryByDrug} />
         <DrugRatioSummary data={data.totalDrugRatioHistory} />
       </Row>
 

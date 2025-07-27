@@ -44,12 +44,7 @@ export interface InventoryDashboardData {
     issued30day: number;
     drugRatio: number;
   }>;
-  lowStockAlert: Array<{
-    name: string;
-    remaining: number;
-    reserveRatio: number;
-    status: 'low' | 'critical';
-  }>;
+
   drugsWithoutHospitalData: Array<{
     drugcode: string;
     drugtype: string;

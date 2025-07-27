@@ -139,46 +139,9 @@ export const formatReserveRatioInMonths = (reserveRatio: number): string => {
   }
 };
 
-/**
- * Legacy function for backward compatibility - returns simplified status
- */
-export const getSimpleStockStatus = (reserveRatio: number): 'critical' | 'low' | 'sufficient' => {
-  if (reserveRatio < 7) {
-    return 'critical';
-  } else if (reserveRatio < 30) {
-    return 'low';
-  } else {
-    return 'sufficient';
-  }
-};
 
-/**
- * Generates low stock alerts
- */
-export const generateLowStockAlerts = (
-  itemsWithReserveRatio: ItemWithReserveRatio[],
-) => {
-  return itemsWithReserveRatio
-    .filter(item => item.remaining > 0) // Only include items with remaining stock
-    .sort((a, b) => a.reserveRatio - b.reserveRatio)
-    .map((item) => {
-      const status = getSimpleStockStatus(item.reserveRatio);
 
-      // Only include critical and low stock items
-      if (status === 'sufficient') {
-        return null;
-      }
 
-      return {
-        name: (item.hospital_drug as { name: string }).name,
-        remaining: item.remaining,
-        reserveRatio: item.reserveRatio,
-        status
-      };
-    })
-    .filter(item => item !== null) // Remove null items
-    .slice(0, 10); // Limit to top 10 most critical items
-};
 
 /**
  * Calculates reserve ratio statistics for a given date's data (unified approach)
