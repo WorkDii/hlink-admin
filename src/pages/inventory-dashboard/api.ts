@@ -14,7 +14,8 @@ import {
   generateLowStockAlerts,
   calculateDrugRatioStats,
   getDrugRatioStatusForHistory,
-  getDrugTypeName
+  getDrugTypeName,
+  getSimpleStockStatus
 } from './utils';
 
 /**
@@ -202,7 +203,9 @@ export const calculateBasicMetrics = (inventoryDetails: InventoryDrugDetail[]) =
   const totalItems = inventoryDetails.length;
   const stockOutItems = inventoryDetails.filter(item => item.remaining <= 0).length;
 
-  const lowStockItems = itemsWithReserveRatio.filter(item => item.reserveRatio < 30 && item.remaining > 0).length;
+  const lowStockItems = itemsWithReserveRatio.filter(item =>
+    item.remaining > 0 && getSimpleStockStatus(item.reserveRatio) !== 'sufficient'
+  ).length;
 
   return {
     totalInventoryValue,

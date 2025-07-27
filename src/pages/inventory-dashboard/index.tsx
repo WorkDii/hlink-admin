@@ -21,7 +21,7 @@ import {
 } from '@ant-design/icons';
 import { Line } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
-import { getDrugRatioStatus, getDrugTypeName } from './utils';
+import { getDrugRatioStatus, getDrugTypeName, getStockStatusWithColors, formatReserveRatioInMonths } from './utils';
 import { useInventoryDashboardData } from './hooks';
 import { InventoryDashboardData } from './types';
 
@@ -235,12 +235,13 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
       sorter: (a: any, b: any) => Number(a.issued30day) - Number(b.issued30day),
     },
     {
-      title: 'อัตราส่วนยา (คงเหลือ/การใช้งาน)',
-      dataIndex: 'drugRatio',
-      key: 'drugRatio',
+      title: 'สถานะสต็อก (เดือนคงเหลือ)',
+      dataIndex: 'reserveRatio',
+      key: 'reserveRatio',
       render: (value: string, record: any) => {
-        const ratio = Number(value);
+        const reserveRatio = Number(value);
         const issued30day = Number(record.issued30day);
+
         if (issued30day === 0) {
           if (record.remaining > 0) {
             return <span style={{ color: '#ff4d4f' }}>ไม่มีการใช้งาน (มีสต็อก {record.remaining.toLocaleString('th-TH')} หน่วย)</span>;
@@ -248,10 +249,11 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
             return <span style={{ color: '#d9d9d9' }}>ไม่มีการใช้งาน (ไม่มีสต็อก)</span>;
           }
         }
-        const { color, status } = getDrugRatioStatus(ratio);
-        return <span style={{ color }}>{ratio.toFixed(2)} ({status})</span>;
+
+        const { color, status } = getStockStatusWithColors(reserveRatio);
+        return <span style={{ color }}>{formatReserveRatioInMonths(reserveRatio)} ({status})</span>;
       },
-      sorter: (a: any, b: any) => Number(a.drugRatio) - Number(b.drugRatio),
+      sorter: (a: any, b: any) => Number(a.reserveRatio) - Number(b.reserveRatio),
     },
   ];
 
@@ -297,32 +299,86 @@ interface LowStockAlertsProps {
 }
 
 const LowStockAlerts: React.FC<LowStockAlertsProps> = ({ data }) => {
+  const criticalItems = data.filter(item => item.status === 'critical');
+  const lowItems = data.filter(item => item.status === 'low');
+
   return (
     <Col span={8}>
-      <Card title="แจ้งเตือนสต็อกต่ำ" extra={<WarningOutlined />}>
-        <List
-          dataSource={data}
-          renderItem={(item) => (
-            <List.Item>
-              <Alert
-                message={
-                  <div>
-                    <strong>{item.name}</strong>
-                    <br />
-                    <small>เหลือ: {item.remaining.toLocaleString()} หน่วย ({item.reserveRatio.toFixed(1)} วัน)</small>
+      <Card
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <WarningOutlined />
+            แจ้งเตือนสต็อกต่ำ
+            <Tag color="red" style={{ marginLeft: 8 }}>
+              {criticalItems.length} วิกฤต
+            </Tag>
+            <Tag color="orange">
+              {lowItems.length} ต่ำ
+            </Tag>
+          </div>
+        }
+      >
+        {data.length === 0 ? (
+          <Alert
+            message="ไม่มีรายการสต็อกต่ำ"
+            description="สต็อกยาทั้งหมดอยู่ในระดับที่เหมาะสม"
+            type="success"
+            showIcon
+          />
+        ) : (
+          <>
+            {/* Summary section */}
+            <div style={{ marginBottom: 16, padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#ff4d4f' }}>
+                      {criticalItems.length}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#666' }}>รายการวิกฤต</div>
+                    <div style={{ fontSize: '10px', color: '#999' }}>&lt; 7 วัน</div>
                   </div>
-                }
-                type={item.status === 'critical' ? 'error' : 'warning'}
-                showIcon
-                action={
-                  <Tag color={item.status === 'critical' ? 'red' : 'orange'}>
-                    {item.status === 'critical' ? 'วิกฤต' : 'ต่ำ'}
-                  </Tag>
-                }
-              />
-            </List.Item>
-          )}
-        />
+                </Col>
+                <Col span={12}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#faad14' }}>
+                      {lowItems.length}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#666' }}>รายการต่ำ</div>
+                    <div style={{ fontSize: '10px', color: '#999' }}>7-30 วัน</div>
+                  </div>
+                </Col>
+              </Row>
+            </div>
+
+            <List
+              dataSource={data}
+              renderItem={(item) => (
+                <List.Item>
+                  <Alert
+                    message={
+                      <div>
+                        <strong>{item.name}</strong>
+                        <br />
+                        <small>
+                          เหลือ: {item.remaining.toLocaleString('th-TH')} หน่วย
+                          ({formatReserveRatioInMonths(item.reserveRatio)})
+                        </small>
+                      </div>
+                    }
+                    type={item.status === 'critical' ? 'error' : 'warning'}
+                    showIcon
+                    action={
+                      <Tag color={item.status === 'critical' ? 'red' : 'orange'}>
+                        {item.status === 'critical' ? 'วิกฤต' : 'ต่ำ'}
+                      </Tag>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          </>
+        )}
       </Card>
     </Col>
   );
@@ -338,7 +394,7 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
   if (!latestData) {
     return (
       <Col span={8}>
-        <Card title="สรุปสถานะอัตราส่วนยา">
+        <Card title="สรุปสถานะสต็อก">
           <Alert message="ไม่พบข้อมูล" type="info" />
         </Card>
       </Col>
@@ -346,15 +402,15 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
   }
 
   const statusItems = [
-    { label: 'วิกฤต', count: latestData.critical, color: '#ff4d4f' },
-    { label: 'ต่ำ', count: latestData.low, color: '#faad14' },
-    { label: 'เหมาะสม', count: latestData.optimal, color: '#52c41a' },
-    { label: 'สต็อกเกิน', count: latestData.excess, color: '#1890ff' },
+    { label: 'วิกฤต', count: latestData.critical, color: '#ff4d4f', threshold: '< 7 วัน' },
+    { label: 'ต่ำ', count: latestData.low, color: '#faad14', threshold: '7-30 วัน' },
+    { label: 'เหมาะสม', count: latestData.optimal, color: '#52c41a', threshold: '1-3 เดือน' },
+    { label: 'สต็อกเกิน', count: latestData.excess, color: '#1890ff', threshold: '≥ 3 เดือน' },
   ];
 
   return (
     <Col span={8}>
-      <Card title="สรุปสถานะอัตราส่วนยา (วันล่าสุด)">
+      <Card title="สรุปสถานะสต็อก (วันล่าสุด)">
         <List
           dataSource={statusItems}
           renderItem={(item) => (
@@ -362,7 +418,10 @@ const DrugRatioSummary: React.FC<DrugRatioSummaryProps> = ({ data }) => {
               <List.Item.Meta
                 title={
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>{item.label}</span>
+                    <div>
+                      <span>{item.label}</span>
+                      <div style={{ fontSize: '10px', color: '#999' }}>{item.threshold}</div>
+                    </div>
                     <Tag color={item.color} style={{ minWidth: 50, textAlign: 'center' }}>
                       {item.count}
                     </Tag>

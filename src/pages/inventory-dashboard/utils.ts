@@ -81,7 +81,7 @@ export const groupInventoryByType = (inventoryDetails: InventoryDrugDetail[]) =>
 };
 
 /**
- * Generates stock movement analysis data
+ * Generates stock movement analysis data (unified with reserve ratio approach)
  */
 export const generateStockMovementAnalysis = (itemsWithReserveRatio: ItemWithReserveRatio[]) => {
   return itemsWithReserveRatio
@@ -99,37 +99,89 @@ export const generateStockMovementAnalysis = (itemsWithReserveRatio: ItemWithRes
         remainingValue: item.remaining * cost,
         unitPrice: cost,
         issued30day: issued30day,
-        drugRatio: drugRatio
+        drugRatio: drugRatio,
+        reserveRatio: item.reserveRatio // Add reserve ratio for unified status calculation
       };
     });
 };
 
 /**
- * Generates low stock alerts
+ * Determines stock status based on reserve ratio (days of stock remaining)
+ * Converted to months for display (30 days = 1 month)
  */
-export const generateLowStockAlerts = (itemsWithReserveRatio: ItemWithReserveRatio[], limit: number = 10) => {
-  return itemsWithReserveRatio
-    .filter(item => {
-      return (
-        item.reserveRatio < 30 &&
-        item.remaining > 0 &&
-        typeof item.hospital_drug === "object" &&
-        item.hospital_drug !== null &&
-        !!item.hospital_drug.name
-      );
-    })
-    .sort((a, b) => a.reserveRatio - b.reserveRatio)
-    .slice(0, limit)
-    .map(item => ({
-      name: (item.hospital_drug as { name: string }).name,
-      remaining: item.remaining,
-      reserveRatio: item.reserveRatio,
-      status: (item.reserveRatio < 15 ? 'critical' : 'low') as 'low' | 'critical'
-    }));
+export const getStockStatus = (reserveRatio: number): 'critical' | 'low' | 'optimal' | 'excess' => {
+  if (reserveRatio < 7) {         // < 0.23 เดือน
+    return 'critical';
+  } else if (reserveRatio < 30) { // < 1 เดือน
+    return 'low';
+  } else if (reserveRatio < 90) { // < 3 เดือน
+    return 'optimal';
+  } else {                        // >= 3 เดือน
+    return 'excess';
+  }
 };
 
 /**
- * Calculates drug ratio statistics for a given date's data
+ * Converts days to months for display (30 days = 1 month)
+ */
+export const formatReserveRatioInMonths = (reserveRatio: number): string => {
+  const months = reserveRatio / 30;
+
+  if (reserveRatio < 7) {
+    // For critical items (< 7 days), show in days for precision
+    return `${reserveRatio.toFixed(0)} วัน`;
+  } else if (months < 1) {
+    // For items between 7-30 days, show as fraction of month
+    return `${months.toFixed(1)} เดือน`;
+  } else {
+    // For items >= 30 days, show in months
+    return `${months.toFixed(1)} เดือน`;
+  }
+};
+
+/**
+ * Legacy function for backward compatibility - returns simplified status
+ */
+export const getSimpleStockStatus = (reserveRatio: number): 'critical' | 'low' | 'sufficient' => {
+  if (reserveRatio < 7) {
+    return 'critical';
+  } else if (reserveRatio < 30) {
+    return 'low';
+  } else {
+    return 'sufficient';
+  }
+};
+
+/**
+ * Generates low stock alerts
+ */
+export const generateLowStockAlerts = (
+  itemsWithReserveRatio: ItemWithReserveRatio[],
+) => {
+  return itemsWithReserveRatio
+    .filter(item => item.remaining > 0) // Only include items with remaining stock
+    .sort((a, b) => a.reserveRatio - b.reserveRatio)
+    .map((item) => {
+      const status = getSimpleStockStatus(item.reserveRatio);
+
+      // Only include critical and low stock items
+      if (status === 'sufficient') {
+        return null;
+      }
+
+      return {
+        name: (item.hospital_drug as { name: string }).name,
+        remaining: item.remaining,
+        reserveRatio: item.reserveRatio,
+        status
+      };
+    })
+    .filter(item => item !== null) // Remove null items
+    .slice(0, 10); // Limit to top 10 most critical items
+};
+
+/**
+ * Calculates reserve ratio statistics for a given date's data (unified approach)
  */
 export const calculateDrugRatioStats = (items: InventoryDrugDetail[]) => {
   let totalRemain = 0;
@@ -139,12 +191,16 @@ export const calculateDrugRatioStats = (items: InventoryDrugDetail[]) => {
   let optimal = 0;
   let excess = 0;
 
-  items.forEach(item => {
+  // Calculate reserve ratios for all items
+  const itemsWithReserveRatio = calculateReserveRatios(items);
+
+  itemsWithReserveRatio.forEach(item => {
     totalRemain += Number(item.remaining);
     totalIssued30day += Number(item.issued30day);
-    const drugRatio = item.issued30day ?? 0 > 0 ? item.remaining / Number(item.issued30day) : item.remaining > 0 ? 999 : 0;
-    const { key } = getDrugRatioStatus(drugRatio);
-    switch (key) {
+
+    // Use reserve ratio (days of stock) for consistent categorization
+    const stockStatus = getStockStatus(item.reserveRatio);
+    switch (stockStatus) {
       case 'critical':
         critical += 1;
         break;
@@ -189,6 +245,47 @@ export const getDrugRatioStatusForHistory = (drugRatio: number): 'critical' | 'l
 };
 
 
+export interface StockStatus {
+  color: string;
+  status: string;
+  key: 'critical' | 'low' | 'optimal' | 'excess';
+}
+
+/**
+ * Gets stock status with colors based on reserve ratio (unified approach)
+ */
+export function getStockStatusWithColors(reserveRatio: number): StockStatus {
+  const statusKey = getStockStatus(reserveRatio);
+
+  switch (statusKey) {
+    case 'critical':
+      return {
+        color: '#ff4d4f',
+        status: 'วิกฤต',
+        key: 'critical'
+      };
+    case 'low':
+      return {
+        color: '#faad14',
+        status: 'ต่ำ',
+        key: 'low'
+      };
+    case 'optimal':
+      return {
+        color: '#52c41a',
+        status: 'เหมาะสม',
+        key: 'optimal'
+      };
+    case 'excess':
+      return {
+        color: '#1890ff',
+        status: 'สต็อกเกิน',
+        key: 'excess'
+      };
+  }
+}
+
+// Legacy function for backward compatibility with drug ratio approach
 export interface DrugRatioStatus {
   color: string;
   status: string;
