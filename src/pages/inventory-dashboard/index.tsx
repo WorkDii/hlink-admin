@@ -187,6 +187,11 @@ interface StockMovementTableProps {
 }
 
 const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+  });
+
   const columns = [
     {
       title: 'ชื่อยา',
@@ -236,50 +241,15 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
       render: (value: string, record: any) => {
         const ratio = Number(value);
         const issued30day = Number(record.issued30day);
-
-        // กรณีไม่มีการใช้งาน
         if (issued30day === 0) {
           if (record.remaining > 0) {
-            return (
-              <div>
-                <span style={{ color: '#ff4d4f', fontWeight: 'bold' }}>
-                  ไม่มีการใช้งาน
-                </span>
-                <br />
-                <small style={{ color: '#ff4d4f' }}>
-                  มีสต็อก {record.remaining.toLocaleString('th-TH')} หน่วย
-                </small>
-              </div>
-            );
+            return <span style={{ color: '#ff4d4f' }}>ไม่มีการใช้งาน (มีสต็อก {record.remaining.toLocaleString('th-TH')} หน่วย)</span>;
           } else {
-            return (
-              <div>
-                <span style={{ color: '#d9d9d9', fontWeight: 'bold' }}>
-                  ไม่มีการใช้งาน
-                </span>
-                <br />
-                <small style={{ color: '#d9d9d9' }}>
-                  ไม่มีสต็อก
-                </small>
-              </div>
-            );
+            return <span style={{ color: '#d9d9d9' }}>ไม่มีการใช้งาน (ไม่มีสต็อก)</span>;
           }
         }
-
-        // กรณีมีการใช้งาน
         const { color, status } = getDrugRatioStatus(ratio);
-
-        return (
-          <div>
-            <span style={{ color, fontWeight: 'bold' }}>
-              {ratio.toFixed(2)}
-            </span>
-            <br />
-            <small style={{ color }}>
-              {status}
-            </small>
-          </div>
-        );
+        return <span style={{ color }}>{ratio.toFixed(2)} ({status})</span>;
       },
       sorter: (a: any, b: any) => Number(a.drugRatio) - Number(b.drugRatio),
     },
@@ -292,8 +262,30 @@ const StockMovementTable: React.FC<StockMovementTableProps> = ({ data }) => {
           columns={columns}
           dataSource={data}
           rowKey="name"
-          pagination={{ pageSize: 20 }}
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} จาก ${total} รายการ`,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            size: 'default',
+            onChange: (page, pageSize) => {
+              setPagination({
+                current: page,
+                pageSize: pageSize || 20,
+              });
+            },
+            onShowSizeChange: (current, size) => {
+              setPagination({
+                current: 1,
+                pageSize: size,
+              });
+            },
+          }}
           scroll={{ x: 1200 }}
+          size="middle"
+          loading={false}
+          bordered
         />
       </Card>
     </Col>
@@ -396,6 +388,11 @@ interface DrugsWithoutHospitalDataProps {
 }
 
 const DrugsWithoutHospitalData: React.FC<DrugsWithoutHospitalDataProps> = ({ data }) => {
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+
   const columns = [
     {
       title: 'รหัสยา',
@@ -474,9 +471,30 @@ const DrugsWithoutHospitalData: React.FC<DrugsWithoutHospitalDataProps> = ({ dat
           columns={columns}
           dataSource={data}
           rowKey="drugcode"
-          pagination={{ pageSize: 10 }}
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} จาก ${total} รายการ`,
+            pageSizeOptions: ['5', '10', '20', '50'],
+            size: 'default',
+            onChange: (page, pageSize) => {
+              setPagination({
+                current: page,
+                pageSize: pageSize || 10,
+              });
+            },
+            onShowSizeChange: (current, size) => {
+              setPagination({
+                current: 1,
+                pageSize: size,
+              });
+            },
+          }}
           scroll={{ x: 1000 }}
           size="small"
+          loading={false}
+          bordered
         />
       </Card>
     </Col>
