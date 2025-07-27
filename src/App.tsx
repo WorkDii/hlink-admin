@@ -40,6 +40,7 @@ import { ConfigProvider } from "./contexts/configProvider";
 import { DashboardOutlined } from "@ant-design/icons";
 import { DrugProblemList } from "./pages/drug_problem";
 import { InventoryDashboard } from "./pages/inventory-dashboard";
+import { InventoryDashboard as InventoryDashboard1 } from "./pages/inventory-dashboard1";
 
 function App() {
   return (
@@ -66,6 +67,14 @@ function App() {
                 list: "/inventory-dashboard",
                 meta: {
                   label: "Dashboard",
+                  icon: <DashboardOutlined />,
+                },
+              },
+              {
+                name: "inventory-dashboard1",
+                list: "/inventory-dashboard1",
+                meta: {
+                  label: "Dashboard1",
                   icon: <DashboardOutlined />,
                 },
               },
@@ -186,6 +195,7 @@ function App() {
                   element={<NavigateToResource resource="inventory-dashboard" />}
                 />
                 <Route path="/inventory-dashboard" element={<InventoryDashboard />} />
+                <Route path="/inventory-dashboard1" element={<InventoryDashboard1 />} />
                 <Route path="/units">
                   <Route index element={<UnitList />} />
                 </Route>
