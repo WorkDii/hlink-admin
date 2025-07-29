@@ -225,8 +225,14 @@ const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
   });
 
   // Count statistics
-  const linkedCount = data.filter(item => item.hospital_drug && item.hospital_drug.name).length;
-  const unlinkedCount = data.filter(item => !item.hospital_drug || !item.hospital_drug.name).length;
+  const linkedCount = data.filter(item => {
+    const hd = item.hospital_drug;
+    return typeof hd === 'object' && hd !== null && 'name' in hd && Boolean((hd as any).name);
+  }).length;
+  const unlinkedCount = data.filter(item => {
+    const hd = item.hospital_drug;
+    return !hd || !(typeof hd === 'object' && hd !== null && 'name' in hd && Boolean((hd as any).name));
+  }).length;
 
   return (
     <Col span={24}>
