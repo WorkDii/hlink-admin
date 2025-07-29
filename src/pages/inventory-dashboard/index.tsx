@@ -71,7 +71,6 @@ const STOCK_STATUS_ORDER: Array<keyof typeof STATUS_COLORS> = [
 ];
 
 const StockStatusSummary: React.FC<StockStatusSummaryProps> = ({ data }) => {
-  // data is an object: { 'วิกฤต': number, ... }
   if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
     return (
       <Col span={24}>
