@@ -15,7 +15,7 @@ export const DrugProblemList = () => {
       aggregate("visitdrug", {
 
         aggregate: {
-          count: ['*']
+          count: ['id']
         },
         groupBy: ['pcucode', 'drugtype', 'drugcode'],
         query: {

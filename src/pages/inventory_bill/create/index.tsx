@@ -20,7 +20,7 @@ export const InventoryBillCreate = () => {
   const { selectProps: inventoryRequestSelectProps } = useSelect({
     resource: "inventory_request",
     meta: {
-      fields: ['*',  'pcucode.name'],
+      fields: ['*', 'pcucode.name'],
     },
     filters: [
       {
@@ -35,13 +35,13 @@ export const InventoryBillCreate = () => {
       }
     ],
     // @ts-ignore
-    optionLabel: (d: InventoryRequest & { hcode: { name: string }, pcucode: { name: string } }) => 
+    optionLabel: (d: InventoryRequest & { hcode: { name: string }, pcucode: { name: string } }) =>
       `[${d.request_id}] จำนวนยา ${d.inventory_request_drug.length} รายการ  ขอเบิกโดย ${d.pcucode.name}`,
     optionValue: "id",
   });
 
   const inventory_request = useWatch("inventory_request", form);
-  
+
   useEffect(() => {
     if (inventory_request) {
       getDrugRequestList(inventory_request).then((v) => {
@@ -49,7 +49,6 @@ export const InventoryBillCreate = () => {
         form.setFieldValue("hcode", v.hcode);
         form.setFieldValue("bill_warehouse", v.bill_warehouse);
         form.setFieldValue("request_id", v.request_id);
-        console.log(v)
         form.setFieldValue("inventory_request_drug", v.inventory_request_drug);
       });
     } else {
@@ -60,7 +59,7 @@ export const InventoryBillCreate = () => {
   return (
     <Create saveButtonProps={saveButtonProps}   >
       <Form
-      form={form}
+        form={form}
         {...formProps}
         layout="vertical"
         onFinish={async (v: any) => {
@@ -68,8 +67,8 @@ export const InventoryBillCreate = () => {
           if (formProps.onFinish) formProps.onFinish(data || {});
         }}
       >
-        
-        <Form.Item label={"คำขอเบิกยา"} name={["inventory_request"]} rules={[{ required: true }]} style={{marginBottom: 8}}><Select {...inventoryRequestSelectProps} /></Form.Item>  
+
+        <Form.Item label={"คำขอเบิกยา"} name={["inventory_request"]} rules={[{ required: true }]} style={{ marginBottom: 8 }}><Select {...inventoryRequestSelectProps} /></Form.Item>
         <Form.Item name={['pcucode']} hidden><Input></Input></Form.Item>
         <Form.Item name={['hcode']} hidden><Input></Input></Form.Item>
         <Form.Item name={['bill_warehouse']} hidden><Input></Input></Form.Item>

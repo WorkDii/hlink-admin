@@ -37,9 +37,10 @@ import {
   InventoryRequestList,
 } from "./pages/inventory_request";
 import { ConfigProvider } from "./contexts/configProvider";
-import { Dashboard } from "./pages/dashboard";
 import { DashboardOutlined } from "@ant-design/icons";
 import { DrugProblemList } from "./pages/drug_problem";
+import { InventoryDashboard } from "./pages/inventory-dashboard";
+import { InventoryDashboard as InventoryDashboard1 } from "./pages/inventory-dashboard1";
 
 function App() {
   return (
@@ -60,11 +61,20 @@ function App() {
             routerProvider={routerBindings}
             authProvider={authProvider}
             resources={[
+
               {
-                name: "dashboard",
-                list: "/dashboard",
+                name: "inventory-dashboard",
+                list: "/inventory-dashboard",
                 meta: {
                   label: "Dashboard",
+                  icon: <DashboardOutlined />,
+                },
+              },
+              {
+                name: "inventory-dashboard1",
+                list: "/inventory-dashboard1",
+                meta: {
+                  label: "Dashboard1",
                   icon: <DashboardOutlined />,
                 },
               },
@@ -152,6 +162,15 @@ function App() {
                   parent: "setting",
                 },
               },
+              {
+                name: 'inventory_drug_detail',
+                list: '/inventory_drug_detail',
+                meta: {
+                  noStatus: true,
+                  label: 'รายละเอียดคลังยา',
+                  parent: 'setting',
+                },
+              }
 
             ]}
             options={{
@@ -182,9 +201,10 @@ function App() {
               >
                 <Route
                   index
-                  element={<NavigateToResource resource="dashboard" />}
+                  element={<NavigateToResource resource="inventory-dashboard" />}
                 />
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/inventory-dashboard" element={<InventoryDashboard />} />
+                <Route path="/inventory-dashboard1" element={<InventoryDashboard1 />} />
                 <Route path="/units">
                   <Route index element={<UnitList />} />
                 </Route>

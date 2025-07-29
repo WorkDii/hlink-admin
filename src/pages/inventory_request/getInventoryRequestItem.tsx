@@ -6,12 +6,17 @@ import { InventoryRequest } from "../../type";
 
 export const getInventoryRequestItem = async (id: string) => {
   const data = await directusClient.request<InventoryRequest>(
-    // @ts-ignore
     readItem("inventory_request", id, {
       fields: [
         "*",
-        "inventory_request_drug.*",
-        "inventory_request_drug.hospital_drug.*",
+        {
+          inventory_request_drug: [
+            "*",
+            {
+              hospital_drug: ["*"]
+            }
+          ]
+        }
       ],
       limit: -1,
       deep: {

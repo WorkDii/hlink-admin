@@ -9,38 +9,39 @@ import {
   rest,
   realtime,
 } from "@tspvivek/refine-directus";
+import { Schema } from "./directus/generated/client";
 
 export const API_URL = import.meta.env.VITE_API_URL as string;
 
 const LOCAL_STORAGE_KEY = "hlink_directus_storage";
 
 export const authLocalStorage = () =>
-  ({
-    get: async () => {
-      const data =
-        typeof window !== "undefined" &&
-        window.localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (data) {
-        return JSON.parse(data);
-      }
-      return null;
-    },
+({
+  get: async () => {
+    const data =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (data) {
+      return JSON.parse(data);
+    }
+    return null;
+  },
 
-    set: async (value: AuthenticationData | null) => {
-      if (!value) {
-        return (
-          typeof window !== "undefined" &&
-          window.localStorage.removeItem(LOCAL_STORAGE_KEY)
-        );
-      }
+  set: async (value: AuthenticationData | null) => {
+    if (!value) {
       return (
         typeof window !== "undefined" &&
-        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value))
+        window.localStorage.removeItem(LOCAL_STORAGE_KEY)
       );
-    },
-  } as AuthenticationStorage);
+    }
+    return (
+      typeof window !== "undefined" &&
+      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value))
+    );
+  },
+} as AuthenticationStorage);
 
-export const directusClient = createDirectus(API_URL)
+export const directusClient = createDirectus<Schema>(API_URL)
   .with(authentication("json", { storage: authLocalStorage() }))
   .with(rest())
   .with(
