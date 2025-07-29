@@ -19,6 +19,7 @@
     "@wdii/numth": "npm:@jsr/wdii__numth",
     "antd": "^5.18.3",
     "antd-style": "^3.6.2",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.11",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",

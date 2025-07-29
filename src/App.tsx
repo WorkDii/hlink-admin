@@ -162,6 +162,15 @@ function App() {
                   parent: "setting",
                 },
               },
+              {
+                name: 'inventory_drug_detail',
+                list: '/inventory_drug_detail',
+                meta: {
+                  noStatus: true,
+                  label: 'รายละเอียดคลังยา',
+                  parent: 'setting',
+                },
+              }
 
             ]}
             options={{

@@ -24,13 +24,18 @@ import PcuOptionsButton from '../../components/pcuOptionsButton';
 import { getDrugRatioStatus, getDrugTypeName, getStockStatusWithColors, formatReserveRatioInMonths } from './utils';
 import { useInventoryDashboardData } from './hooks';
 import { InventoryDashboardData } from './types';
+import { ComponentLoading } from './component.loading';
+import { ComponentError } from './component.error';
+import { ComponentEmpty } from './component.empty';
+import { useList, useMany } from '@refinedev/core';
+import { valueType } from 'antd/es/statistic/utils';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 interface InventoryMetricCardProps {
   title: string;
-  value: number;
+  value: valueType;
   suffix?: string;
   icon: React.ReactNode;
   color?: string;
@@ -476,65 +481,23 @@ export const InventoryDashboard: React.FC = () => {
   const [pcucode, setPcucode] = useState<string | undefined>(undefined);
   const { data, loading, error } = useInventoryDashboardData(pcucode);
 
-  if (loading) {
-    return (
-      <div>
-        <Title level={2}>แดชบอร์ดคลังยา (จากข้อมูลรายละเอียด)</Title>
-        <PcuOptionsButton setPcucode={setPcucode} pcucode={pcucode} style={{ marginBottom: 16 }} />
-        <Row gutter={[16, 16]} justify="center" align="middle" style={{ minHeight: '200px' }}>
-          <Col>
-            <Spin size="large" />
-          </Col>
-        </Row>
-      </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div>
-        <Title level={2}>แดชบอร์ดคลังยา (จากข้อมูลรายละเอียด)</Title>
-        <PcuOptionsButton setPcucode={setPcucode} pcucode={pcucode} style={{ marginBottom: 16 }} />
-        <Row gutter={[16, 16]} justify="center" align="middle" style={{ minHeight: '200px' }}>
-          <Col>
-            <Alert
-              message="เกิดข้อผิดพลาด"
-              description={error.message}
-              type="error"
-              showIcon
-            />
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div>
-        <Title level={2}>แดชบอร์ดคลังยา (จากข้อมูลรายละเอียด)</Title>
-        <PcuOptionsButton setPcucode={setPcucode} pcucode={pcucode} style={{ marginBottom: 16 }} />
-        <Row gutter={[16, 16]} justify="center" align="middle" style={{ minHeight: '200px' }}>
-          <Col>
-            <Alert
-              message="ไม่พบข้อมูล"
-              description="กรุณาเลือก PCU เพื่อดูข้อมูล"
-              type="info"
-              showIcon
-            />
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <Title level={2}>แดชบอร์ดคลังยา (จากข้อมูลรายละเอียด)</Title>
-      <PcuOptionsButton setPcucode={setPcucode} pcucode={pcucode} style={{ marginBottom: 16 }} />
-
-      {/* Key Metrics */}
+  return <div>
+    <Title level={2}>แดชบอร์ดคลังยา (จากข้อมูลรายละเอียด)</Title>
+    <PcuOptionsButton setPcucode={setPcucode} pcucode={pcucode} style={{ marginBottom: 16 }} />
+    {loading && <ComponentLoading />}
+    {error && <ComponentError error={error} />}
+    {!data && !loading && !error && <ComponentEmpty />}
+    {data && !loading && (
       <Row gutter={[16, 16]}>
+        <InventoryMetricCard
+          title="อัตราการสำรองยา (เดือน)"
+          value={data.totalDrugRatio30Day?.valueString}
+          icon={<LineChartOutlined />}
+          suffix={`เท่า (${data.totalDrugRatio30Day.status})`}
+          color={data.totalDrugRatio30Day.color}
+          precision={2}
+        />
         <InventoryMetricCard
           title="มูลค่าคลังยารวม"
           value={data.totalInventoryValue}
@@ -545,47 +508,20 @@ export const InventoryDashboard: React.FC = () => {
         />
         <InventoryMetricCard
           title="จำนวนรายการยารวม"
-          value={data.totalItems}
+          value={data.totalItem}
           icon={<MedicineBoxOutlined />}
           suffix=" รายการ"
           color="#1890ff"
         />
         <InventoryMetricCard
-          title="รายการสต็อกต่ำ"
-          value={data.lowStockItems}
+          title="จำนวนยาที่มีการใช้งาน แต่ยังไม่ได้ลิงค์ข้อมูลกับระบบคลังยา"
+          value={data.drugsWithoutHospitalData?.length || 0}
           icon={<WarningOutlined />}
           suffix=" รายการ"
           color="#faad14"
         />
-        <InventoryMetricCard
-          title="รายการยาที่ต้องลิงค์ข้อมูล"
-          value={data.drugsWithoutHospitalData.length}
-          icon={<InfoCircleOutlined />}
-          suffix=" รายการ"
-          color="#faad14"
-        />
       </Row>
 
-      {/* Total Drug Ratio History Chart - Full Width */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <TotalDrugRatioHistoryChart data={data.totalDrugRatioHistory} />
-      </Row>
-
-      {/* Drug Ratio by Drug Chart and Summary */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <DrugRatioHistoryByDrugChart data={data.drugRatioHistoryByDrug} />
-        <DrugRatioSummary data={data.totalDrugRatioHistory} />
-      </Row>
-
-      {/* Drugs Without Hospital Data */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <DrugsWithoutHospitalData data={data.drugsWithoutHospitalData} />
-      </Row>
-
-      {/* Stock Movement Table */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <StockMovementTable data={data.stockMovementAnalysis} />
-      </Row>
-    </div>
-  );
+    )}
+  </div>
 };
