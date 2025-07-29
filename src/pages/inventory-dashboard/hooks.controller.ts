@@ -180,13 +180,13 @@ export const listHistoricalDrugRatio = async (pcucode: string) => {
     },
     groupBy: ['date']
   }))
-  return _data.map(i => {
+  return _data.filter(i => !!i.date).map(i => {
     const ratio = getRatioData(i.sum.issued30day, i.sum.remaining)
     return {
-      ...i,
+      date: format(i.date || new Date, 'yyyy-MM-dd'),
       ratio
     }
-  })
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 }
 
 export const getInventoryDashboardData = async (pcucode: string, date?: string) => {
