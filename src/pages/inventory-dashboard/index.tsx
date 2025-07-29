@@ -7,13 +7,17 @@ import {
   Statistic,
   Table,
   Tag,
+  Button,
+  Space,
 } from 'antd';
 import {
   MedicineBoxOutlined,
   WarningOutlined,
   DollarOutlined,
   LineChartOutlined,
-  PieChartOutlined
+  PieChartOutlined,
+  UnorderedListOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import { Line, LineConfig } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
@@ -57,6 +61,191 @@ const InventoryMetricCard: React.FC<InventoryMetricCardProps> = ({
   </Col>
 );
 
+interface DrugDetailsListProps {
+  data: Awaited<ReturnType<typeof getInventoryDashboardData>>['drugData'];
+}
+
+const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
+  const [showDetails, setShowDetails] = useState(false);
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <Col span={24}>
+        <Card title="รายละเอียดยาทั้งหมด" extra={<UnorderedListOutlined />}>
+          <div style={{ textAlign: 'center', color: '#aaa', padding: '32px 0' }}>
+            ไม่มีข้อมูล
+          </div>
+        </Card>
+      </Col>
+    );
+  }
+
+  const columns = [
+    {
+      title: 'รหัสยา',
+      dataIndex: 'drugcode',
+      key: 'drugcode',
+      width: 100,
+      fixed: 'left' as const,
+    },
+    {
+      title: 'ชื่อยา',
+      dataIndex: ['hospital_drug', 'name'],
+      key: 'hospital_drug.name',
+      width: 250,
+      ellipsis: true,
+    },
+    {
+      title: 'ประเภทยา',
+      dataIndex: 'drugtype',
+      key: 'drugtype',
+      width: 100,
+      render: (drugtype: string) => {
+        const typeMap: Record<string, string> = {
+          '01': 'ยาแผนปัจจุบัน',
+          '04': 'ยา คุมกำเนิด',
+          '10': 'ยาสมุนไพร',
+        };
+        return typeMap[drugtype] || drugtype;
+      },
+    },
+    {
+      title: 'คงเหลือ',
+      dataIndex: 'remaining',
+      key: 'remaining',
+      width: 100,
+      align: 'right' as const,
+      render: (remaining: number) => remaining?.toLocaleString() || '0',
+    },
+    {
+      title: 'ใช้ 30 วัน',
+      dataIndex: 'issued30day',
+      key: 'issued30day',
+      width: 100,
+      align: 'right' as const,
+      render: (issued: number) => issued?.toLocaleString() || '0',
+    },
+    {
+      title: 'อัตราส่วน',
+      key: 'ratio',
+      width: 120,
+      align: 'right' as const,
+      render: (record: any) => (
+        <span style={{ fontWeight: 'bold' }}>
+          {record.ratio.valueString} เดือน
+        </span>
+      ),
+    },
+    {
+      title: 'วันคงเหลือ',
+      key: 'days',
+      width: 100,
+      align: 'right' as const,
+      render: (record: any) => (
+        <span>{record.ratio.days} วัน</span>
+      ),
+    },
+    {
+      title: 'สถานะ',
+      key: 'status',
+      width: 120,
+      render: (record: any) => (
+        <Tag color={record.ratio.color}>
+          {record.ratio.status}
+        </Tag>
+      ),
+    },
+    {
+      title: 'ราคา/หน่วย',
+      key: 'cost',
+      width: 120,
+      align: 'right' as const,
+      render: (record: any) => {
+        const cost = record.hospital_drug?.cost;
+        return cost ? `${Number(cost).toLocaleString()} บาท` : 'ไม่มีข้อมูล';
+      },
+    },
+    {
+      title: 'มูลค่าคงเหลือ',
+      key: 'totalValue',
+      width: 150,
+      align: 'right' as const,
+      render: (record: any) => {
+        const cost = record.hospital_drug?.cost;
+        const remaining = record.remaining;
+        if (cost && remaining) {
+          const total = Number(cost) * Number(remaining);
+          return `${total.toLocaleString()} บาท`;
+        }
+        return 'ไม่มีข้อมูล';
+      },
+    },
+  ];
+
+  // Sort data by status priority (critical first)
+  const statusPriority: Record<string, number> = {
+    'วิกฤต': 1,
+    'ต่ำ': 2,
+    'เหมาะสม': 3,
+    'เกิน': 4,
+    'มากเกินไป': 5
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    const priorityA = statusPriority[a.ratio.status] || 999;
+    const priorityB = statusPriority[b.ratio.status] || 999;
+    return priorityA - priorityB;
+  });
+
+  return (
+    <Col span={24}>
+      <Card
+        title={`รายละเอียดยาทั้งหมด (${data.length} รายการ)`}
+        extra={
+          <Space>
+            <Button
+              type={showDetails ? "primary" : "default"}
+              icon={<EyeOutlined />}
+              onClick={() => setShowDetails(!showDetails)}
+            >
+              {showDetails ? 'ซ่อนรายละเอียด' : 'แสดงรายละเอียด'}
+            </Button>
+          </Space>
+        }
+      >
+        {showDetails && (
+          <Table
+            dataSource={sortedData}
+            columns={columns}
+            rowKey="id"
+            size="small"
+            scroll={{ x: 1200, y: 600 }}
+            pagination={{
+              pageSize: 50,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} จาก ${total} รายการ`,
+            }}
+            onRow={(record) => ({
+              style: {
+                backgroundColor:
+                  record.ratio.status === 'วิกฤต' ? '#fff2f0' :
+                    record.ratio.status === 'ต่ำ' ? '#fffbe6' :
+                      'transparent'
+              }
+            })}
+          />
+        )}
+        {!showDetails && (
+          <div style={{ textAlign: 'center', color: '#666', padding: '32px 0' }}>
+            คลิก "แสดงรายละเอียด" เพื่อดูตารางยาทั้งหมด
+          </div>
+        )}
+      </Card>
+    </Col>
+  );
+};
 
 interface StockStatusSummaryProps {
   data: Awaited<ReturnType<typeof getInventoryDashboardData>>['drugStatus'];
@@ -156,7 +345,7 @@ interface HistoricalDrugRatioChartProps {
 const HistoricalDrugRatioChart: React.FC<HistoricalDrugRatioChartProps> = ({ data }) => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
-      <Col span={12}>
+      <Col span={18}>
         <Card title="ประวัติอัตราการสำรองยา (เดือน)" extra={<LineChartOutlined />}>
           <div style={{ textAlign: 'center', color: '#aaa', padding: '32px 0' }}>
             ไม่มีข้อมูล
@@ -259,6 +448,9 @@ export const InventoryDashboard: React.FC = () => {
         <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
           <StockStatusSummary data={data.drugStatus} />
           <HistoricalDrugRatioChart data={data.historicalDrugRatio || []} />
+        </Row>
+        <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+          <DrugDetailsList data={data.drugData || []} />
         </Row>
       </>
     )}

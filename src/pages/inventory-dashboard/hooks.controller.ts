@@ -232,7 +232,8 @@ export const getInventoryDashboardData = async (pcucode: string, date?: string) 
     totalDrugRatio30Day,
     drugsWithoutHospitalData,
     historicalDrugRatio,
-    drugStatus
+    drugStatus,
+    drugData: data // Include detailed drug data for list display
   }
 }
 
