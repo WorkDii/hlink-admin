@@ -7,8 +7,8 @@ import {
   Statistic,
   Table,
   Tag,
-  Button,
   Space,
+  Radio,
 } from 'antd';
 import {
   MedicineBoxOutlined,
@@ -17,7 +17,7 @@ import {
   LineChartOutlined,
   PieChartOutlined,
   UnorderedListOutlined,
-  EyeOutlined,
+  FilterOutlined,
 } from '@ant-design/icons';
 import { Line, LineConfig } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
@@ -65,8 +65,10 @@ interface DrugDetailsListProps {
   data: Awaited<ReturnType<typeof getInventoryDashboardData>>['drugData'];
 }
 
+type FilterType = 'all' | 'linked' | 'unlinked';
+
 const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
-  const [showDetails, setShowDetails] = useState(false);
+  const [filterType, setFilterType] = useState<FilterType>('all');
 
   if (!Array.isArray(data) || data.length === 0) {
     return (
@@ -79,6 +81,21 @@ const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       </Col>
     );
   }
+
+  // Filter data based on selected filter type
+  const getFilteredData = () => {
+    switch (filterType) {
+      case 'linked':
+        return data.filter(item => item.hospital_drug && item.hospital_drug.name);
+      case 'unlinked':
+        return data.filter(item => !item.hospital_drug || !item.hospital_drug.name);
+      case 'all':
+      default:
+        return data;
+    }
+  };
+
+  const filteredData = getFilteredData();
 
   const columns = [
     {
@@ -94,6 +111,16 @@ const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       key: 'hospital_drug.name',
       width: 250,
       ellipsis: true,
+      render: (name: string, record: any) => {
+        if (name) {
+          return name;
+        }
+        return (
+          <span style={{ color: '#ff4d4f', fontStyle: 'italic' }}>
+            ไม่ได้เชื่อมโยง ({record.drugname})
+          </span>
+        );
+      },
     },
     {
       title: 'ประเภทยา',
@@ -191,57 +218,64 @@ const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
     'มากเกินไป': 5
   };
 
-  const sortedData = [...data].sort((a, b) => {
+  const sortedData = [...filteredData].sort((a, b) => {
     const priorityA = statusPriority[a.ratio.status] || 999;
     const priorityB = statusPriority[b.ratio.status] || 999;
     return priorityA - priorityB;
   });
 
+  // Count statistics
+  const linkedCount = data.filter(item => item.hospital_drug && item.hospital_drug.name).length;
+  const unlinkedCount = data.filter(item => !item.hospital_drug || !item.hospital_drug.name).length;
+
   return (
     <Col span={24}>
       <Card
-        title={`รายละเอียดยาทั้งหมด (${data.length} รายการ)`}
+        title={`รายละเอียดยาทั้งหมด`}
         extra={
           <Space>
-            <Button
-              type={showDetails ? "primary" : "default"}
-              icon={<EyeOutlined />}
-              onClick={() => setShowDetails(!showDetails)}
+            <FilterOutlined />
+            <Radio.Group
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              size="small"
             >
-              {showDetails ? 'ซ่อนรายละเอียด' : 'แสดงรายละเอียด'}
-            </Button>
+              <Radio.Button value="all">
+                ทั้งหมด ({data.length})
+              </Radio.Button>
+              <Radio.Button value="linked">
+                เชื่อมโยงแล้ว ({linkedCount})
+              </Radio.Button>
+              <Radio.Button value="unlinked">
+                ยังไม่เชื่อมโยง ({unlinkedCount})
+              </Radio.Button>
+            </Radio.Group>
           </Space>
         }
       >
-        {showDetails && (
-          <Table
-            dataSource={sortedData}
-            columns={columns}
-            rowKey="id"
-            size="small"
-            scroll={{ x: 1200, y: 600 }}
-            pagination={{
-              pageSize: 50,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} จาก ${total} รายการ`,
-            }}
-            onRow={(record) => ({
-              style: {
-                backgroundColor:
-                  record.ratio.status === 'วิกฤต' ? '#fff2f0' :
-                    record.ratio.status === 'ต่ำ' ? '#fffbe6' :
+        <Table
+          dataSource={sortedData}
+          columns={columns}
+          rowKey="id"
+          size="small"
+          scroll={{ x: 1200, y: 600 }}
+          pagination={{
+            pageSize: 50,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} จาก ${total} รายการ (แสดง: ${filterType === 'all' ? 'ทั้งหมด' : filterType === 'linked' ? 'เชื่อมโยงแล้ว' : 'ยังไม่เชื่อมโยง'})`,
+          }}
+          onRow={(record) => ({
+            style: {
+              backgroundColor:
+                record.ratio.status === 'วิกฤต' ? '#fff2f0' :
+                  record.ratio.status === 'ต่ำ' ? '#fffbe6' :
+                    !record.hospital_drug?.name ? '#f6ffed' :
                       'transparent'
-              }
-            })}
-          />
-        )}
-        {!showDetails && (
-          <div style={{ textAlign: 'center', color: '#666', padding: '32px 0' }}>
-            คลิก "แสดงรายละเอียด" เพื่อดูตารางยาทั้งหมด
-          </div>
-        )}
+            }
+          })}
+        />
       </Card>
     </Col>
   );
