@@ -83,6 +83,7 @@ const HistoricalDrugRatioChart: React.FC<HistoricalDrugRatioChartProps> = ({ dat
     data: chartData,
     xField: 'date',
     yField: 'ratio',
+    height: 300,
     point: {
       size: 5,
       shape: 'diamond',
@@ -164,6 +165,8 @@ export const InventoryDashboard: React.FC = () => {
         <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
           <HistoricalDrugRatioChart data={data.historicalDrugRatio || []} />
         </Row>
+
+
       </>
     )}
   </div>

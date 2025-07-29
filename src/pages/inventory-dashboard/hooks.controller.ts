@@ -14,17 +14,17 @@ const getDrugStockStatus = (ratio: number): DrugStockStatus => {
       status: 'วิกฤต',
       color: '#ff4d4f'
     }
-  } else if (days < 14) {
+  } else if (days < 0.5 * 30) {
     return {
       status: 'ต่ำ',
       color: '#faad14'
     }
-  } else if (days <= 30) {
+  } else if (days <= 1.5 * 30) {
     return {
       status: 'เหมาะสม',
       color: '#52c41a'
     }
-  } else if (days <= 60) {
+  } else if (days <= 2.5 * 30) {
     return {
       status: 'เกิน',
       color: '#1890ff'
