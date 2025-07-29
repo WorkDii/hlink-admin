@@ -5,12 +5,15 @@ import {
   Col,
   Card,
   Statistic,
+  Table,
+  Tag,
 } from 'antd';
 import {
   MedicineBoxOutlined,
   WarningOutlined,
   DollarOutlined,
-  LineChartOutlined
+  LineChartOutlined,
+  PieChartOutlined
 } from '@ant-design/icons';
 import { Line, LineConfig } from '@ant-design/plots';
 import PcuOptionsButton from '../../components/pcuOptionsButton';
@@ -19,7 +22,7 @@ import { ComponentLoading } from './component.loading';
 import { ComponentError } from './component.error';
 import { ComponentEmpty } from './component.empty';
 import { valueType } from 'antd/es/statistic/utils';
-import { getInventoryDashboardData } from './hooks.controller';
+import { getInventoryDashboardData, STATUS_COLORS } from './hooks.controller';
 
 const { Title } = Typography;
 
@@ -54,6 +57,99 @@ const InventoryMetricCard: React.FC<InventoryMetricCardProps> = ({
   </Col>
 );
 
+
+interface StockStatusSummaryProps {
+  data: Awaited<ReturnType<typeof getInventoryDashboardData>>['drugStatus'];
+}
+
+const STOCK_STATUS_ORDER: Array<keyof typeof STATUS_COLORS> = [
+  'วิกฤต',
+  'ต่ำ',
+  'เหมาะสม',
+  'เกิน',
+  'มากเกินไป'
+];
+
+const StockStatusSummary: React.FC<StockStatusSummaryProps> = ({ data }) => {
+  // data is an object: { 'วิกฤต': number, ... }
+  if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+    return (
+      <Col span={24}>
+        <Card title="สรุปสถานะสต็อก" extra={<PieChartOutlined />}>
+          <div style={{ textAlign: 'center', color: '#aaa', padding: '32px 0' }}>
+            ไม่มีข้อมูล
+          </div>
+        </Card>
+      </Col>
+    );
+  }
+
+  // Prepare data for Table
+  const statusData = STOCK_STATUS_ORDER.map(status => ({
+    status,
+    count: data[status] || 0,
+    color: STATUS_COLORS[status]
+  }));
+
+  const totalItems = statusData.reduce((sum, item) => sum + item.count, 0);
+
+  const columns = [
+    {
+      title: 'สถานะ',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: string, record: any) => (
+        <Tag color={record.color}>{status}</Tag>
+      ),
+    },
+    {
+      title: 'จำนวน',
+      dataIndex: 'count',
+      key: 'count',
+      render: (count: number) => (
+        <span style={{ fontWeight: 'bold' }}>{count} รายการ</span>
+      ),
+    },
+    {
+      title: 'เปอร์เซ็นต์',
+      key: 'percentage',
+      render: (record: any) => {
+        const percentage = totalItems > 0 ? ((record.count / totalItems) * 100).toFixed(1) : '0.0';
+        return `${percentage}%`;
+      },
+    },
+  ];
+
+  return (
+    <Col span={6}>
+      <Card title="สรุปสถานะสต็อก" extra={<PieChartOutlined />}>
+        <Table
+          dataSource={statusData}
+          columns={columns}
+          pagination={false}
+          size="small"
+          rowKey="status"
+          summary={() => (
+            <Table.Summary>
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0}>
+                  <strong>รวม</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={1}>
+                  <strong>{totalItems} รายการ</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                  <strong>100.0%</strong>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+            </Table.Summary>
+          )}
+        />
+      </Card>
+    </Col>
+  );
+};
+
 interface HistoricalDrugRatioChartProps {
   data: Awaited<ReturnType<typeof getInventoryDashboardData>>['historicalDrugRatio'];
 }
@@ -61,7 +157,7 @@ interface HistoricalDrugRatioChartProps {
 const HistoricalDrugRatioChart: React.FC<HistoricalDrugRatioChartProps> = ({ data }) => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
-      <Col span={24}>
+      <Col span={12}>
         <Card title="ประวัติอัตราการสำรองยา (เดือน)" extra={<LineChartOutlined />}>
           <div style={{ textAlign: 'center', color: '#aaa', padding: '32px 0' }}>
             ไม่มีข้อมูล
@@ -77,7 +173,6 @@ const HistoricalDrugRatioChart: React.FC<HistoricalDrugRatioChartProps> = ({ dat
       date: item.date,
       ratio: item.ratio.value
     }))
-
 
   const lineConfig: LineConfig = {
     data: chartData,
@@ -109,7 +204,7 @@ const HistoricalDrugRatioChart: React.FC<HistoricalDrugRatioChartProps> = ({ dat
   };
 
   return (
-    <Col span={24}>
+    <Col span={18}>
       <Card title="ประวัติอัตราการสำรองยา (เดือน)" extra={<LineChartOutlined />}>
         <Line {...lineConfig} />
       </Card>
@@ -163,10 +258,9 @@ export const InventoryDashboard: React.FC = () => {
           />
         </Row>
         <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+          <StockStatusSummary data={data.drugStatus} />
           <HistoricalDrugRatioChart data={data.historicalDrugRatio || []} />
         </Row>
-
-
       </>
     )}
   </div>

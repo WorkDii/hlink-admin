@@ -7,32 +7,40 @@ type DrugStockStatus = {
   color: string
 }
 
+export const STATUS_COLORS: Record<DrugStockStatus['status'], string> = {
+  'วิกฤต': '#ff4d4f',
+  'ต่ำ': '#faad14',
+  'เหมาะสม': '#52c41a',
+  'เกิน': '#1890ff',
+  'มากเกินไป': '#b37feb'
+}
+
 const getDrugStockStatus = (ratio: number): DrugStockStatus => {
   const days = ratio * 30
   if (days < 7) {
     return {
       status: 'วิกฤต',
-      color: '#ff4d4f'
+      color: STATUS_COLORS['วิกฤต']
     }
   } else if (days < 0.5 * 30) {
     return {
       status: 'ต่ำ',
-      color: '#faad14'
+      color: STATUS_COLORS['ต่ำ']
     }
   } else if (days <= 1.5 * 30) {
     return {
       status: 'เหมาะสม',
-      color: '#52c41a'
+      color: STATUS_COLORS['เหมาะสม']
     }
   } else if (days <= 2.5 * 30) {
     return {
       status: 'เกิน',
-      color: '#1890ff'
+      color: STATUS_COLORS['เกิน']
     }
   } else {
     return {
       status: 'มากเกินไป',
-      color: '#b37feb'
+      color: STATUS_COLORS['มากเกินไป']
     }
   }
 }
@@ -189,6 +197,20 @@ export const listHistoricalDrugRatio = async (pcucode: string) => {
   }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 }
 
+const getDrugStatus = async (data: ListData) => {
+  const status: Record<DrugStockStatus['status'], number> = {
+    'วิกฤต': 0,
+    'ต่ำ': 0,
+    'เหมาะสม': 0,
+    'เกิน': 0,
+    'มากเกินไป': 0
+  }
+  data.forEach(i => {
+    status[i.ratio.status] = (status[i.ratio.status] || 0) + 1
+  })
+  return status
+}
+
 export const getInventoryDashboardData = async (pcucode: string, date?: string) => {
   let lastDate = date
   if (!lastDate) {
@@ -203,12 +225,14 @@ export const getInventoryDashboardData = async (pcucode: string, date?: string) 
   const totalDrugRatio30Day = await getTotalDrugRatio30Day(data)
   const drugsWithoutHospitalData = await getDrugsWithoutHospitalData(data)
   const historicalDrugRatio = await listHistoricalDrugRatio(pcucode)
+  const drugStatus = await getDrugStatus(data)
   return {
     totalInventoryValue,
     totalItem,
     totalDrugRatio30Day,
     drugsWithoutHospitalData,
-    historicalDrugRatio
+    historicalDrugRatio,
+    drugStatus
   }
 }
 
