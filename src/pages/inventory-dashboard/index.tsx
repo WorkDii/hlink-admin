@@ -86,9 +86,9 @@ const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
   const getFilteredData = () => {
     switch (filterType) {
       case 'linked':
-        return data.filter(item => item.hospital_drug && item.hospital_drug.name);
+        return data.filter(item => item.hospital_drug && typeof item.hospital_drug === 'object' && 'name' in item.hospital_drug);
       case 'unlinked':
-        return data.filter(item => !item.hospital_drug || !item.hospital_drug.name);
+        return data.filter(item => !item.hospital_drug || typeof item.hospital_drug === 'string');
       case 'all':
       default:
         return data;
