@@ -14,9 +14,6 @@ importers:
       '@ant-design/plots':
         specifier: ^2.3.2
         version: 2.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@directus/sdk':
-        specifier: ^20.0.0
-        version: 20.0.0
       '@react-pdf/renderer':
         specifier: ^3.4.4
         version: 3.4.5(react@18.3.1)
@@ -476,10 +473,6 @@ packages:
   '@directus/sdk@16.1.2':
     resolution: {integrity: sha512-TlKmS80tH5mmFQA1kRYZ6QuvggE/kP1uMRTTIM3qSTrAsAabaG1oKhRVLM3Qi8HZYL20DWqSSG6AQFjYgbKxFw==}
     engines: {node: '>=18.0.0'}
-
-  '@directus/sdk@20.0.0':
-    resolution: {integrity: sha512-DoKggMNaVWiKC2bU5BY+Nf6ia2Yz7hrKte0ZtSPXQVkl2mxwDtM0gLfOI6xxVY1CfnvyxJDu+d+21VjI4GYdyw==}
-    engines: {node: '>=22'}
 
   '@emotion/babel-plugin@11.13.5':
     resolution: {integrity: sha512-pxHCpT2ex+0q+HH91/zsdHkw/lXd468DIN2zvfvLtPKLLMo6gQj7oLObq8PhkrxOZb/gGCq03S3Z7PDhS8pduQ==}
@@ -4702,8 +4695,6 @@ snapshots:
   '@ctrl/tinycolor@3.6.1': {}
 
   '@directus/sdk@16.1.2': {}
-
-  '@directus/sdk@20.0.0': {}
 
   '@emotion/babel-plugin@11.13.5':
     dependencies:
