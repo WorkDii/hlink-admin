@@ -9,7 +9,7 @@ import {
   rest,
   realtime,
 } from "@tspvivek/refine-directus";
-import { Schema } from "./directus/generated/client";
+import type { Schema } from "./directus/generated/client";
 
 export const API_URL = import.meta.env.VITE_API_URL as string;
 

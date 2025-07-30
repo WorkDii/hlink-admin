@@ -27567,87 +27567,6 @@
       }
     },
     {
-      "collection": "directus_revisions",
-      "field": "version",
-      "related_collection": "directus_versions",
-      "schema": {
-        "constraint_name": "directus_revisions_version_foreign",
-        "table": "directus_revisions",
-        "column": "version",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "directus_versions",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "CASCADE"
-      },
-      "meta": {
-        "many_collection": "directus_revisions",
-        "many_field": "version",
-        "one_collection": "directus_versions",
-        "one_field": null,
-        "one_allowed_collections": null,
-        "one_collection_field": null,
-        "one_deselect_action": "nullify",
-        "junction_field": null,
-        "sort_field": null,
-        "system": true
-      }
-    },
-    {
-      "collection": "directus_revisions",
-      "field": "parent",
-      "related_collection": "directus_revisions",
-      "schema": {
-        "constraint_name": "directus_revisions_parent_foreign",
-        "table": "directus_revisions",
-        "column": "parent",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "directus_revisions",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "NO ACTION"
-      },
-      "meta": {
-        "many_collection": "directus_revisions",
-        "many_field": "parent",
-        "one_collection": "directus_revisions",
-        "one_field": null,
-        "one_allowed_collections": null,
-        "one_collection_field": null,
-        "one_deselect_action": "nullify",
-        "junction_field": null,
-        "sort_field": null,
-        "system": true
-      }
-    },
-    {
-      "collection": "directus_revisions",
-      "field": "activity",
-      "related_collection": "directus_activity",
-      "schema": {
-        "constraint_name": "directus_revisions_activity_foreign",
-        "table": "directus_revisions",
-        "column": "activity",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "directus_activity",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "CASCADE"
-      },
-      "meta": {
-        "many_collection": "directus_revisions",
-        "many_field": "activity",
-        "one_collection": "directus_activity",
-        "one_field": "revisions",
-        "one_allowed_collections": null,
-        "one_collection_field": null,
-        "one_deselect_action": "nullify",
-        "junction_field": null,
-        "sort_field": null,
-        "system": true
-      }
-    },
-    {
       "collection": "directus_webhooks",
       "field": "migrated_flow",
       "related_collection": "directus_flows",
@@ -27855,6 +27774,87 @@
         "many_field": "role",
         "one_collection": "directus_roles",
         "one_field": null,
+        "one_allowed_collections": null,
+        "one_collection_field": null,
+        "one_deselect_action": "nullify",
+        "junction_field": null,
+        "sort_field": null,
+        "system": true
+      }
+    },
+    {
+      "collection": "directus_revisions",
+      "field": "version",
+      "related_collection": "directus_versions",
+      "schema": {
+        "constraint_name": "directus_revisions_version_foreign",
+        "table": "directus_revisions",
+        "column": "version",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "directus_versions",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE"
+      },
+      "meta": {
+        "many_collection": "directus_revisions",
+        "many_field": "version",
+        "one_collection": "directus_versions",
+        "one_field": null,
+        "one_allowed_collections": null,
+        "one_collection_field": null,
+        "one_deselect_action": "nullify",
+        "junction_field": null,
+        "sort_field": null,
+        "system": true
+      }
+    },
+    {
+      "collection": "directus_revisions",
+      "field": "parent",
+      "related_collection": "directus_revisions",
+      "schema": {
+        "constraint_name": "directus_revisions_parent_foreign",
+        "table": "directus_revisions",
+        "column": "parent",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "directus_revisions",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "NO ACTION"
+      },
+      "meta": {
+        "many_collection": "directus_revisions",
+        "many_field": "parent",
+        "one_collection": "directus_revisions",
+        "one_field": null,
+        "one_allowed_collections": null,
+        "one_collection_field": null,
+        "one_deselect_action": "nullify",
+        "junction_field": null,
+        "sort_field": null,
+        "system": true
+      }
+    },
+    {
+      "collection": "directus_revisions",
+      "field": "activity",
+      "related_collection": "directus_activity",
+      "schema": {
+        "constraint_name": "directus_revisions_activity_foreign",
+        "table": "directus_revisions",
+        "column": "activity",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "directus_activity",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "CASCADE"
+      },
+      "meta": {
+        "many_collection": "directus_revisions",
+        "many_field": "activity",
+        "one_collection": "directus_activity",
+        "one_field": "revisions",
         "one_allowed_collections": null,
         "one_collection_field": null,
         "one_deselect_action": "nullify",

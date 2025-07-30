@@ -5,6 +5,7 @@ import { InventoryBillItem } from "../../../type";
 
 export const getInventoryBillItem = async (id: string) => {
   const data = await directusClient.request<InventoryBillItem>(
+    // @ts-ignore
     readItem("inventory_bill", id, {
       fields: [
         "*",
