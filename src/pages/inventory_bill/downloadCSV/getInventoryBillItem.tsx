@@ -1,6 +1,6 @@
 import { directusClient } from "../../../directusClient";
-import { readItem } from "@directus/sdk";
 import { InventoryBillItem } from "../../../type";
+import { readItem } from "@tspvivek/refine-directus";
 
 
 export const getInventoryBillItem = async (id: string) => {
