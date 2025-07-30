@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
-import PropTypes from "prop-types";
 import { wholeNumber } from "@wdii/numth";
 import { getInventoryBillItem } from "../downloadCSV/getInventoryBillItem";
 
@@ -66,7 +65,7 @@ type Props = {
   data: Awaited<ReturnType<typeof getInventoryBillItem>>;
 };
 
-const ReportTable = ({ data }: Props) => {
+const ReportTable = ({ data }: { data: any[] }) => {
   return (
     <View style={styles.table}>
       <View style={[styles.row, styles.bold, styles.header]} fixed>
@@ -118,10 +117,6 @@ const ReportTable = ({ data }: Props) => {
       ))}
     </View>
   );
-};
-
-ReportTable.propTypes = {
-  data: PropTypes.array.isRequired,
 };
 
 export default ReportTable;
