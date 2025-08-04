@@ -1,15 +1,117 @@
-import React, { useState } from 'react';
-import { Col, Card, Table, Tag, Space, Radio } from 'antd';
-import { UnorderedListOutlined, FilterOutlined } from '@ant-design/icons';
+import React, { useState, useMemo } from 'react';
+import { Col, Card, Table, Tag, Space, Radio, Button } from 'antd';
+import { UnorderedListOutlined, FilterOutlined, DownloadOutlined } from '@ant-design/icons';
 import { DrugData, FilterType, STATUS_PRIORITY, DRUG_TYPE_MAP } from '../types';
 
 interface DrugDetailsListProps {
   data: DrugData;
 }
 
+// Utility functions
+const isLinkedDrug = (hospitalDrug: any): boolean => {
+  return hospitalDrug && typeof hospitalDrug === 'object' && 'name' in hospitalDrug;
+};
+
+const getDrugName = (record: any): string => {
+  const hospitalDrug = record.hospital_drug;
+  if (isLinkedDrug(hospitalDrug)) {
+    return (hospitalDrug as any).name;
+  }
+  return `ไม่ได้เชื่อมโยง`;
+};
+
+const getDrugCost = (record: any): number | null => {
+  const hospitalDrug = record.hospital_drug;
+  return isLinkedDrug(hospitalDrug) ? (hospitalDrug as any).cost : null;
+};
+
+const getTotalValue = (record: any): number | null => {
+  const cost = getDrugCost(record);
+  const remaining = record.remaining;
+  return cost && remaining ? Number(cost) * Number(remaining) : null;
+};
+
+const formatNumber = (value: number | null | undefined): string => {
+  return value?.toLocaleString() || '0';
+};
+
+const formatCurrency = (value: number | null | undefined): string => {
+  return value ? `${Number(value).toLocaleString()} บาท` : 'ไม่มีข้อมูล';
+};
+
+const getFilterTypeLabel = (filterType: FilterType): string => {
+  switch (filterType) {
+    case 'all': return 'ทั้งหมด';
+    case 'linked': return 'เชื่อมโยงแล้ว';
+    case 'unlinked': return 'ยังไม่เชื่อมโยง';
+    default: return 'ทั้งหมด';
+  }
+};
+
+const getRowBackgroundColor = (status: string): string => {
+  switch (status) {
+    case 'วิกฤต': return '#fff2f0';
+    case 'ต่ำ': return '#fffbe6';
+    case 'เหมาะสม': return '#f0f5ff';
+    default: return 'transparent';
+  }
+};
+
+// CSV Export functionality
+const createCSVContent = (data: any[], filterType: FilterType): string => {
+  const headers = [
+    'รหัสยา',
+    'ชื่อยา',
+    'ประเภทยา',
+    'คงเหลือ',
+    'ใช้ 30 วัน',
+    'อัตราส่วน (เดือน)',
+    'วันคงเหลือ',
+    'สถานะ',
+    'ราคา/หน่วย (บาท)',
+    'มูลค่าคงเหลือ (บาท)'
+  ];
+
+  const csvData = data.map(record => [
+    record.drugcode,
+    getDrugName(record),
+    DRUG_TYPE_MAP[record.drugtype || ''] || record.drugtype,
+    formatNumber(record.remaining),
+    formatNumber(record.issued30day),
+    record.ratio.valueString,
+    record.ratio.days,
+    record.ratio.status,
+    formatCurrency(getDrugCost(record)),
+    formatCurrency(getTotalValue(record))
+  ]);
+
+  return [
+    headers.join(','),
+    ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
+  ].join('\n');
+};
+
+const downloadCSV = (data: any[], filterType: FilterType): void => {
+  const csvContent = createCSVContent(data, filterType);
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  const date = new Date().toISOString().split('T')[0];
+  const filterLabel = getFilterTypeLabel(filterType);
+
+  link.setAttribute('href', url);
+  link.setAttribute('download', `รายละเอียดยา_${filterLabel}_${date}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
   const [filterType, setFilterType] = useState<FilterType>('all');
+  const [pageSize, setPageSize] = useState<number>(50);
 
+  // Early return for empty data
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <Col span={24}>
@@ -22,28 +124,42 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
     );
   }
 
-  // Filter data based on selected filter type
-  const getFilteredData = () => {
+  // Memoized computed values
+  const { filteredData, linkedCount, unlinkedCount } = useMemo(() => {
+    const linkedCount = data.filter(item => isLinkedDrug(item.hospital_drug)).length;
+    const unlinkedCount = data.length - linkedCount;
+
+    let filteredData = data;
     switch (filterType) {
       case 'linked':
-        return data.filter(item => item.hospital_drug && typeof item.hospital_drug === 'object' && 'name' in item.hospital_drug);
+        filteredData = data.filter(item => isLinkedDrug(item.hospital_drug));
+        break;
       case 'unlinked':
-        return data.filter(item => !item.hospital_drug || typeof item.hospital_drug === 'string');
-      case 'all':
-      default:
-        return data;
+        filteredData = data.filter(item => !isLinkedDrug(item.hospital_drug));
+        break;
     }
-  };
 
-  const filteredData = getFilteredData();
+    return { filteredData, linkedCount, unlinkedCount };
+  }, [data, filterType]);
 
-  const columns = [
+  // Sort data by status priority (critical first)
+  const sortedData = useMemo(() => {
+    return [...filteredData].sort((a, b) => {
+      const priorityA = STATUS_PRIORITY[a.ratio.status] || 999;
+      const priorityB = STATUS_PRIORITY[b.ratio.status] || 999;
+      return priorityA - priorityB;
+    });
+  }, [filteredData]);
+
+  // Table columns configuration
+  const columns = useMemo(() => [
     {
       title: 'รหัสยา',
       dataIndex: 'drugcode',
       key: 'drugcode',
       width: 100,
       fixed: 'left' as const,
+      sorter: (a: any, b: any) => a.drugcode.localeCompare(b.drugcode),
     },
     {
       title: 'ชื่อยา',
@@ -51,13 +167,19 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       key: 'hospital_drug.name',
       width: 250,
       ellipsis: true,
-      render: (name: string, record: any) => {
-        if (name) {
+      sorter: (a: any, b: any) => {
+        const nameA = getDrugName(a);
+        const nameB = getDrugName(b);
+        return nameA.localeCompare(nameB);
+      },
+      render: (_: string, record: any) => {
+        const name = getDrugName(record);
+        if (isLinkedDrug(record.hospital_drug)) {
           return name;
         }
         return (
           <span style={{ color: '#ff4d4f', fontStyle: 'italic' }}>
-            ไม่ได้เชื่อมโยง ({record.drugname})
+            {name}
           </span>
         );
       },
@@ -67,6 +189,11 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       dataIndex: 'drugtype',
       key: 'drugtype',
       width: 100,
+      sorter: (a: any, b: any) => {
+        const typeA = DRUG_TYPE_MAP[a.drugtype] || a.drugtype || '';
+        const typeB = DRUG_TYPE_MAP[b.drugtype] || b.drugtype || '';
+        return typeA.localeCompare(typeB);
+      },
       render: (drugtype: string) => DRUG_TYPE_MAP[drugtype] || drugtype,
     },
     {
@@ -75,7 +202,8 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       key: 'remaining',
       width: 100,
       align: 'right' as const,
-      render: (remaining: number) => remaining?.toLocaleString() || '0',
+      sorter: (a: any, b: any) => (a.remaining || 0) - (b.remaining || 0),
+      render: (remaining: number) => formatNumber(remaining),
     },
     {
       title: 'ใช้ 30 วัน',
@@ -83,13 +211,15 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       key: 'issued30day',
       width: 100,
       align: 'right' as const,
-      render: (issued: number) => issued?.toLocaleString() || '0',
+      sorter: (a: any, b: any) => (a.issued30day || 0) - (b.issued30day || 0),
+      render: (issued: number) => formatNumber(issued),
     },
     {
       title: 'อัตราส่วน',
       key: 'ratio',
       width: 120,
       align: 'right' as const,
+      sorter: (a: any, b: any) => (a.ratio.value || 0) - (b.ratio.value || 0),
       render: (record: any) => (
         <span style={{ fontWeight: 'bold' }}>
           {record.ratio.valueString} เดือน
@@ -101,6 +231,7 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       key: 'days',
       width: 100,
       align: 'right' as const,
+      sorter: (a: any, b: any) => (a.ratio.days || 0) - (b.ratio.days || 0),
       render: (record: any) => (
         <span>{record.ratio.days} วัน</span>
       ),
@@ -109,6 +240,11 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       title: 'สถานะ',
       key: 'status',
       width: 120,
+      sorter: (a: any, b: any) => {
+        const priorityA = STATUS_PRIORITY[a.ratio.status] || 999;
+        const priorityB = STATUS_PRIORITY[b.ratio.status] || 999;
+        return priorityA - priorityB;
+      },
       render: (record: any) => (
         <Tag color={record.ratio.color}>
           {record.ratio.status}
@@ -120,49 +256,41 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       key: 'cost',
       width: 120,
       align: 'right' as const,
-      render: (record: any) => {
-        const cost = record.hospital_drug?.cost;
-        return cost ? `${Number(cost).toLocaleString()} บาท` : 'ไม่มีข้อมูล';
+      sorter: (a: any, b: any) => {
+        const costA = getDrugCost(a) || 0;
+        const costB = getDrugCost(b) || 0;
+        return costA - costB;
       },
+      render: (record: any) => formatCurrency(getDrugCost(record)),
     },
     {
       title: 'มูลค่าคงเหลือ',
       key: 'totalValue',
       width: 150,
       align: 'right' as const,
-      render: (record: any) => {
-        const cost = record.hospital_drug?.cost;
-        const remaining = record.remaining;
-        if (cost && remaining) {
-          const total = Number(cost) * Number(remaining);
-          return `${total.toLocaleString()} บาท`;
-        }
-        return 'ไม่มีข้อมูล';
+      sorter: (a: any, b: any) => {
+        const totalA = getTotalValue(a) || 0;
+        const totalB = getTotalValue(b) || 0;
+        return totalA - totalB;
       },
+      render: (record: any) => formatCurrency(getTotalValue(record)),
     },
-  ];
+  ], []);
 
-  // Sort data by status priority (critical first)
-  const sortedData = [...filteredData].sort((a, b) => {
-    const priorityA = STATUS_PRIORITY[a.ratio.status] || 999;
-    const priorityB = STATUS_PRIORITY[b.ratio.status] || 999;
-    return priorityA - priorityB;
-  });
-
-  // Count statistics
-  const linkedCount = data.filter(item => {
-    const hd = item.hospital_drug;
-    return typeof hd === 'object' && hd !== null && 'name' in hd && Boolean((hd as any).name);
-  }).length;
-  const unlinkedCount = data.filter(item => {
-    const hd = item.hospital_drug;
-    return !hd || !(typeof hd === 'object' && hd !== null && 'name' in hd && Boolean((hd as any).name));
-  }).length;
+  // Pagination configuration
+  const paginationConfig = {
+    pageSize,
+    showSizeChanger: true,
+    showQuickJumper: true,
+    onShowSizeChange: (_current: number, size: number) => setPageSize(size),
+    showTotal: (total: number, range: [number, number]) =>
+      `${range[0]}-${range[1]} จาก ${total} รายการ (แสดง: ${getFilterTypeLabel(filterType)})`,
+  };
 
   return (
     <Col span={24}>
       <Card
-        title={`รายละเอียดยาทั้งหมด`}
+        title="รายละเอียดยาทั้งหมด"
         extra={
           <Space>
             <FilterOutlined />
@@ -181,6 +309,14 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
                 ยังไม่เชื่อมโยง ({unlinkedCount})
               </Radio.Button>
             </Radio.Group>
+            <Button
+              type="primary"
+              icon={<DownloadOutlined />}
+              onClick={() => downloadCSV(sortedData, filterType)}
+              size="small"
+            >
+              ดาวน์โหลด CSV
+            </Button>
           </Space>
         }
       >
@@ -190,20 +326,10 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
           rowKey="id"
           size="small"
           scroll={{ x: 1200, y: 600 }}
-          pagination={{
-            pageSize: 50,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} จาก ${total} รายการ (แสดง: ${filterType === 'all' ? 'ทั้งหมด' : filterType === 'linked' ? 'เชื่อมโยงแล้ว' : 'ยังไม่เชื่อมโยง'})`,
-          }}
-          onRow={(record) => ({
+          pagination={paginationConfig}
+          onRow={(record: typeof sortedData[0]) => ({
             style: {
-              backgroundColor:
-                record.ratio.status === 'วิกฤต' ? '#fff2f0' :
-                  record.ratio.status === 'ต่ำ' ? '#fffbe6' :
-                    !record.hospital_drug?.name ? '#f6ffed' :
-                      'transparent'
+              backgroundColor: getRowBackgroundColor(record.ratio.status)
             }
           })}
         />
