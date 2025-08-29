@@ -20518,6 +20518,144 @@
       }
     },
     {
+      "collection": "inventory_drug_detail",
+      "field": "issued30day_cost",
+      "type": "decimal",
+      "schema": {
+        "name": "issued30day_cost",
+        "table": "inventory_drug_detail",
+        "data_type": "numeric",
+        "default_value": 0,
+        "generation_expression": null,
+        "max_length": null,
+        "numeric_precision": 10,
+        "numeric_scale": 2,
+        "is_generated": false,
+        "is_nullable": false,
+        "is_unique": false,
+        "is_indexed": false,
+        "is_primary_key": false,
+        "has_auto_increment": false,
+        "foreign_key_schema": null,
+        "foreign_key_table": null,
+        "foreign_key_column": null,
+        "comment": null
+      },
+      "meta": {
+        "id": 283,
+        "collection": "inventory_drug_detail",
+        "field": "issued30day_cost",
+        "special": null,
+        "interface": "input",
+        "options": null,
+        "display": null,
+        "display_options": null,
+        "readonly": false,
+        "hidden": false,
+        "sort": 18,
+        "width": "full",
+        "translations": null,
+        "note": null,
+        "conditions": null,
+        "required": false,
+        "group": null,
+        "validation": null,
+        "validation_message": null
+      }
+    },
+    {
+      "collection": "inventory_drug_detail",
+      "field": "issued_cost",
+      "type": "decimal",
+      "schema": {
+        "name": "issued_cost",
+        "table": "inventory_drug_detail",
+        "data_type": "numeric",
+        "default_value": 0,
+        "generation_expression": null,
+        "max_length": null,
+        "numeric_precision": 10,
+        "numeric_scale": 2,
+        "is_generated": false,
+        "is_nullable": false,
+        "is_unique": false,
+        "is_indexed": false,
+        "is_primary_key": false,
+        "has_auto_increment": false,
+        "foreign_key_schema": null,
+        "foreign_key_table": null,
+        "foreign_key_column": null,
+        "comment": null
+      },
+      "meta": {
+        "id": 284,
+        "collection": "inventory_drug_detail",
+        "field": "issued_cost",
+        "special": null,
+        "interface": "input",
+        "options": null,
+        "display": null,
+        "display_options": null,
+        "readonly": false,
+        "hidden": false,
+        "sort": 19,
+        "width": "full",
+        "translations": null,
+        "note": null,
+        "conditions": null,
+        "required": false,
+        "group": null,
+        "validation": null,
+        "validation_message": null
+      }
+    },
+    {
+      "collection": "inventory_drug_detail",
+      "field": "remaining_cost",
+      "type": "decimal",
+      "schema": {
+        "name": "remaining_cost",
+        "table": "inventory_drug_detail",
+        "data_type": "numeric",
+        "default_value": 0,
+        "generation_expression": null,
+        "max_length": null,
+        "numeric_precision": 10,
+        "numeric_scale": 2,
+        "is_generated": false,
+        "is_nullable": false,
+        "is_unique": false,
+        "is_indexed": false,
+        "is_primary_key": false,
+        "has_auto_increment": false,
+        "foreign_key_schema": null,
+        "foreign_key_table": null,
+        "foreign_key_column": null,
+        "comment": null
+      },
+      "meta": {
+        "id": 285,
+        "collection": "inventory_drug_detail",
+        "field": "remaining_cost",
+        "special": null,
+        "interface": "input",
+        "options": null,
+        "display": null,
+        "display_options": null,
+        "readonly": false,
+        "hidden": false,
+        "sort": 20,
+        "width": "full",
+        "translations": null,
+        "note": null,
+        "conditions": null,
+        "required": false,
+        "group": null,
+        "validation": null,
+        "validation_message": null
+      }
+    },
+    {
       "collection": "inventory_request",
       "field": "id",
       "type": "uuid",
@@ -25672,114 +25810,6 @@
   ],
   "relations": [
     {
-      "collection": "inventory_drug_detail",
-      "field": "hospital_drug",
-      "related_collection": "hospital_drug",
-      "schema": {
-        "constraint_name": "inventory_drug_detail_hospital_drug_foreign",
-        "table": "inventory_drug_detail",
-        "column": "hospital_drug",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "hospital_drug",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "SET NULL"
-      },
-      "meta": {
-        "id": 95,
-        "many_collection": "inventory_drug_detail",
-        "many_field": "hospital_drug",
-        "one_collection": "hospital_drug",
-        "one_field": "inventory_drug_detail",
-        "one_collection_field": null,
-        "one_allowed_collections": null,
-        "junction_field": null,
-        "sort_field": null,
-        "one_deselect_action": "nullify"
-      }
-    },
-    {
-      "collection": "inventory_drug_detail",
-      "field": "pcucode",
-      "related_collection": "ou",
-      "schema": {
-        "constraint_name": "inventory_drug_detail_pcucode_foreign",
-        "table": "inventory_drug_detail",
-        "column": "pcucode",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "ou",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "NO ACTION"
-      },
-      "meta": {
-        "id": 94,
-        "many_collection": "inventory_drug_detail",
-        "many_field": "pcucode",
-        "one_collection": "ou",
-        "one_field": "inventory_drug_detail",
-        "one_collection_field": null,
-        "one_allowed_collections": null,
-        "junction_field": null,
-        "sort_field": null,
-        "one_deselect_action": "nullify"
-      }
-    },
-    {
-      "collection": "inventory_drug_detail",
-      "field": "user_updated",
-      "related_collection": "directus_users",
-      "schema": {
-        "constraint_name": "inventory_drug_detail_user_updated_foreign",
-        "table": "inventory_drug_detail",
-        "column": "user_updated",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "directus_users",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "NO ACTION"
-      },
-      "meta": {
-        "id": 93,
-        "many_collection": "inventory_drug_detail",
-        "many_field": "user_updated",
-        "one_collection": "directus_users",
-        "one_field": null,
-        "one_collection_field": null,
-        "one_allowed_collections": null,
-        "junction_field": null,
-        "sort_field": null,
-        "one_deselect_action": "nullify"
-      }
-    },
-    {
-      "collection": "inventory_drug_detail",
-      "field": "user_created",
-      "related_collection": "directus_users",
-      "schema": {
-        "constraint_name": "inventory_drug_detail_user_created_foreign",
-        "table": "inventory_drug_detail",
-        "column": "user_created",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "directus_users",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "NO ACTION"
-      },
-      "meta": {
-        "id": 92,
-        "many_collection": "inventory_drug_detail",
-        "many_field": "user_created",
-        "one_collection": "directus_users",
-        "one_field": null,
-        "one_collection_field": null,
-        "one_allowed_collections": null,
-        "junction_field": null,
-        "sort_field": null,
-        "one_deselect_action": "nullify"
-      }
-    },
-    {
       "collection": "unit2unit",
       "field": "small_unit",
       "related_collection": "unit",
@@ -25937,6 +25967,114 @@
         "one_collection_field": null,
         "one_allowed_collections": null,
         "junction_field": "hospital_drug_id",
+        "sort_field": null,
+        "one_deselect_action": "nullify"
+      }
+    },
+    {
+      "collection": "inventory_drug_detail",
+      "field": "hospital_drug",
+      "related_collection": "hospital_drug",
+      "schema": {
+        "constraint_name": "inventory_drug_detail_hospital_drug_foreign",
+        "table": "inventory_drug_detail",
+        "column": "hospital_drug",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "hospital_drug",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL"
+      },
+      "meta": {
+        "id": 95,
+        "many_collection": "inventory_drug_detail",
+        "many_field": "hospital_drug",
+        "one_collection": "hospital_drug",
+        "one_field": "inventory_drug_detail",
+        "one_collection_field": null,
+        "one_allowed_collections": null,
+        "junction_field": null,
+        "sort_field": null,
+        "one_deselect_action": "nullify"
+      }
+    },
+    {
+      "collection": "inventory_drug_detail",
+      "field": "pcucode",
+      "related_collection": "ou",
+      "schema": {
+        "constraint_name": "inventory_drug_detail_pcucode_foreign",
+        "table": "inventory_drug_detail",
+        "column": "pcucode",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "ou",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "NO ACTION"
+      },
+      "meta": {
+        "id": 94,
+        "many_collection": "inventory_drug_detail",
+        "many_field": "pcucode",
+        "one_collection": "ou",
+        "one_field": "inventory_drug_detail",
+        "one_collection_field": null,
+        "one_allowed_collections": null,
+        "junction_field": null,
+        "sort_field": null,
+        "one_deselect_action": "nullify"
+      }
+    },
+    {
+      "collection": "inventory_drug_detail",
+      "field": "user_updated",
+      "related_collection": "directus_users",
+      "schema": {
+        "constraint_name": "inventory_drug_detail_user_updated_foreign",
+        "table": "inventory_drug_detail",
+        "column": "user_updated",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "directus_users",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "NO ACTION"
+      },
+      "meta": {
+        "id": 93,
+        "many_collection": "inventory_drug_detail",
+        "many_field": "user_updated",
+        "one_collection": "directus_users",
+        "one_field": null,
+        "one_collection_field": null,
+        "one_allowed_collections": null,
+        "junction_field": null,
+        "sort_field": null,
+        "one_deselect_action": "nullify"
+      }
+    },
+    {
+      "collection": "inventory_drug_detail",
+      "field": "user_created",
+      "related_collection": "directus_users",
+      "schema": {
+        "constraint_name": "inventory_drug_detail_user_created_foreign",
+        "table": "inventory_drug_detail",
+        "column": "user_created",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "directus_users",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "NO ACTION"
+      },
+      "meta": {
+        "id": 92,
+        "many_collection": "inventory_drug_detail",
+        "many_field": "user_created",
+        "one_collection": "directus_users",
+        "one_field": null,
+        "one_collection_field": null,
+        "one_allowed_collections": null,
+        "junction_field": null,
         "sort_field": null,
         "one_deselect_action": "nullify"
       }

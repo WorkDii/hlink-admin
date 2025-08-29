@@ -364,6 +364,9 @@ export namespace Collections {
     remaining: Types.Number;
     hospital_drug: Types.Optional<Types.UUID | Collections.HospitalDrug>;
     issued30day: Types.Optional<Types.Number>;
+    issued30day_cost: Types.Number;
+    issued_cost: Types.Number;
+    remaining_cost: Types.Number;
   }
 
   /**
@@ -954,14 +957,15 @@ export function deleteBillStatusItem(key: string | number) {
 }
 
 export class BillStatusItems
-  implements TypedCollectionItemsWrapper<Collections.BillStatus> {
+  implements TypedCollectionItemsWrapper<Collections.BillStatus>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -1009,10 +1013,10 @@ export class BillStatusItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.BillStatus,
-      Query["fields"]
-    >
+        Schema,
+        Collections.BillStatus,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -1048,18 +1052,19 @@ export class BillStatusItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.BillStatus>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class BillStatusItem
-  implements TypedCollectionItemWrapper<Collections.BillStatus> {
+  implements TypedCollectionItemWrapper<Collections.BillStatus>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -1089,10 +1094,10 @@ export class BillStatusItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.BillStatus,
-      Query["fields"]
-    >
+        Schema,
+        Collections.BillStatus,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readBillStatusItem(key, query));
@@ -1109,10 +1114,10 @@ export class BillStatusItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.BillStatus,
-      Query["fields"]
-    >
+        Schema,
+        Collections.BillStatus,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -1221,14 +1226,15 @@ export function deleteCdrugItem(key: string | number) {
 }
 
 export class CdrugItems
-  implements TypedCollectionItemsWrapper<Collections.Cdrug> {
+  implements TypedCollectionItemsWrapper<Collections.Cdrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -1293,18 +1299,19 @@ export class CdrugItems
    */
   async remove<const Query extends Directus.Query<Schema, Collections.Cdrug>>(
     keys: string[] | number[],
-  ): Promise<void> { }
+  ): Promise<void> {}
 }
 
 export class CdrugItem
-  implements TypedCollectionItemWrapper<Collections.Cdrug> {
+  implements TypedCollectionItemWrapper<Collections.Cdrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -1476,14 +1483,15 @@ export function deleteHospitalDrugItem(key: string | number) {
 }
 
 export class HospitalDrugItems
-  implements TypedCollectionItemsWrapper<Collections.HospitalDrug> {
+  implements TypedCollectionItemsWrapper<Collections.HospitalDrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -1531,10 +1539,10 @@ export class HospitalDrugItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -1572,18 +1580,19 @@ export class HospitalDrugItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.HospitalDrug>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class HospitalDrugItem
-  implements TypedCollectionItemWrapper<Collections.HospitalDrug> {
+  implements TypedCollectionItemWrapper<Collections.HospitalDrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -1615,10 +1624,10 @@ export class HospitalDrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readHospitalDrugItem(key, query));
@@ -1635,10 +1644,10 @@ export class HospitalDrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -1776,14 +1785,15 @@ export function deleteHospitalDrugOuItem(key: string | number) {
 }
 
 export class HospitalDrugOuItems
-  implements TypedCollectionItemsWrapper<Collections.HospitalDrugOu> {
+  implements TypedCollectionItemsWrapper<Collections.HospitalDrugOu>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -1831,10 +1841,10 @@ export class HospitalDrugOuItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugOu,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugOu,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -1872,18 +1882,19 @@ export class HospitalDrugOuItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.HospitalDrugOu>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class HospitalDrugOuItem
-  implements TypedCollectionItemWrapper<Collections.HospitalDrugOu> {
+  implements TypedCollectionItemWrapper<Collections.HospitalDrugOu>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -1915,10 +1926,10 @@ export class HospitalDrugOuItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugOu,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugOu,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readHospitalDrugOuItem(key, query));
@@ -1935,10 +1946,10 @@ export class HospitalDrugOuItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugOu,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugOu,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -2076,14 +2087,15 @@ export function deleteHospitalDrugRateItem(key: string | number) {
 }
 
 export class HospitalDrugRateItems
-  implements TypedCollectionItemsWrapper<Collections.HospitalDrugRate> {
+  implements TypedCollectionItemsWrapper<Collections.HospitalDrugRate>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -2131,10 +2143,10 @@ export class HospitalDrugRateItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugRate,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugRate,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -2172,18 +2184,19 @@ export class HospitalDrugRateItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.HospitalDrugRate>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class HospitalDrugRateItem
-  implements TypedCollectionItemWrapper<Collections.HospitalDrugRate> {
+  implements TypedCollectionItemWrapper<Collections.HospitalDrugRate>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -2215,10 +2228,10 @@ export class HospitalDrugRateItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugRate,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugRate,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readHospitalDrugRateItem(key, query));
@@ -2235,10 +2248,10 @@ export class HospitalDrugRateItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugRate,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugRate,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -2376,14 +2389,15 @@ export function deleteHospitalDrugUnitItem(key: string | number) {
 }
 
 export class HospitalDrugUnitItems
-  implements TypedCollectionItemsWrapper<Collections.HospitalDrugUnit> {
+  implements TypedCollectionItemsWrapper<Collections.HospitalDrugUnit>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -2431,10 +2445,10 @@ export class HospitalDrugUnitItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugUnit,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugUnit,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -2472,18 +2486,19 @@ export class HospitalDrugUnitItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.HospitalDrugUnit>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class HospitalDrugUnitItem
-  implements TypedCollectionItemWrapper<Collections.HospitalDrugUnit> {
+  implements TypedCollectionItemWrapper<Collections.HospitalDrugUnit>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -2515,10 +2530,10 @@ export class HospitalDrugUnitItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugUnit,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugUnit,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readHospitalDrugUnitItem(key, query));
@@ -2535,10 +2550,10 @@ export class HospitalDrugUnitItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.HospitalDrugUnit,
-      Query["fields"]
-    >
+        Schema,
+        Collections.HospitalDrugUnit,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -2676,14 +2691,15 @@ export function deleteInventoryBillItem(key: string | number) {
 }
 
 export class InventoryBillItems
-  implements TypedCollectionItemsWrapper<Collections.InventoryBill> {
+  implements TypedCollectionItemsWrapper<Collections.InventoryBill>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -2731,10 +2747,10 @@ export class InventoryBillItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryBill,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryBill,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -2772,18 +2788,19 @@ export class InventoryBillItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.InventoryBill>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class InventoryBillItem
-  implements TypedCollectionItemWrapper<Collections.InventoryBill> {
+  implements TypedCollectionItemWrapper<Collections.InventoryBill>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -2815,10 +2832,10 @@ export class InventoryBillItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryBill,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryBill,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readInventoryBillItem(key, query));
@@ -2835,10 +2852,10 @@ export class InventoryBillItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryBill,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryBill,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -2976,14 +2993,15 @@ export function deleteInventoryDrugItem(key: string | number) {
 }
 
 export class InventoryDrugItems
-  implements TypedCollectionItemsWrapper<Collections.InventoryDrug> {
+  implements TypedCollectionItemsWrapper<Collections.InventoryDrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -3031,10 +3049,10 @@ export class InventoryDrugItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -3072,18 +3090,19 @@ export class InventoryDrugItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.InventoryDrug>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class InventoryDrugItem
-  implements TypedCollectionItemWrapper<Collections.InventoryDrug> {
+  implements TypedCollectionItemWrapper<Collections.InventoryDrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -3115,10 +3134,10 @@ export class InventoryDrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readInventoryDrugItem(key, query));
@@ -3135,10 +3154,10 @@ export class InventoryDrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -3279,14 +3298,15 @@ export function deleteInventoryDrugDetailItem(key: string | number) {
 }
 
 export class InventoryDrugDetailItems
-  implements TypedCollectionItemsWrapper<Collections.InventoryDrugDetail> {
+  implements TypedCollectionItemsWrapper<Collections.InventoryDrugDetail>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -3337,10 +3357,10 @@ export class InventoryDrugDetailItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryDrugDetail,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryDrugDetail,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -3381,18 +3401,19 @@ export class InventoryDrugDetailItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.InventoryDrugDetail>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class InventoryDrugDetailItem
-  implements TypedCollectionItemWrapper<Collections.InventoryDrugDetail> {
+  implements TypedCollectionItemWrapper<Collections.InventoryDrugDetail>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -3424,10 +3445,10 @@ export class InventoryDrugDetailItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryDrugDetail,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryDrugDetail,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readInventoryDrugDetailItem(key, query));
@@ -3444,10 +3465,10 @@ export class InventoryDrugDetailItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryDrugDetail,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryDrugDetail,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -3585,14 +3606,15 @@ export function deleteInventoryRequestItem(key: string | number) {
 }
 
 export class InventoryRequestItems
-  implements TypedCollectionItemsWrapper<Collections.InventoryRequest> {
+  implements TypedCollectionItemsWrapper<Collections.InventoryRequest>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -3640,10 +3662,10 @@ export class InventoryRequestItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequest,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequest,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -3681,18 +3703,19 @@ export class InventoryRequestItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.InventoryRequest>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class InventoryRequestItem
-  implements TypedCollectionItemWrapper<Collections.InventoryRequest> {
+  implements TypedCollectionItemWrapper<Collections.InventoryRequest>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -3724,10 +3747,10 @@ export class InventoryRequestItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequest,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequest,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readInventoryRequestItem(key, query));
@@ -3744,10 +3767,10 @@ export class InventoryRequestItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequest,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequest,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -3900,14 +3923,15 @@ export function deleteInventoryRequestDrugItem(key: string | number) {
 }
 
 export class InventoryRequestDrugItems
-  implements TypedCollectionItemsWrapper<Collections.InventoryRequestDrug> {
+  implements TypedCollectionItemsWrapper<Collections.InventoryRequestDrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -3964,10 +3988,10 @@ export class InventoryRequestDrugItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequestDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequestDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -4011,18 +4035,19 @@ export class InventoryRequestDrugItems
       Schema,
       Collections.InventoryRequestDrug
     >,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class InventoryRequestDrugItem
-  implements TypedCollectionItemWrapper<Collections.InventoryRequestDrug> {
+  implements TypedCollectionItemWrapper<Collections.InventoryRequestDrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -4060,10 +4085,10 @@ export class InventoryRequestDrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequestDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequestDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readInventoryRequestDrugItem(key, query));
@@ -4083,10 +4108,10 @@ export class InventoryRequestDrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequestDrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequestDrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -4248,14 +4273,15 @@ export function deleteInventoryRequestStatusItem(key: string | number) {
 }
 
 export class InventoryRequestStatusItems
-  implements TypedCollectionItemsWrapper<Collections.InventoryRequestStatus> {
+  implements TypedCollectionItemsWrapper<Collections.InventoryRequestStatus>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -4312,10 +4338,10 @@ export class InventoryRequestStatusItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequestStatus,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequestStatus,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -4359,18 +4385,19 @@ export class InventoryRequestStatusItems
       Schema,
       Collections.InventoryRequestStatus
     >,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class InventoryRequestStatusItem
-  implements TypedCollectionItemWrapper<Collections.InventoryRequestStatus> {
+  implements TypedCollectionItemWrapper<Collections.InventoryRequestStatus>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -4408,10 +4435,10 @@ export class InventoryRequestStatusItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequestStatus,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequestStatus,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(
@@ -4433,10 +4460,10 @@ export class InventoryRequestStatusItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.InventoryRequestStatus,
-      Query["fields"]
-    >
+        Schema,
+        Collections.InventoryRequestStatus,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -4544,7 +4571,7 @@ export class OuItems implements TypedCollectionItemsWrapper<Collections.Ou> {
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -4607,7 +4634,7 @@ export class OuItems implements TypedCollectionItemsWrapper<Collections.Ou> {
    */
   async remove<const Query extends Directus.Query<Schema, Collections.Ou>>(
     keys: string[] | number[],
-  ): Promise<void> { }
+  ): Promise<void> {}
 }
 
 export class OuItem implements TypedCollectionItemWrapper<Collections.Ou> {
@@ -4617,7 +4644,7 @@ export class OuItem implements TypedCollectionItemWrapper<Collections.Ou> {
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -4787,14 +4814,15 @@ export function deleteOuWarehouseItem(key: string | number) {
 }
 
 export class OuWarehouseItems
-  implements TypedCollectionItemsWrapper<Collections.OuWarehouse> {
+  implements TypedCollectionItemsWrapper<Collections.OuWarehouse>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -4842,10 +4870,10 @@ export class OuWarehouseItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.OuWarehouse,
-      Query["fields"]
-    >
+        Schema,
+        Collections.OuWarehouse,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -4883,18 +4911,19 @@ export class OuWarehouseItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.OuWarehouse>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class OuWarehouseItem
-  implements TypedCollectionItemWrapper<Collections.OuWarehouse> {
+  implements TypedCollectionItemWrapper<Collections.OuWarehouse>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -4926,10 +4955,10 @@ export class OuWarehouseItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.OuWarehouse,
-      Query["fields"]
-    >
+        Schema,
+        Collections.OuWarehouse,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readOuWarehouseItem(key, query));
@@ -4946,10 +4975,10 @@ export class OuWarehouseItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.OuWarehouse,
-      Query["fields"]
-    >
+        Schema,
+        Collections.OuWarehouse,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -5058,14 +5087,15 @@ export function deleteUnitItem(key: string | number) {
 }
 
 export class UnitItems
-  implements TypedCollectionItemsWrapper<Collections.Unit> {
+  implements TypedCollectionItemsWrapper<Collections.Unit>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -5128,7 +5158,7 @@ export class UnitItems
    */
   async remove<const Query extends Directus.Query<Schema, Collections.Unit>>(
     keys: string[] | number[],
-  ): Promise<void> { }
+  ): Promise<void> {}
 }
 
 export class UnitItem implements TypedCollectionItemWrapper<Collections.Unit> {
@@ -5138,7 +5168,7 @@ export class UnitItem implements TypedCollectionItemWrapper<Collections.Unit> {
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -5300,14 +5330,15 @@ export function deleteUnit2unitItem(key: string | number) {
 }
 
 export class Unit2unitItems
-  implements TypedCollectionItemsWrapper<Collections.Unit2unit> {
+  implements TypedCollectionItemsWrapper<Collections.Unit2unit>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -5353,10 +5384,10 @@ export class Unit2unitItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Unit2unit,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Unit2unit,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -5392,18 +5423,19 @@ export class Unit2unitItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.Unit2unit>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class Unit2unitItem
-  implements TypedCollectionItemWrapper<Collections.Unit2unit> {
+  implements TypedCollectionItemWrapper<Collections.Unit2unit>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -5429,10 +5461,10 @@ export class Unit2unitItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Unit2unit,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Unit2unit,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readUnit2unitItem(key, query));
@@ -5449,10 +5481,10 @@ export class Unit2unitItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Unit2unit,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Unit2unit,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -5577,14 +5609,15 @@ export function deleteVisitdrugItem(key: string | number) {
 }
 
 export class VisitdrugItems
-  implements TypedCollectionItemsWrapper<Collections.Visitdrug> {
+  implements TypedCollectionItemsWrapper<Collections.Visitdrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -5630,10 +5663,10 @@ export class VisitdrugItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Visitdrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Visitdrug,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -5669,18 +5702,19 @@ export class VisitdrugItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.Visitdrug>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class VisitdrugItem
-  implements TypedCollectionItemWrapper<Collections.Visitdrug> {
+  implements TypedCollectionItemWrapper<Collections.Visitdrug>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -5706,10 +5740,10 @@ export class VisitdrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Visitdrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Visitdrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readVisitdrugItem(key, query));
@@ -5726,10 +5760,10 @@ export class VisitdrugItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Visitdrug,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Visitdrug,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -5854,14 +5888,15 @@ export function deleteWarehouseItem(key: string | number) {
 }
 
 export class WarehouseItems
-  implements TypedCollectionItemsWrapper<Collections.Warehouse> {
+  implements TypedCollectionItemsWrapper<Collections.Warehouse>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Creates many items in the collection.
@@ -5907,10 +5942,10 @@ export class WarehouseItems
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Warehouse,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Warehouse,
+        Query["fields"]
+      >
     | undefined
   > {
     const items = await this.client.request(
@@ -5946,18 +5981,19 @@ export class WarehouseItems
    */
   async remove<
     const Query extends Directus.Query<Schema, Collections.Warehouse>,
-  >(keys: string[] | number[]): Promise<void> { }
+  >(keys: string[] | number[]): Promise<void> {}
 }
 
 export class WarehouseItem
-  implements TypedCollectionItemWrapper<Collections.Warehouse> {
+  implements TypedCollectionItemWrapper<Collections.Warehouse>
+{
   /**
    *
    */
   constructor(
     private client: Directus.DirectusClient<Schema> &
       Directus.RestClient<Schema>,
-  ) { }
+  ) {}
 
   /**
    * Create a single item in the collection.
@@ -5983,10 +6019,10 @@ export class WarehouseItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Warehouse,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Warehouse,
+        Query["fields"]
+      >
     | undefined
   > {
     return await this.client.request(readWarehouseItem(key, query));
@@ -6003,10 +6039,10 @@ export class WarehouseItem
     query?: Query,
   ): Promise<
     | DirectusSDK.ApplyQueryFields<
-      Schema,
-      Collections.Warehouse,
-      Query["fields"]
-    >
+        Schema,
+        Collections.Warehouse,
+        Query["fields"]
+      >
     | undefined
   > {
     return (await this.client.request(
@@ -6032,8 +6068,8 @@ export type DirectusRestCommands<T extends Record<any, any>> = keyof {
   [K in keyof T as T[K] extends (
     ...any: any[]
   ) => Directus.RestCommand<any, any>
-  ? K
-  : never]: K;
+    ? K
+    : never]: K;
 };
 
 export type TypedClient = {
@@ -6255,77 +6291,77 @@ const excludedDirectusCommands: {
 
 type _InjectSchemaSystemTypes<T, Schema> =
   T extends Directus.Query<any, infer C>
-  ? Directus.Query<Schema, C>
-  : T extends Directus.DirectusActivity<any>
-  ? Directus.DirectusActivity<Schema>
-  : T extends Directus.DirectusCollection<any>
-  ? Directus.DirectusCollection<Schema>
-  : T extends Directus.DirectusComment<any>
-  ? Directus.DirectusComment<Schema>
-  : T extends Directus.DirectusField<any>
-  ? Directus.DirectusField<Schema>
-  : T extends Directus.DirectusFile<any>
-  ? Directus.DirectusFile<Schema>
-  : T extends Directus.DirectusFolder<any>
-  ? Directus.DirectusFolder<Schema>
-  : T extends Directus.DirectusPermission<any>
-  ? Directus.DirectusPermission<Schema>
-  : T extends Directus.DirectusPreset<any>
-  ? Directus.DirectusPreset<Schema>
-  : T extends Directus.DirectusRelation<any>
-  ? Directus.DirectusRelation<Schema>
-  : T extends Directus.DirectusRevision<any>
-  ? Directus.DirectusRevision<Schema>
-  : T extends Directus.DirectusRole<any>
-  ? Directus.DirectusRole<Schema>
-  : T extends Directus.DirectusSettings<any>
-  ? Directus.DirectusSettings<Schema>
-  : T extends Directus.DirectusUser<any>
-  ? Directus.DirectusUser<Schema>
-  : T extends Directus.DirectusWebhook<any>
-  ? Directus.DirectusWebhook<Schema>
-  : T extends Directus.DirectusDashboard<any>
-  ? Directus.DirectusDashboard<Schema>
-  : T extends Directus.DirectusPanel<any>
-  ? Directus.DirectusPanel<Schema>
-  : T extends Directus.DirectusNotification<any>
-  ? Directus.DirectusNotification<Schema>
-  : T extends Directus.DirectusShare<any>
-  ? Directus.DirectusShare<Schema>
-  : T extends Directus.DirectusFlow<any>
-  ? Directus.DirectusFlow<Schema>
-  : T extends Directus.DirectusOperation<any>
-  ? Directus.DirectusOperation<Schema>
-  : T extends Directus.DirectusTranslation<any>
-  ? Directus.DirectusTranslation<Schema>
-  : T extends Directus.DirectusVersion<any>
-  ? Directus.DirectusVersion<Schema>
-  : T extends Directus.DirectusExtension<any>
-  ? Directus.DirectusExtension<Schema>
-  : T extends Directus.DirectusUser<any>
-  ? Directus.DirectusUser<Schema>
-  : T;
+    ? Directus.Query<Schema, C>
+    : T extends Directus.DirectusActivity<any>
+      ? Directus.DirectusActivity<Schema>
+      : T extends Directus.DirectusCollection<any>
+        ? Directus.DirectusCollection<Schema>
+        : T extends Directus.DirectusComment<any>
+          ? Directus.DirectusComment<Schema>
+          : T extends Directus.DirectusField<any>
+            ? Directus.DirectusField<Schema>
+            : T extends Directus.DirectusFile<any>
+              ? Directus.DirectusFile<Schema>
+              : T extends Directus.DirectusFolder<any>
+                ? Directus.DirectusFolder<Schema>
+                : T extends Directus.DirectusPermission<any>
+                  ? Directus.DirectusPermission<Schema>
+                  : T extends Directus.DirectusPreset<any>
+                    ? Directus.DirectusPreset<Schema>
+                    : T extends Directus.DirectusRelation<any>
+                      ? Directus.DirectusRelation<Schema>
+                      : T extends Directus.DirectusRevision<any>
+                        ? Directus.DirectusRevision<Schema>
+                        : T extends Directus.DirectusRole<any>
+                          ? Directus.DirectusRole<Schema>
+                          : T extends Directus.DirectusSettings<any>
+                            ? Directus.DirectusSettings<Schema>
+                            : T extends Directus.DirectusUser<any>
+                              ? Directus.DirectusUser<Schema>
+                              : T extends Directus.DirectusWebhook<any>
+                                ? Directus.DirectusWebhook<Schema>
+                                : T extends Directus.DirectusDashboard<any>
+                                  ? Directus.DirectusDashboard<Schema>
+                                  : T extends Directus.DirectusPanel<any>
+                                    ? Directus.DirectusPanel<Schema>
+                                    : T extends Directus.DirectusNotification<any>
+                                      ? Directus.DirectusNotification<Schema>
+                                      : T extends Directus.DirectusShare<any>
+                                        ? Directus.DirectusShare<Schema>
+                                        : T extends Directus.DirectusFlow<any>
+                                          ? Directus.DirectusFlow<Schema>
+                                          : T extends Directus.DirectusOperation<any>
+                                            ? Directus.DirectusOperation<Schema>
+                                            : T extends Directus.DirectusTranslation<any>
+                                              ? Directus.DirectusTranslation<Schema>
+                                              : T extends Directus.DirectusVersion<any>
+                                                ? Directus.DirectusVersion<Schema>
+                                                : T extends Directus.DirectusExtension<any>
+                                                  ? Directus.DirectusExtension<Schema>
+                                                  : T extends Directus.DirectusUser<any>
+                                                    ? Directus.DirectusUser<Schema>
+                                                    : T;
 
 type InjectSchemaSystemTypes<T, Schema> =
   T extends Partial<infer Nested>
-  ? Partial<_InjectSchemaSystemTypes<Nested, Schema>>
-  : _InjectSchemaSystemTypes<T, Schema>;
+    ? Partial<_InjectSchemaSystemTypes<Nested, Schema>>
+    : _InjectSchemaSystemTypes<T, Schema>;
 
 type InjectSchema<T, Schema> = T extends []
   ? []
   : T extends [infer Param]
-  ? [InjectSchema<Param, Schema>]
-  : T extends [infer Param, ...infer Rest]
-  ? [InjectSchema<Param, Schema>, ...InjectSchema<Rest, Schema>]
-  : InjectSchemaSystemTypes<T, Schema>;
+    ? [InjectSchema<Param, Schema>]
+    : T extends [infer Param, ...infer Rest]
+      ? [InjectSchema<Param, Schema>, ...InjectSchema<Rest, Schema>]
+      : InjectSchemaSystemTypes<T, Schema>;
 
 export type DirectusCommands = {
   [K in DirectusRestCommands<DirectusSDK>]: (
     ...args: InjectSchema<Parameters<DirectusSDK[K]>, Schema>
   ) => Promise<
     ReturnType<DirectusSDK[K]> extends Directus.RestCommand<infer Output, any>
-    ? Output
-    : unknown
+      ? Output
+      : unknown
   >;
 };
 
@@ -6341,7 +6377,7 @@ function isDirectusRestCommand(
 function isDirectusRestClient<Schema>(
   client: DirectusSDK.DirectusClient<Schema>,
 ): client is DirectusSDK.DirectusClient<Schema> &
-DirectusSDK.RestClient<Schema> {
+  DirectusSDK.RestClient<Schema> {
   return client && "request" in client;
 }
 
