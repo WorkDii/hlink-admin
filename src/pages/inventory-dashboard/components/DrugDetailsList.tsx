@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Col, Card, Table, Tag, Space, Radio, Button } from 'antd';
-import { UnorderedListOutlined, FilterOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Col, Card, Table, Tag, Space, Radio, Button, Input } from 'antd';
+import { UnorderedListOutlined, FilterOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { DrugData, FilterType, STATUS_PRIORITY, DRUG_TYPE_MAP } from '../types';
 
 interface DrugDetailsListProps {
@@ -110,6 +110,7 @@ const downloadCSV = (data: any[], filterType: FilterType): void => {
 export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [pageSize, setPageSize] = useState<number>(50);
+  const [searchText, setSearchText] = useState<string>('');
 
   // Early return for empty data
   if (!Array.isArray(data) || data.length === 0) {
@@ -139,8 +140,24 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
         break;
     }
 
+    // Apply search filter
+    if (searchText.trim()) {
+      const searchLower = searchText.toLowerCase();
+      filteredData = filteredData.filter(item => {
+        const drugCode = (item.drugcode || '').toLowerCase();
+        const drugName = getDrugName(item).toLowerCase();
+        const drugType = (DRUG_TYPE_MAP[item.drugtype || ''] || item.drugtype || '').toLowerCase();
+        const status = (item.ratio?.status || '').toLowerCase();
+
+        return drugCode.includes(searchLower) ||
+          drugName.includes(searchLower) ||
+          drugType.includes(searchLower) ||
+          status.includes(searchLower);
+      });
+    }
+
     return { filteredData, linkedCount, unlinkedCount };
-  }, [data, filterType]);
+  }, [data, filterType, searchText]);
 
   // Sort data by status priority (critical first)
   const sortedData = useMemo(() => {
@@ -283,8 +300,10 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
     showSizeChanger: true,
     showQuickJumper: true,
     onShowSizeChange: (_current: number, size: number) => setPageSize(size),
-    showTotal: (total: number, range: [number, number]) =>
-      `${range[0]}-${range[1]} จาก ${total} รายการ (แสดง: ${getFilterTypeLabel(filterType)})`,
+    showTotal: (total: number, range: [number, number]) => {
+      const searchInfo = searchText.trim() ? ` (ค้นหา: "${searchText}")` : '';
+      return `${range[0]}-${range[1]} จาก ${total} รายการ (แสดง: ${getFilterTypeLabel(filterType)})${searchInfo}`;
+    },
   };
 
   return (
@@ -293,7 +312,14 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
         title="รายละเอียดยาทั้งหมด"
         extra={
           <Space>
-            <FilterOutlined />
+            <Input
+              placeholder="ค้นหายา..."
+              prefix={<SearchOutlined />}
+              style={{ width: '300px' }}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+            />
             <Radio.Group
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -320,6 +346,7 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
           </Space>
         }
       >
+
         <Table
           dataSource={sortedData}
           columns={columns}
