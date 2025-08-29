@@ -78,7 +78,7 @@ const createCSVContent = (data: any[], filterType: FilterType): string => {
     DRUG_TYPE_MAP[record.drugtype || ''] || record.drugtype,
     formatNumber(record.remaining),
     formatNumber(record.issued30day),
-    record.ratio.valueString,
+    record.ratio.value,
     record.ratio.days,
     record.ratio.status,
     formatCurrency(getDrugCost(record)),
@@ -222,7 +222,7 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
       sorter: (a: any, b: any) => (a.ratio.value || 0) - (b.ratio.value || 0),
       render: (record: any) => (
         <span style={{ fontWeight: 'bold' }}>
-          {record.ratio.valueString} เดือน
+          {record.ratio.value} เดือน
         </span>
       ),
     },

@@ -58,14 +58,12 @@ const getDrugStockStatus = (ratio: number): DrugStockStatus => {
 }
 
 const getRatioData = (issued: any, remain: any) => {
-  let value = Number(remain || 0) / Number(issued || 0)
-  // if (value > 999) value = Infinity
-  const valueString = (Math.round(value * 100) / 100).toFixed(2)
+  // 2 decimal places
+  let value = Math.round((Number(remain || 0) / Number(issued || 0)) * 100) / 100
   const days = Math.round(value * 30)
   const status = getDrugStockStatus(value)
   return {
     value,
-    valueString,
     days,
     ...status
   }
@@ -198,12 +196,12 @@ export const listHistoricalDrugRatio = async (pcucode: string) => {
       }
     },
     aggregate: {
-      sum: ['remaining', 'issued30day']
+      sum: ['remaining_cost', 'issued30day_cost']
     },
     groupBy: ['date']
   }))
   return _data.filter(i => !!i.date).map(i => {
-    const ratio = getRatioData(i.sum.issued30day, i.sum.remaining)
+    const ratio = getRatioData(i.sum.issued30day_cost, i.sum.remaining_cost)
     return {
       date: format(i.date || new Date, 'yyyy-MM-dd'),
       ratio
