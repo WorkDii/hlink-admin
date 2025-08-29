@@ -31,7 +31,7 @@ const PcuOptionsButton = ({ setPcucode, pcucode, ...props }: Props) => {
           size="large"
         >
           {allChildrenPcu?.data.map((v) => {
-            return <Radio.Button value={v.id}>{v.name}</Radio.Button>;
+            return <Radio.Button value={v.id}>[{v.id}] {v.name}</Radio.Button>;
           })}
         </Radio.Group>
       </Flex>
