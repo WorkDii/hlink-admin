@@ -15,6 +15,18 @@ export const STATUS_COLORS: Record<DrugStockStatus['status'], string> = {
   'มากเกินไป': '#b37feb'
 }
 
+/**
+ * ฟังก์ชัน getDrugStockStatus ใช้สำหรับประเมินสถานะของสต็อกยา
+ * โดยรับค่า ratio (อัตราส่วนของจำนวนยาคงเหลือเทียบกับการใช้ต่อเดือน)
+ * แล้วคำนวณจำนวนวันที่ยาคงเหลือจะเพียงพอ (days = ratio * 30)
+ * จากนั้นจะจัดกลุ่มสถานะตามช่วงของ days ดังนี้:
+ * - น้อยกว่า 7 วัน: "วิกฤต" (สีแดง)
+ * - น้อยกว่า 15 วัน (0.5 เดือน): "ต่ำ" (สีส้ม)
+ * - 15-45 วัน (0.5-1.5 เดือน): "เหมาะสม" (สีเขียว)
+ * - 45-75 วัน (1.5-2.5 เดือน): "เกิน" (สีน้ำเงิน)
+ * - มากกว่า 75 วัน: "มากเกินไป" (สีม่วง)
+ * ฟังก์ชันจะคืนค่าเป็นอ็อบเจกต์ที่มี status และ color สำหรับแสดงผลในแดชบอร์ด
+ */
 const getDrugStockStatus = (ratio: number): DrugStockStatus => {
   const days = ratio * 30
   if (days < 7) {
@@ -46,14 +58,12 @@ const getDrugStockStatus = (ratio: number): DrugStockStatus => {
 }
 
 const getRatioData = (issued: any, remain: any) => {
-  let value = Number(remain || 0) / Number(issued || 0)
-  if (value > 999) value = 999
-  const valueString = (Math.round(value * 100) / 100).toFixed(2)
+  // 2 decimal places
+  let value = Math.round((Number(remain || 0) / Number(issued || 0)) * 100) / 100
   const days = Math.round(value * 30)
   const status = getDrugStockStatus(value)
   return {
     value,
-    valueString,
     days,
     ...status
   }
@@ -131,8 +141,10 @@ const getTotalDrugRatio30Day = async (data: ListData) => {
   let issued30dayTotal = 0
   let remainTotal = 0
   data.forEach(i => {
-    issued30dayTotal += (Number(i.issued30day) || 0)
-    remainTotal += (Number(i.remaining) || 0)
+    if (i.hospital_drug && typeof i.hospital_drug === 'object' && i.hospital_drug !== null) {
+      issued30dayTotal += (Number(i.issued30day) * (Number(i.hospital_drug.cost) || 0) || 0)
+      remainTotal += (Number(i.remaining) * (Number(i.hospital_drug.cost) || 0) || 0)
+    }
   })
   return getRatioData(issued30dayTotal, remainTotal)
 }
@@ -184,12 +196,12 @@ export const listHistoricalDrugRatio = async (pcucode: string) => {
       }
     },
     aggregate: {
-      sum: ['remaining', 'issued30day']
+      sum: ['remaining_cost', 'issued30day_cost']
     },
     groupBy: ['date']
   }))
   return _data.filter(i => !!i.date).map(i => {
-    const ratio = getRatioData(i.sum.issued30day, i.sum.remaining)
+    const ratio = getRatioData(i.sum.issued30day_cost, i.sum.remaining_cost)
     return {
       date: format(i.date || new Date, 'yyyy-MM-dd'),
       ratio

@@ -87,6 +87,22 @@ function runCommand(cmd, args, opts = {}) {
 
     console.log("✅ Successfully copied to src/directus");
 
+
+    // Add // @ts-nocheck to the first line of src/directus/generated/client.ts
+    const clientTsPath = path.join("src", "directus", "generated", "client.ts");
+    try {
+      let clientContent = await fsPromises.readFile(clientTsPath, "utf8");
+      if (!clientContent.startsWith("// @ts-nocheck")) {
+        clientContent = `// @ts-nocheck\n${clientContent}`;
+        await fsPromises.writeFile(clientTsPath, clientContent, "utf8");
+        console.log("✅ Added // @ts-nocheck to src/directus/generated/client.ts");
+      } else {
+        console.log("// @ts-nocheck already present in src/directus/generated/client.ts");
+      }
+    } catch (err) {
+      console.warn(`⚠️ Could not update ${clientTsPath}:`, err.message);
+    }
+
     // Verify the copy was successful
     let stat;
     try {

@@ -38,7 +38,7 @@ export const InventoryDashboard: React.FC = () => {
           <Row gutter={[16, 16]}>
             <InventoryMetricCard
               title="อัตราการสำรองยา (เดือน)"
-              value={data.totalDrugRatio30Day?.valueString}
+              value={data.totalDrugRatio30Day?.value}
               icon={<LineChartOutlined />}
               suffix={`เท่า (${data.totalDrugRatio30Day.status})`}
               color={data.totalDrugRatio30Day.color}
