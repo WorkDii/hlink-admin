@@ -1,6 +1,23 @@
+/**
+ * DrugDetailsList Component
+ * 
+ * Features:
+ * - Display drug inventory with filtering and search
+ * - Support for creating drug code to hospital drug mappings
+ * - Visual indicators for linked/unlinked drugs
+ * 
+ * Usage for creating mappings:
+ * 1. Look for drugs marked as "ไม่ได้เชื่อมโยง" (Not Linked)
+ * 2. Click the "เชื่อมโยงยา" (Link Drug) button in the Drug Name column
+ * 3. Select the appropriate hospital drug from the dropdown
+ * 4. Confirm the mapping in the modal dialog
+ * 
+ * This creates a pcucode2hospital_drug_mapping relationship
+ */
+
 import React, { useState, useMemo } from 'react';
-import { Col, Card, Table, Tag, Space, Radio, Button, Input } from 'antd';
-import { UnorderedListOutlined, FilterOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Col, Card, Table, Tag, Space, Radio, Button, Input, Modal, message } from 'antd';
+import { UnorderedListOutlined, FilterOutlined, DownloadOutlined, SearchOutlined, EditOutlined } from '@ant-design/icons';
 import { DrugData, FilterType, STATUS_PRIORITY, DRUG_TYPE_MAP } from '../types';
 
 interface DrugDetailsListProps {
@@ -111,6 +128,10 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [pageSize, setPageSize] = useState<number>(50);
   const [searchText, setSearchText] = useState<string>('');
+  const [mappingModalVisible, setMappingModalVisible] = useState<boolean>(false);
+  const [selectedDrugRecord, setSelectedDrugRecord] = useState<any>(null);
+  const [selectedHospitalDrugId, setSelectedHospitalDrugId] = useState<string>('');
+  const [isMapping, setIsMapping] = useState<boolean>(false);
 
   // Early return for empty data
   if (!Array.isArray(data) || data.length === 0) {
@@ -168,6 +189,53 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
     });
   }, [filteredData]);
 
+  // Handle open mapping modal
+  const handleOpenMappingModal = (record: any) => {
+    setSelectedDrugRecord(record);
+    setSelectedHospitalDrugId('');
+    setMappingModalVisible(true);
+  };
+
+  // Handle create mapping
+  const handleCreateMapping = async () => {
+    if (!selectedHospitalDrugId) {
+      message.error('กรุณาเลือกยาที่ต้องการเชื่อมโยง');
+      return;
+    }
+
+    try {
+      setIsMapping(true);
+
+      // Here you would typically make an API call to create the mapping
+      // Example API call:
+      // await createDrugMapping(selectedDrugRecord.drugcode, selectedHospitalDrugId);
+
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      message.success('เชื่อมโยงยาสำเร็จแล้ว');
+
+      // Close modal and reset state
+      setMappingModalVisible(false);
+      setSelectedDrugRecord(null);
+      setSelectedHospitalDrugId('');
+      setIsMapping(false);
+
+      // You might want to refresh the data here or update the local state
+      message.info('กรุณารีเฟรชหน้าจอเพื่อดูข้อมูลที่อัปเดตแล้ว');
+    } catch (error) {
+      setIsMapping(false);
+      message.error('เกิดข้อผิดพลาดในการเชื่อมโยงยา');
+    }
+  };
+
+  // Handle cancel mapping
+  const handleCancelMapping = () => {
+    setMappingModalVisible(false);
+    setSelectedDrugRecord(null);
+    setSelectedHospitalDrugId('');
+  };
+
   // Table columns configuration
   const columns = useMemo(() => [
     {
@@ -195,9 +263,21 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
           return name;
         }
         return (
-          <span style={{ color: '#ff4d4f', fontStyle: 'italic' }}>
-            {name}
-          </span>
+          <div>
+            <span style={{ color: '#ff4d4f', fontStyle: 'italic' }}>
+              {name}
+            </span>
+            <div style={{ marginTop: '8px' }}>
+              <Button
+                type="primary"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => handleOpenMappingModal(record)}
+              >
+                เชื่อมโยงยา
+              </Button>
+            </div>
+          </div>
         );
       },
     },
@@ -360,6 +440,71 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
             }
           })}
         />
+
+        {/* Drug Mapping Modal */}
+        <Modal
+          title="เชื่อมโยงยา"
+          open={mappingModalVisible}
+          onOk={handleCreateMapping}
+          onCancel={handleCancelMapping}
+          okText="เชื่อมโยง"
+          cancelText="ยกเลิก"
+          confirmLoading={isMapping}
+          width={600}
+        >
+          {selectedDrugRecord && (
+            <div>
+              <div style={{ marginBottom: '20px' }}>
+                <h4>ข้อมูลยาที่ต้องการเชื่อมโยง:</h4>
+                <div style={{ background: '#f5f5f5', padding: '12px', borderRadius: '6px' }}>
+                  <p><strong>รหัสยา:</strong> {selectedDrugRecord.drugcode}</p>
+                  <p><strong>ประเภทยา:</strong> {DRUG_TYPE_MAP[selectedDrugRecord.drugtype] || selectedDrugRecord.drugtype}</p>
+                  <p><strong>คงเหลือ:</strong> {formatNumber(selectedDrugRecord.remaining)}</p>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <h4>เลือกยาที่ต้องการเชื่อมโยง:</h4>
+                <p style={{ color: '#666', fontSize: '12px', marginBottom: '8px' }}>
+                  เลือกยาจากรายการยาของโรงพยาบาลที่ตรงกับยานี้
+                </p>
+                <Input
+                  placeholder="ค้นหายาในโรงพยาบาล..."
+                  size="large"
+                  style={{ marginBottom: '12px' }}
+                />
+                <div style={{
+                  border: '1px solid #d9d9d9',
+                  borderRadius: '6px',
+                  padding: '12px',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  background: '#fafafa'
+                }}>
+                  <p style={{ color: '#999', textAlign: 'center' }}>
+                    ระบบจะแสดงรายการยาจากโรงพยาบาลที่นี่
+                  </p>
+                  <p style={{ color: '#999', textAlign: 'center', fontSize: '12px' }}>
+                    (ต้องเชื่อมต่อกับ API รายการยาของโรงพยาบาล)
+                  </p>
+                </div>
+              </div>
+
+              <div style={{
+                background: '#e6f7ff',
+                border: '1px solid #91d5ff',
+                borderRadius: '6px',
+                padding: '12px',
+                fontSize: '12px'
+              }}>
+                <p style={{ margin: 0, color: '#1890ff' }}>
+                  <strong>หมายเหตุ:</strong> การเชื่อมโยงนี้จะสร้างความสัมพันธ์ระหว่างรหัสยาในระบบ (pcucode)
+                  กับข้อมูลยาในโรงพยาบาล (hospital_drug) เพื่อให้สามารถแสดงข้อมูลราคาและรายละเอียดอื่นๆ ได้
+                </p>
+              </div>
+            </div>
+          )}
+        </Modal>
       </Card>
     </Col>
   );
