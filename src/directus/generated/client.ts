@@ -265,7 +265,6 @@ export namespace Collections {
     warehouse: Types.Optional<Types.String | Collections.Warehouse>;
     cost: Types.Optional<Types.Number>;
     only_ou: Collections.HospitalDrugOu[];
-    inventory_drug_detail: Collections.InventoryDrugDetail[];
   }
 
   /**
@@ -362,7 +361,6 @@ export namespace Collections {
     received: Types.Number;
     issued: Types.Number;
     remaining: Types.Number;
-    hospital_drug: Types.Optional<Types.UUID | Collections.HospitalDrug>;
     issued30day: Types.Optional<Types.Number>;
     issued30day_cost: Types.Number;
     issued_cost: Types.Number;
@@ -442,6 +440,20 @@ export namespace Collections {
     id: Types.PrimaryKey<Types.Integer>;
     ou_id: Types.Optional<Types.String | Collections.Ou>;
     warehouse_id: Types.Optional<Types.String | Collections.Warehouse>;
+  }
+
+  /**
+   * The pcu2hospital drug mapping collection.
+   */
+  export interface Pcu2hospitalDrugMapping {
+    id: Types.PrimaryKey<Types.UUID>;
+    user_created: Types.Optional<Types.UUID | Collections.DirectusUser>;
+    date_created: Types.Optional<Types.DateTime>;
+    user_updated: Types.Optional<Types.UUID | Collections.DirectusUser>;
+    date_updated: Types.Optional<Types.DateTime>;
+    pcucode: Types.Optional<Types.String | Collections.Ou>;
+    hospital_drug: Types.UUID | Collections.HospitalDrug;
+    drugcode: Types.Optional<Types.String>;
   }
 
   /**
@@ -729,6 +741,11 @@ export interface Schema extends System {
    * The ou warehouse collection.
    */
   ou_warehouse: Collections.OuWarehouse[];
+
+  /**
+   * The pcu2hospital drug mapping collection.
+   */
+  pcu2hospital_drug_mapping: Collections.Pcu2hospitalDrugMapping[];
 
   /**
    * The unit collection.
@@ -4997,6 +5014,358 @@ export class OuWarehouseItem
 }
 
 /**
+ * Create many pcu2hospital drug mapping items.
+ */
+export function createPcu2hospitalDrugMappingItems<
+  const Query extends Directus.Query<
+    Schema,
+    Collections.Pcu2hospitalDrugMapping[]
+  >,
+>(items: Partial<Collections.Pcu2hospitalDrugMapping>[], query?: Query) {
+  return DirectusSDK.createItems<Schema, "pcu2hospital_drug_mapping", Query>(
+    "pcu2hospital_drug_mapping",
+    items,
+    query,
+  );
+}
+
+/**
+ * Create a single pcu2hospital drug mapping item.
+ */
+export function createPcu2hospitalDrugMappingItem<
+  const Query extends DirectusSDK.Query<
+    Schema,
+    Collections.Pcu2hospitalDrugMapping[]
+  >, // Is this a mistake? Why []?
+>(item: Partial<Collections.Pcu2hospitalDrugMapping>, query?: Query) {
+  return DirectusSDK.createItem<Schema, "pcu2hospital_drug_mapping", Query>(
+    "pcu2hospital_drug_mapping",
+    item,
+    query,
+  );
+}
+
+/**
+ * Read many pcu2hospital drug mapping items.
+ */
+export function readPcu2hospitalDrugMappingItems<
+  const Query extends Directus.Query<
+    Schema,
+    Collections.Pcu2hospitalDrugMapping
+  >,
+>(query?: Query) {
+  return DirectusSDK.readItems<Schema, "pcu2hospital_drug_mapping", Query>(
+    "pcu2hospital_drug_mapping",
+    query,
+  );
+}
+
+/**
+ * Read many pcu2hospital drug mapping items.
+ */
+export const listPcu2hospitalDrugMapping = readPcu2hospitalDrugMappingItems;
+
+/**
+ * Gets a single known pcu2hospital drug mapping item by id.
+ */
+export function readPcu2hospitalDrugMappingItem<
+  const Query extends Directus.Query<
+    Schema,
+    Collections.Pcu2hospitalDrugMapping
+  >,
+>(key: string | number, query?: Query) {
+  return DirectusSDK.readItem<Schema, "pcu2hospital_drug_mapping", Query>(
+    "pcu2hospital_drug_mapping",
+    key,
+    query,
+  );
+}
+
+/**
+ * Gets a single known pcu2hospital drug mapping item by id.
+ */
+export const readPcu2hospitalDrugMapping = readPcu2hospitalDrugMappingItem;
+
+/**
+ * Read many pcu2hospital drug mapping items.
+ */
+export function updatePcu2hospitalDrugMappingItems<
+  const Query extends Directus.Query<
+    Schema,
+    Collections.Pcu2hospitalDrugMapping[]
+  >,
+>(
+  keys: string[] | number[],
+  patch: Partial<Collections.Pcu2hospitalDrugMapping>,
+  query?: Query,
+) {
+  return DirectusSDK.updateItems<Schema, "pcu2hospital_drug_mapping", Query>(
+    "pcu2hospital_drug_mapping",
+    keys,
+    patch,
+    query,
+  );
+}
+
+/**
+ * Gets a single known pcu2hospital drug mapping item by id.
+ */
+export function updatePcu2hospitalDrugMappingItem<
+  const Query extends Directus.Query<
+    Schema,
+    Collections.Pcu2hospitalDrugMapping[]
+  >,
+>(
+  key: string | number,
+  patch: Partial<Collections.Pcu2hospitalDrugMapping>,
+  query?: Query,
+) {
+  return DirectusSDK.updateItem<Schema, "pcu2hospital_drug_mapping", Query>(
+    "pcu2hospital_drug_mapping",
+    key,
+    patch,
+    query,
+  );
+}
+
+/**
+ * Deletes many pcu2hospital drug mapping items.
+ */
+export function deletePcu2hospitalDrugMappingItems<
+  const Query extends Directus.Query<
+    Schema,
+    Collections.Pcu2hospitalDrugMapping[]
+  >,
+>(keys: string[] | number[]) {
+  return DirectusSDK.deleteItems<Schema, "pcu2hospital_drug_mapping", Query>(
+    "pcu2hospital_drug_mapping",
+    keys,
+  );
+}
+
+/**
+ * Deletes a single known pcu2hospital drug mapping item by id.
+ */
+export function deletePcu2hospitalDrugMappingItem(key: string | number) {
+  return DirectusSDK.deleteItem<Schema, "pcu2hospital_drug_mapping">(
+    "pcu2hospital_drug_mapping",
+    key,
+  );
+}
+
+export class Pcu2hospitalDrugMappingItems
+  implements TypedCollectionItemsWrapper<Collections.Pcu2hospitalDrugMapping>
+{
+  /**
+   *
+   */
+  constructor(
+    private client: Directus.DirectusClient<Schema> &
+      Directus.RestClient<Schema>,
+  ) {}
+
+  /**
+   * Creates many items in the collection.
+   */
+  async create<
+    const Query extends DirectusSDK.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(
+    items: Partial<Collections.Pcu2hospitalDrugMapping>[],
+    query?: Query,
+  ): Promise<
+    DirectusSDK.ApplyQueryFields<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping,
+      Query["fields"]
+    >[]
+  > {
+    return (await this.client.request(
+      createPcu2hospitalDrugMappingItems(items, query as any),
+    )) as any; // Seems like a bug in the SDK.
+  }
+
+  /**
+   * Read many items from the collection.
+   */
+  async query<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(
+    query?: Query,
+  ): Promise<
+    DirectusSDK.ApplyQueryFields<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping,
+      Query["fields"]
+    >[]
+  > {
+    return await this.client.request(readPcu2hospitalDrugMappingItems(query));
+  }
+
+  /**
+   * Read the first item from the collection matching the query.
+   */
+  async find<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(
+    query?: Query,
+  ): Promise<
+    | DirectusSDK.ApplyQueryFields<
+        Schema,
+        Collections.Pcu2hospitalDrugMapping,
+        Query["fields"]
+      >
+    | undefined
+  > {
+    const items = await this.client.request(
+      readPcu2hospitalDrugMappingItems({
+        ...query,
+        limit: 1,
+      }),
+    );
+    return items?.[0] as any; // TODO: fix
+  }
+
+  /**
+   * Update many items in the collection.
+   */
+  async update<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping[]
+    >,
+  >(
+    keys: string[] | number[],
+    patch: Partial<Collections.Pcu2hospitalDrugMapping>,
+    query?: Query,
+  ): Promise<
+    DirectusSDK.ApplyQueryFields<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping,
+      Query["fields"]
+    >[]
+  > {
+    return await this.client.request(
+      updatePcu2hospitalDrugMappingItems(keys, patch, query),
+    );
+  }
+
+  /**
+   * Remove many items in the collection.
+   */
+  async remove<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(keys: string[] | number[]): Promise<void> {}
+}
+
+export class Pcu2hospitalDrugMappingItem
+  implements TypedCollectionItemWrapper<Collections.Pcu2hospitalDrugMapping>
+{
+  /**
+   *
+   */
+  constructor(
+    private client: Directus.DirectusClient<Schema> &
+      Directus.RestClient<Schema>,
+  ) {}
+
+  /**
+   * Create a single item in the collection.
+   */
+  async create<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(
+    item: Partial<Collections.Pcu2hospitalDrugMapping>,
+    query?: Query,
+  ): Promise<
+    DirectusSDK.ApplyQueryFields<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping,
+      Query["fields"]
+    >
+  > {
+    return (await this.client.request(
+      createPcu2hospitalDrugMappingItem(item, query as any),
+    )) as any;
+  }
+
+  /**
+   * Read a single item from the collection.
+   */
+  async get<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(
+    key: string | number,
+    query?: Query,
+  ): Promise<
+    | DirectusSDK.ApplyQueryFields<
+        Schema,
+        Collections.Pcu2hospitalDrugMapping,
+        Query["fields"]
+      >
+    | undefined
+  > {
+    return await this.client.request(
+      readPcu2hospitalDrugMappingItem(key, query),
+    );
+  }
+
+  /**
+   * Update a single item from the collection.
+   */
+  async update<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(
+    key: string | number,
+    patch: Partial<Collections.Pcu2hospitalDrugMapping>,
+    query?: Query,
+  ): Promise<
+    | DirectusSDK.ApplyQueryFields<
+        Schema,
+        Collections.Pcu2hospitalDrugMapping,
+        Query["fields"]
+      >
+    | undefined
+  > {
+    return (await this.client.request(
+      updatePcu2hospitalDrugMappingItem(key, patch, query as any),
+    )) as any;
+  }
+
+  /**
+   * Remove many items in the collection.
+   */
+  async remove<
+    const Query extends Directus.Query<
+      Schema,
+      Collections.Pcu2hospitalDrugMapping
+    >,
+  >(key: string | number): Promise<void> {
+    return await this.client.request(deletePcu2hospitalDrugMappingItem(key));
+  }
+}
+
+/**
  * Create many unit items.
  */
 export function createUnitItems<
@@ -6214,6 +6583,16 @@ export type TypedClient = {
   ou_warehouse: TypedCollectionItemWrapper<Collections.OuWarehouse>;
 
   /**
+   * Manages multiple items from the Pcu2hospitalDrugMapping collection.
+   */
+  pcu2hospital_drug_mappings: TypedCollectionItemsWrapper<Collections.Pcu2hospitalDrugMapping>;
+
+  /**
+   * Manages individual items from the Pcu2hospitalDrugMapping collection.
+   */
+  pcu2hospital_drug_mapping: TypedCollectionItemWrapper<Collections.Pcu2hospitalDrugMapping>;
+
+  /**
    * Manages multiple items from the Unit collection.
    */
   units: TypedCollectionItemsWrapper<Collections.Unit>;
@@ -6446,6 +6825,15 @@ export const schema = () => {
 
       ["ou_warehouses", new OuWarehouseItems(client as any)],
       ["ou_warehouse", new OuWarehouseItem(client as any)],
+
+      [
+        "pcu2hospital_drug_mappings",
+        new Pcu2hospitalDrugMappingItems(client as any),
+      ],
+      [
+        "pcu2hospital_drug_mapping",
+        new Pcu2hospitalDrugMappingItem(client as any),
+      ],
 
       ["units", new UnitItems(client as any)],
       ["unit", new UnitItem(client as any)],

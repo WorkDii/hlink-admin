@@ -88,6 +88,8 @@ export const getLastInventoryDate = async (pcucode: string) => {
 // หากไม่ระบุวันที่ (date) จะค้นหาวันที่ล่าสุดโดยอัตโนมัติ
 // หากไม่พบข้อมูลจะส่ง error กลับ
 const listData = async (pcucode: string, lastDate: string) => {
+
+  // First, get the inventory data
   const _data = await directusClient.request(readItems('inventory_drug_detail', {
     filter: {
       pcucode: {
@@ -100,14 +102,34 @@ const listData = async (pcucode: string, lastDate: string) => {
         _eq: lastDate
       }
     },
-    fields: ['*', { hospital_drug: ['id', 'name', 'cost'] }],
-    sort: ['drugtype', 'hospital_drug'],
+    fields: ['*'],
+    sort: ['drugtype', 'drugcode'],
     limit: -1
   }))
+
+  // Get the mapping data for this PCU
+  const mappingData = await directusClient.request(readItems('pcu2hospital_drug_mapping', {
+    filter: {
+      pcucode: {
+        _eq: pcucode
+      }
+    },
+    fields: ['drugcode', { hospital_drug: ['id', 'name', 'cost'] }],
+    limit: -1
+  }))
+
+  // Create a map for quick lookup
+  const drugMapping = new Map(
+    mappingData.map(m => [m.drugcode, m.hospital_drug])
+  )
+
   return _data.map(i => {
     const ratio = getRatioData(i.issued30day, i.remaining)
+    const hospitalDrug = drugMapping.get(i.drugcode)
+
     return {
       ...i,
+      hospital_drug: hospitalDrug,
       ratio
     }
   })
