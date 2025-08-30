@@ -3,7 +3,6 @@ import { Modal, Input, List, Spin, Button, Tag, Typography, message } from 'antd
 import { SearchOutlined, LinkOutlined } from '@ant-design/icons';
 import { useSimpleList } from '@refinedev/antd';
 import { debounce } from 'lodash';
-import { HospitalDrug } from '../../../../type';
 import { DRUG_TYPE_MAP } from '../constants';
 import { formatNumber } from '../utils';
 
@@ -17,6 +16,20 @@ interface DrugMappingModalProps {
   onOk: () => void;
   onCancel: () => void;
   onHospitalDrugIdChange: (value: string) => void;
+}
+
+interface HospitalDrug {
+  id: string;
+  name: string;
+  drugcode24: string;
+  h_drugcode: string;
+  is_active: boolean;
+  default_unit: {
+    name: string;
+  };
+  warehouse: {
+    name: string;
+  };
 }
 
 export const DrugMappingModal: React.FC<DrugMappingModalProps> = ({
