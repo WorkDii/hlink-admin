@@ -5,6 +5,8 @@ import { useSimpleList } from '@refinedev/antd';
 import { debounce } from 'lodash';
 import { DRUG_TYPE_MAP } from '../constants';
 import { formatNumber } from '../utils';
+import { directusClient } from '../../../../../directusClient';
+import { createPcu2hospitalDrugMappingItem } from '../../../../../directus/generated/client';
 
 const { Text } = Typography;
 
@@ -43,6 +45,7 @@ export const DrugMappingModal: React.FC<DrugMappingModalProps> = ({
 }) => {
   const [searchText, setSearchText] = useState('');
   const [selectedDrug, setSelectedDrug] = useState<HospitalDrug | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   // Fetch hospital_drug data using Refine's useSimpleList hook
   const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({
@@ -110,19 +113,30 @@ export const DrugMappingModal: React.FC<DrugMappingModalProps> = ({
 
   // Handle save mapping
   const handleSaveMapping = async () => {
-    if (!selectedDrug) {
+    if (!selectedDrug || !selectedRecord) {
       message.error('กรุณาเลือกยาที่ต้องการเชื่อมโยง');
       return;
     }
 
     try {
-      // Here you would typically save the mapping to your database
-      // For now, we'll just call the onOk callback
+      setIsCreating(true);
+
+      // Create the mapping record in pcu2hospital_drug_mapping table
+      await directusClient.request(
+        createPcu2hospitalDrugMappingItem({
+          pcucode: selectedRecord.pcucode,
+          drugcode: selectedRecord.drugcode,
+          hospital_drug: selectedDrug.id,
+        })
+      );
+
       message.success('เชื่อมโยงยาสำเร็จ');
       onOk();
     } catch (error) {
       message.error('เกิดข้อผิดพลาดในการเชื่อมโยงยา');
       console.error('Mapping error:', error);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -144,10 +158,10 @@ export const DrugMappingModal: React.FC<DrugMappingModalProps> = ({
       onCancel={onCancel}
       okText="เชื่อมโยง"
       cancelText="ยกเลิก"
-      confirmLoading={isMapping}
+      confirmLoading={isMapping || isCreating}
       width={800}
       okButtonProps={{
-        disabled: !selectedDrug,
+        disabled: !selectedDrug || isCreating,
       }}
     >
       {selectedRecord && (
