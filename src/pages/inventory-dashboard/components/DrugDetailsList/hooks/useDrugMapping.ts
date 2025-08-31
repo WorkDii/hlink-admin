@@ -1,7 +1,38 @@
 import { useState, useCallback } from 'react';
 import { message } from 'antd';
-import { MappingModalState } from '../types';
+import { MappingModalState, DrugRecord } from '../types';
+import {
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+  handleApiError,
+  safeAsyncOperation
+} from '../utils/errorHandling';
 
+/**
+ * Custom hook for managing drug mapping modal state and operations
+ * 
+ * Provides state management and handlers for the drug mapping functionality,
+ * including modal visibility, selected records, and mapping operations.
+ * 
+ * @returns Object containing modal state and handler functions
+ * 
+ * @example
+ * ```tsx
+ * const {
+ *   mappingModal,
+ *   handleOpenMappingModal,
+ *   handleCreateMapping,
+ *   handleCancelMapping,
+ *   handleUpdateHospitalDrugId,
+ * } = useDrugMapping();
+ * ```
+ * 
+ * Features:
+ * - Modal state management with loading states
+ * - Error handling for mapping operations
+ * - Validation of required fields
+ * - Async operation handling with user feedback
+ */
 export const useDrugMapping = () => {
   const [mappingModal, setMappingModal] = useState<MappingModalState>({
     visible: false,
@@ -10,7 +41,11 @@ export const useDrugMapping = () => {
     isMapping: false
   });
 
-  const handleOpenMappingModal = useCallback((record: any) => {
+  /**
+   * Open the drug mapping modal for a specific record
+   * @param record - The drug record to create a mapping for
+   */
+  const handleOpenMappingModal = useCallback((record: DrugRecord) => {
     setMappingModal({
       visible: true,
       selectedRecord: record,
@@ -19,23 +54,38 @@ export const useDrugMapping = () => {
     });
   }, []);
 
+  /**
+   * Create a new drug mapping with validation and error handling
+   * Validates required fields, executes the mapping operation, and provides user feedback
+   */
   const handleCreateMapping = useCallback(async () => {
     if (!mappingModal.selectedHospitalDrugId) {
-      message.error('กรุณาเลือกยาที่ต้องการเชื่อมโยง');
+      message.error(ERROR_MESSAGES.NO_SELECTION);
       return;
     }
 
-    try {
-      setMappingModal(prev => ({ ...prev, isMapping: true }));
+    if (!mappingModal.selectedRecord) {
+      message.error(ERROR_MESSAGES.INVALID_DATA);
+      return;
+    }
 
-      // Here you would typically make an API call to create the mapping
-      // Example API call:
-      // await createDrugMapping(mappingModal.selectedRecord.drugcode, mappingModal.selectedHospitalDrugId);
+    setMappingModal(prev => ({ ...prev, isMapping: true }));
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    const result = await safeAsyncOperation(
+      async () => {
+        // Here you would typically make an API call to create the mapping
+        // Example API call:
+        // await createDrugMapping(mappingModal.selectedRecord.drugcode, mappingModal.selectedHospitalDrugId);
 
-      message.success('เชื่อมโยงยาสำเร็จแล้ว');
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true;
+      },
+      'การเชื่อมโยงยา'
+    );
+
+    if (result) {
+      message.success(SUCCESS_MESSAGES.MAPPING_SUCCESS);
 
       // Close modal and reset state
       setMappingModal({
@@ -47,12 +97,15 @@ export const useDrugMapping = () => {
 
       // You might want to refresh the data here or update the local state
       message.info('กรุณารีเฟรชหน้าจอเพื่อดูข้อมูลที่อัปเดตแล้ว');
-    } catch (error) {
+    } else {
       setMappingModal(prev => ({ ...prev, isMapping: false }));
-      message.error('เกิดข้อผิดพลาดในการเชื่อมโยงยา');
     }
-  }, [mappingModal.selectedHospitalDrugId]);
+  }, [mappingModal.selectedHospitalDrugId, mappingModal.selectedRecord]);
 
+  /**
+   * Cancel the mapping operation and close the modal
+   * Resets all modal state to initial values
+   */
   const handleCancelMapping = useCallback(() => {
     setMappingModal({
       visible: false,
@@ -62,6 +115,10 @@ export const useDrugMapping = () => {
     });
   }, []);
 
+  /**
+   * Update the selected hospital drug ID
+   * @param value - The new hospital drug ID
+   */
   const handleUpdateHospitalDrugId = useCallback((value: string) => {
     setMappingModal(prev => ({ ...prev, selectedHospitalDrugId: value }));
   }, []);

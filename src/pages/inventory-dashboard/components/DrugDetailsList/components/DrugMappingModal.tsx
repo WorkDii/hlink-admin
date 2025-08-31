@@ -3,22 +3,13 @@ import { Modal, Input, List, Spin, Button, Tag, Typography, message } from 'antd
 import { SearchOutlined, LinkOutlined } from '@ant-design/icons';
 import { useSimpleList } from '@refinedev/antd';
 import { debounce } from 'lodash';
-import { DRUG_TYPE_MAP } from '../constants';
+import { DRUG_TYPE_MAP, SEARCH_DEBOUNCE_DELAY, MAX_DROPDOWN_ITEMS } from '../constants';
 import { formatNumber } from '../utils';
 import { directusClient } from '../../../../../directusClient';
 import { createPcu2hospitalDrugMappingItem } from '../../../../../directus/generated/client';
+import { DrugMappingModalProps } from '../types';
 
 const { Text } = Typography;
-
-interface DrugMappingModalProps {
-  visible: boolean;
-  selectedRecord: any | null;
-  selectedHospitalDrugId: string;
-  isMapping: boolean;
-  onOk: () => void;
-  onCancel: () => void;
-  onHospitalDrugIdChange: (value: string) => void;
-}
 
 interface HospitalDrug {
   id: string;
@@ -63,7 +54,7 @@ export const DrugMappingModal: React.FC<DrugMappingModalProps> = ({
       ],
     },
     pagination: {
-      pageSize: 20,
+      pageSize: MAX_DROPDOWN_ITEMS,
     },
   });
 
@@ -96,7 +87,7 @@ export const DrugMappingModal: React.FC<DrugMappingModalProps> = ({
         },
       ]);
     }
-  }, 500);
+  }, SEARCH_DEBOUNCE_DELAY);
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

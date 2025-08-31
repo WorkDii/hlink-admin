@@ -1,11 +1,12 @@
-import { DRUG_TYPE_MAP } from '../../../types';
+import { DRUG_TYPE_MAP, FilterType } from '../../../types';
 import { CSV_HEADERS, FILTER_TYPE_LABELS } from '../constants';
 import { getDrugName, getDrugCost, getTotalValue, formatNumber, formatCurrency } from '../utils';
+import { DrugRecord } from '../types';
 
 /**
  * Create CSV content for export
  */
-export const createCSVContent = (data: any[], filterType: string): string => {
+export const createCSVContent = (data: DrugRecord[], filterType: FilterType): string => {
   const csvData = data.map(record => [
     record.drugcode,
     getDrugName(record),
@@ -28,7 +29,7 @@ export const createCSVContent = (data: any[], filterType: string): string => {
 /**
  * Download CSV file
  */
-export const downloadCSV = (data: any[], filterType: string): void => {
+export const downloadCSV = (data: DrugRecord[], filterType: FilterType): void => {
   const csvContent = createCSVContent(data, filterType);
   const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');

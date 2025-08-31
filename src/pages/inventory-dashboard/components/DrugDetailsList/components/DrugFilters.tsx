@@ -1,19 +1,7 @@
 import React from 'react';
 import { Space, Input, Radio, Button } from 'antd';
 import { SearchOutlined, DownloadOutlined } from '@ant-design/icons';
-import { FilterType } from '../../../types';
-import { downloadCSV } from './CSVExport';
-
-interface DrugFiltersProps {
-  filterType: FilterType;
-  searchText: string;
-  dataLength: number;
-  linkedCount: number;
-  unlinkedCount: number;
-  onFilterTypeChange: (value: FilterType) => void;
-  onSearchTextChange: (value: string) => void;
-  onDownloadCSV: () => void;
-}
+import { DrugFiltersProps } from '../types';
 
 export const DrugFilters: React.FC<DrugFiltersProps> = ({
   filterType,
