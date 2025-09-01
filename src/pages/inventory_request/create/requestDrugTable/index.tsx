@@ -167,7 +167,6 @@ export const RequestTableDrug = ({
               ...hospital_drug_selected,
               data.hospital_drug.id,
             ]);
-            setIsModalOpen(false);
           }}
           form={form}
         ></ModalSearchDrug>
@@ -198,7 +197,7 @@ export const RequestTableDrug = ({
         <Table dataSource={dataSource} columns={columns} pagination={{
           showSizeChanger: true,
           showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} รายการ`
-        }}  />
+        }} />
       </Space>
       <Form.ErrorList errors={errors} />
     </>

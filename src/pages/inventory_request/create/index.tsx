@@ -3,7 +3,6 @@ import { Form, Select, Typography } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import { useEffect } from "react";
 import { RequestTableDrug } from "./requestDrugTable";
-import { getRecommendDrug } from "./getRecommendDrug";
 import { resetHospitalDrugSelect } from "./resetHospitalDrugSelect";
 import { createDataInventoryRequest } from "./create";
 
@@ -12,7 +11,6 @@ const Text = Typography.Text;
 export const InventoryRequestCreate = () => {
   const { formProps, saveButtonProps, form } = useForm();
   const pcucode = useWatch("pcucode", form);
-  const bill_warehouse = useWatch("bill_warehouse", form);
 
   const { selectProps: ouHospitalSelectProps } = useSelect({
     resource: "ou",
@@ -26,7 +24,7 @@ export const InventoryRequestCreate = () => {
     optionValue: 'bill_warehouse',
   });
 
-  const { selectProps: ouPCUSelectProps } = useSelect({ 
+  const { selectProps: ouPCUSelectProps } = useSelect({
     resource: "ou",
     optionLabel: "name",
     filters: [{ field: "drug_stock_parent", operator: "nnull", value: true }],
@@ -35,13 +33,11 @@ export const InventoryRequestCreate = () => {
   useEffect(() => {
     form.setFieldValue("inventory_drug", null);
     if (pcucode) {
-      getRecommendDrug(pcucode, bill_warehouse).then((v) => {
-        form.setFieldValue(
-          "inventory_drug",
-          v.filter((v) => v._quantity > 0)
-        );
-        resetHospitalDrugSelect(form);
-      });
+      form.setFieldValue(
+        "inventory_drug",
+        []
+      );
+      resetHospitalDrugSelect(form);
     }
   }, [pcucode]);
   return (
