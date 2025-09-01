@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   first_name: string;
@@ -67,7 +68,8 @@ export interface HospitalDrug {
   prepack: number;
   h_drugcode: string;
   warehouse: string;
-  cost: string
+  cost: string;
+  pcu2hospital_drug_mapping: string[];
 }
 
 export interface HospitalDrugRate {

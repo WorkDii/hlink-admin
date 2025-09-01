@@ -22,19 +22,20 @@ export default function ModalSearchDrug({
   const [isAdding, setIsAdding] = useState(false);
   const bill_warehouse = useWatch(["bill_warehouse"], form);
   const [search, setSearch] = useState("")
-  const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({  
+  const pcucode = useWatch(["pcucode"], form);
+  const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({
     resource: "hospital_drug",
     meta: {
-      fields: ["*"],
+      fields: ["*", 'pcu2hospital_drug_mapping.*'],
     },
     sorters: {
       initial: [
-        {field: "name", order: "asc"}
-]
+        { field: "name", order: "asc" }
+      ]
     },
     filters: {
       permanent: [
-        {field: "warehouse.bill_warehouse", operator: "eq", value: bill_warehouse}
+        { field: "warehouse.bill_warehouse", operator: "eq", value: bill_warehouse },
       ]
     },
   });
@@ -92,29 +93,28 @@ export default function ModalSearchDrug({
           const { id, name, drugcode24, is_active, warehouse } = item;
           return <List.Item actions={[
             <Button
-            disabled={hospital_drug_selected.includes(item.id) || !item.is_active}
+              disabled={hospital_drug_selected.includes(item.id) || !item.is_active}
               onClick={async () => {
                 try {
-                setIsAdding(true)
-                const pcucode = form.getFieldValue("pcucode");
-                const data = await getRecommendDrug(pcucode, bill_warehouse, item.id);
-                handleOk(data[0]);
-              } catch (error) {
-                console.error(error);
-              } finally {
-                setIsAdding(false);
-                clearSearch()
-              }
-            }}
-          >
-            เพิ่มรายการ 
-          </Button>
+                  setIsAdding(true)
+                  const data = await getRecommendDrug(pcucode, bill_warehouse, item.id);
+                  handleOk(data[0]);
+                } catch (error) {
+                  console.error(error);
+                } finally {
+                  setIsAdding(false);
+                  clearSearch()
+                }
+              }}
+            >
+              เพิ่มรายการ
+            </Button>
           ]}>
-            <List.Item.Meta 
+            <List.Item.Meta
               style={{
                 opacity: item.is_active ? 1 : 0.5
               }}
-              title={name} 
+              title={name}
               description={
                 <div>
                   <Typography.Text>[{drugcode24}] </Typography.Text>
@@ -122,8 +122,13 @@ export default function ModalSearchDrug({
                   {
                     item.is_active ? "" : <Tag style={{ marginLeft: 8 }} color="error">ยกเลิก</Tag>
                   }
+                  {
+                    item.pcu2hospital_drug_mapping && item.pcu2hospital_drug_mapping.length > 0 && (
+                      <Tag style={{ marginLeft: 8 }} color="success">เชื่อมโยงแล้ว</Tag>
+                    )
+                  }
                 </div>
-              } 
+              }
             />
           </List.Item>
         }} pagination={{ ...listProps.pagination, align: "end", }} ></List>

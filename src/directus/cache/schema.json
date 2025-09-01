@@ -17636,7 +17636,7 @@
         "display_options": null,
         "readonly": false,
         "hidden": false,
-        "sort": null,
+        "sort": 16,
         "width": "full",
         "translations": null,
         "note": "เก็บ รหัสยา ภายในของโรงพยาบาล",
@@ -17684,7 +17684,7 @@
         "display_options": null,
         "readonly": false,
         "hidden": false,
-        "sort": 14,
+        "sort": 13,
         "width": "full",
         "translations": null,
         "note": null,
@@ -17730,7 +17730,7 @@
         "display_options": null,
         "readonly": false,
         "hidden": false,
-        "sort": 15,
+        "sort": 14,
         "width": "full",
         "translations": null,
         "note": null,
@@ -24837,35 +24837,6 @@
       }
     },
     {
-      "collection": "hospital_drug",
-      "field": "only_ou",
-      "type": "alias",
-      "schema": null,
-      "meta": {
-        "id": 222,
-        "collection": "hospital_drug",
-        "field": "only_ou",
-        "special": [
-          "m2m"
-        ],
-        "interface": "list-m2m",
-        "options": null,
-        "display": null,
-        "display_options": null,
-        "readonly": false,
-        "hidden": false,
-        "sort": 16,
-        "width": "full",
-        "translations": null,
-        "note": null,
-        "conditions": null,
-        "required": false,
-        "group": null,
-        "validation": null,
-        "validation_message": null
-      }
-    },
-    {
       "collection": "ou",
       "field": "warehouse",
       "type": "alias",
@@ -24982,6 +24953,35 @@
       }
     },
     {
+      "collection": "hospital_drug",
+      "field": "only_ou",
+      "type": "alias",
+      "schema": null,
+      "meta": {
+        "id": 222,
+        "collection": "hospital_drug",
+        "field": "only_ou",
+        "special": [
+          "m2m"
+        ],
+        "interface": "list-m2m",
+        "options": null,
+        "display": null,
+        "display_options": null,
+        "readonly": false,
+        "hidden": false,
+        "sort": 15,
+        "width": "full",
+        "translations": null,
+        "note": null,
+        "conditions": null,
+        "required": false,
+        "group": null,
+        "validation": null,
+        "validation_message": null
+      }
+    },
+    {
       "collection": "ou",
       "field": "inventory_drug_detail",
       "type": "alias",
@@ -25000,6 +25000,37 @@
         "readonly": false,
         "hidden": false,
         "sort": 11,
+        "width": "full",
+        "translations": null,
+        "note": null,
+        "conditions": null,
+        "required": false,
+        "group": null,
+        "validation": null,
+        "validation_message": null
+      }
+    },
+    {
+      "collection": "hospital_drug",
+      "field": "pcu2hospital_drug_mapping",
+      "type": "alias",
+      "schema": null,
+      "meta": {
+        "id": 303,
+        "collection": "hospital_drug",
+        "field": "pcu2hospital_drug_mapping",
+        "special": [
+          "o2m"
+        ],
+        "interface": "list-o2m",
+        "options": {
+          "enableCreate": false
+        },
+        "display": null,
+        "display_options": null,
+        "readonly": false,
+        "hidden": false,
+        "sort": 17,
         "width": "full",
         "translations": null,
         "note": null,
@@ -26563,6 +26594,33 @@
     },
     {
       "collection": "pcu2hospital_drug_mapping",
+      "field": "hospital_drug",
+      "related_collection": "hospital_drug",
+      "schema": {
+        "constraint_name": "pcu2hospital_drug_mapping_hospital_drug_foreign",
+        "table": "pcu2hospital_drug_mapping",
+        "column": "hospital_drug",
+        "foreign_key_schema": "public",
+        "foreign_key_table": "hospital_drug",
+        "foreign_key_column": "id",
+        "on_update": "NO ACTION",
+        "on_delete": "SET NULL"
+      },
+      "meta": {
+        "id": 103,
+        "many_collection": "pcu2hospital_drug_mapping",
+        "many_field": "hospital_drug",
+        "one_collection": "hospital_drug",
+        "one_field": "pcu2hospital_drug_mapping",
+        "one_collection_field": null,
+        "one_allowed_collections": null,
+        "junction_field": null,
+        "sort_field": null,
+        "one_deselect_action": "nullify"
+      }
+    },
+    {
+      "collection": "pcu2hospital_drug_mapping",
       "field": "pcucode",
       "related_collection": "ou",
       "schema": {
@@ -26580,33 +26638,6 @@
         "many_collection": "pcu2hospital_drug_mapping",
         "many_field": "pcucode",
         "one_collection": "ou",
-        "one_field": null,
-        "one_collection_field": null,
-        "one_allowed_collections": null,
-        "junction_field": null,
-        "sort_field": null,
-        "one_deselect_action": "nullify"
-      }
-    },
-    {
-      "collection": "pcu2hospital_drug_mapping",
-      "field": "hospital_drug",
-      "related_collection": "hospital_drug",
-      "schema": {
-        "constraint_name": "pcu2hospital_drug_mapping_hospital_drug_foreign",
-        "table": "pcu2hospital_drug_mapping",
-        "column": "hospital_drug",
-        "foreign_key_schema": "public",
-        "foreign_key_table": "hospital_drug",
-        "foreign_key_column": "id",
-        "on_update": "NO ACTION",
-        "on_delete": "NO ACTION"
-      },
-      "meta": {
-        "id": 103,
-        "many_collection": "pcu2hospital_drug_mapping",
-        "many_field": "hospital_drug",
-        "one_collection": "hospital_drug",
         "one_field": null,
         "one_collection_field": null,
         "one_allowed_collections": null,
