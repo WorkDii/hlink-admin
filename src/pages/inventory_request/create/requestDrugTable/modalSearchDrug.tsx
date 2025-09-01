@@ -1,11 +1,11 @@
 import { Button, Input, List, Modal, Spin, Tag, Typography, Space, Switch } from "antd";
 import { useState, useMemo, useEffect } from "react";
 import { useWatch } from "antd/lib/form/Form";
-import { getRecommendDrug } from "../getRecommendDrug";
 import { useSimpleList } from "@refinedev/antd";
 import { HospitalDrug as _HospitalDrug } from "../../../../type";
 import { getLastInventoryDrugDetail, LastInventoryDrugDetail } from "./getInventoryDrugDetail";
 import { Collections } from "../../../../directus/generated/client";
+import { getRecommendDrug } from "../getRecommendDrug1";
 
 type Props = {
   isModalOpen: boolean;
@@ -152,11 +152,11 @@ export default function ModalSearchDrug({
     setSearch(e.target.value);
   };
 
-  const handleAddDrug = async (item: HospitalDrug) => {
+  const handleAddDrug = async (item: HospitalDrug, lastInventoryDetail?: LastInventoryDrugDetail) => {
     try {
       setIsAdding(true);
-      const data = await getRecommendDrug(pcucode, bill_warehouse, item.id);
-      handleOk(data[0]);
+      const data = await getRecommendDrug(item, lastInventoryDetail);
+      handleOk(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -175,7 +175,7 @@ export default function ModalSearchDrug({
     const { id, name, drugcode24, is_active, warehouse } = item;
     const isSelected = hospital_drug_selected.includes(id);
 
-    const lastInventoryDetail = item.pcu2hospital_drug_mapping.length > 0 && lastInventoryDrugDetail[item.pcu2hospital_drug_mapping?.[0].drugcode || ''];
+    const lastInventoryDetail = item.pcu2hospital_drug_mapping.length > 0 ? lastInventoryDrugDetail[item.pcu2hospital_drug_mapping?.[0].drugcode || ''] : undefined;
 
     return (
       <List.Item
@@ -183,7 +183,7 @@ export default function ModalSearchDrug({
           <Button
             key="add"
             disabled={isSelected || !is_active}
-            onClick={() => handleAddDrug(item)}
+            onClick={() => handleAddDrug(item, lastInventoryDetail)}
           >
             เพิ่มรายการ
           </Button>

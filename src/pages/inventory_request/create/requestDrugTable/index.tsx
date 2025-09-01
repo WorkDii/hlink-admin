@@ -9,18 +9,14 @@ import {
   FormInstance,
   FormListFieldData,
   FormListOperation,
-  InputNumber,
   Space,
   Table,
   Typography,
 } from "antd";
 import React, { useState } from "react";
-import UnitColumn from "./unit_column";
-import { updateQuantity } from "./updateQuantity";
 import { accountant } from "@wdii/numth";
 import ModalSearchDrug from "./modalSearchDrug";
 import { useWatch } from "antd/es/form/Form";
-import NetAmountRequest from "./netAmountRequest";
 import NetAmountAfterRequest from "./netAmountAfterRequest";
 
 type Props = {
@@ -81,36 +77,11 @@ export const RequestTableDrug = ({
       },
     },
     {
-      title: "จำนวนขอเบิก",
+      title: "จำนวนขอ",
       render: (_: any, { index }: { index: number }) => {
-        return (
-          <Form.Item
-            name={[index, "_quantity"]}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <InputNumber
-              onChange={() => {
-                updateQuantity(form, index);
-              }}
-            ></InputNumber>
-          </Form.Item>
+        return accountant(
+          form.getFieldValue(["inventory_drug", index, "quantity"])
         );
-      },
-    },
-    {
-      title: "หน่วย",
-      render: (_: any, { index }: { index: number }) => (
-        <UnitColumn form={form} index={index}></UnitColumn>
-      ),
-    },
-    {
-      title: "จำนวนขอเบิกสุทธิ",
-      render: (_: any, { index }: { index: number }) => {
-        return <NetAmountRequest index={index} form={form}></NetAmountRequest>;
       },
     },
     {
