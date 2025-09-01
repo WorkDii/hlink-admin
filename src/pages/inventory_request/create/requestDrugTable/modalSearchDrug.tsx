@@ -1,9 +1,10 @@
 import { Button, Input, List, Modal, Spin, Tag, Typography, Space, Switch } from "antd";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useWatch } from "antd/lib/form/Form";
 import { getRecommendDrug } from "../getRecommendDrug";
 import { useSimpleList } from "@refinedev/antd";
 import { HospitalDrug } from "../../../../type";
+import { getLastInventoryDrugDetail, LastInventoryDrugDetail } from "./getInventoryDrugDetail";
 
 type Props = {
   isModalOpen: boolean;
@@ -24,6 +25,7 @@ export default function ModalSearchDrug({
   const [search, setSearch] = useState("")
   const [showLinkedOnly, setShowLinkedOnly] = useState(false);
   const pcucode = useWatch(["pcucode"], form);
+  const [lastInventoryDrugDetail, setLastInventoryDrugDetail] = useState<{ [key: string]: LastInventoryDrugDetail }>({});
   const { listProps, setFilters, setCurrent, } = useSimpleList<HospitalDrug>({
     resource: "hospital_drug",
     meta: {
@@ -67,6 +69,14 @@ export default function ModalSearchDrug({
 
     return filtered;
   }, [listProps.dataSource, showLinkedOnly, search]);
+
+  useEffect(() => {
+    if (pcucode) {
+      getLastInventoryDrugDetail(pcucode).then(res => {
+        setLastInventoryDrugDetail(res);
+      });
+    }
+  }, [pcucode]);
 
   function clearSearch() {
     setSearch("")
