@@ -3,8 +3,9 @@ import { useState, useMemo, useEffect } from "react";
 import { useWatch } from "antd/lib/form/Form";
 import { getRecommendDrug } from "../getRecommendDrug";
 import { useSimpleList } from "@refinedev/antd";
-import { HospitalDrug } from "../../../../type";
+import { HospitalDrug as _HospitalDrug } from "../../../../type";
 import { getLastInventoryDrugDetail, LastInventoryDrugDetail } from "./getInventoryDrugDetail";
+import { Collections } from "../../../../directus/generated/client";
 
 type Props = {
   isModalOpen: boolean;
@@ -12,6 +13,10 @@ type Props = {
   handleCancel: () => void;
   form: any;
 };
+
+interface HospitalDrug extends Omit<_HospitalDrug, 'pcu2hospital_drug_mapping'> {
+  pcu2hospital_drug_mapping: Collections.Pcu2hospitalDrugMapping[];
+}
 
 // Component for displaying drug inventory details
 const DrugInventoryDetails = ({
@@ -104,7 +109,7 @@ export default function ModalSearchDrug({
   const filteredData = useMemo(() => {
     if (!listProps.dataSource) return [];
 
-    let filtered = listProps.dataSource as HospitalDrug[];
+    let filtered = listProps.dataSource
 
     // Apply linked drugs filter
     if (showLinkedOnly) {
@@ -169,9 +174,8 @@ export default function ModalSearchDrug({
   const renderDrugItem = (item: HospitalDrug, index: number) => {
     const { id, name, drugcode24, is_active, warehouse } = item;
     const isSelected = hospital_drug_selected.includes(id);
-    const hasMapping = item.pcu2hospital_drug_mapping?.length > 0;
-    const lastInventoryDetail = hasMapping &&
-      lastInventoryDrugDetail[(item.pcu2hospital_drug_mapping[0] as any).drugcode];
+
+    const lastInventoryDetail = item.pcu2hospital_drug_mapping.length > 0 && lastInventoryDrugDetail[item.pcu2hospital_drug_mapping?.[0].drugcode || ''];
 
     return (
       <List.Item
@@ -202,7 +206,7 @@ export default function ModalSearchDrug({
               <DrugTags item={item} />
 
               {/* Show inventory details for linked drugs */}
-              {hasMapping && lastInventoryDetail && (
+              {lastInventoryDetail && (
                 <DrugInventoryDetails
                   lastInventoryDetail={lastInventoryDetail}
                 />
