@@ -24,7 +24,7 @@ export default function ModalSearchDrug({
   const [search, setSearch] = useState("")
   const [showLinkedOnly, setShowLinkedOnly] = useState(false);
   const pcucode = useWatch(["pcucode"], form);
-  const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({
+  const { listProps, setFilters, setCurrent, } = useSimpleList<HospitalDrug>({
     resource: "hospital_drug",
     meta: {
       fields: ["*", 'pcu2hospital_drug_mapping.*'],
@@ -84,8 +84,6 @@ export default function ModalSearchDrug({
     setSearch(e.target.value);
   };
 
-  console.log(listProps.dataSource)
-
   return (
     <Modal
       title="ค้นหายาที่ต้องการเพิ่ม"
@@ -118,7 +116,7 @@ export default function ModalSearchDrug({
         <List
           dataSource={filteredData}
           pagination={false}
-          renderItem={(item: any) => {
+          renderItem={(item: any, index: number) => {
             const { id, name, drugcode24, is_active, warehouse } = item as HospitalDrug;
             return <List.Item actions={[
               <Button
@@ -143,7 +141,14 @@ export default function ModalSearchDrug({
                 style={{
                   opacity: item.is_active ? 1 : 0.5
                 }}
-                title={name}
+                title={
+                  <Space>
+                    <Typography.Text style={{ minWidth: '30px' }}>
+                      {index + 1}.
+                    </Typography.Text>
+                    {name}
+                  </Space>
+                }
                 description={
                   <div>
                     <Typography.Text>[{drugcode24}] </Typography.Text>
