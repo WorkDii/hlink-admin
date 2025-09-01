@@ -13,29 +13,84 @@ type Props = {
   form: any;
 };
 
+// Component for displaying drug inventory details
+const DrugInventoryDetails = ({
+  lastInventoryDetail
+}: {
+  lastInventoryDetail: LastInventoryDrugDetail;
+}) => {
+  const { issued30day, remaining, ratio, unitsellname } = lastInventoryDetail;
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <Space size="small" wrap>
+        <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+          การใช้งาน 30 วัน: {issued30day.toLocaleString()}
+        </Typography.Text>
+        <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+          คงเหลือ: {remaining.toLocaleString()}
+        </Typography.Text>
+        <Tag color={ratio.color} style={{ fontSize: '11px' }}>
+          อัตรา: {ratio.value} เท่า ({ratio.days} วัน)
+        </Tag>
+        <Tag color={ratio.color} style={{ fontSize: '11px' }}>
+          {ratio.status}
+        </Tag>
+        <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+          หน่วย: {unitsellname}
+        </Typography.Text>
+      </Space>
+    </div>
+  );
+};
+
+// Component for displaying drug tags
+const DrugTags = ({ item }: { item: HospitalDrug }) => {
+  const tags = [];
+
+  if (!item.is_active) {
+    tags.push(<Tag key="inactive" color="error">ยกเลิก</Tag>);
+  }
+
+  if (item.pcu2hospital_drug_mapping?.length > 0) {
+    tags.push(<Tag key="linked" color="success">เชื่อมโยงแล้ว</Tag>);
+  }
+
+  return tags.length > 0 ? (
+    <Space size="small">
+      {tags}
+    </Space>
+  ) : null;
+};
+
 export default function ModalSearchDrug({
   isModalOpen,
   handleOk,
   handleCancel,
   form,
 }: Props) {
+  // Form watchers
   const hospital_drug_selected = useWatch(["hospital_drug_selected"], form);
-  const [isAdding, setIsAdding] = useState(false);
   const bill_warehouse = useWatch(["bill_warehouse"], form);
-  const [search, setSearch] = useState("")
-  const [showLinkedOnly, setShowLinkedOnly] = useState(false);
   const pcucode = useWatch(["pcucode"], form);
-  const [lastInventoryDrugDetail, setLastInventoryDrugDetail] = useState<{ [key: string]: LastInventoryDrugDetail }>({});
-  const { listProps, setFilters, setCurrent, } = useSimpleList<HospitalDrug>({
+
+  // Local state
+  const [isAdding, setIsAdding] = useState(false);
+  const [search, setSearch] = useState("");
+  const [showLinkedOnly, setShowLinkedOnly] = useState(false);
+  const [lastInventoryDrugDetail, setLastInventoryDrugDetail] = useState<{
+    [key: string]: LastInventoryDrugDetail
+  }>({});
+
+  // API data fetching
+  const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({
     resource: "hospital_drug",
     meta: {
       fields: ["*", 'pcu2hospital_drug_mapping.*'],
       limit: -1
     },
     sorters: {
-      initial: [
-        { field: "name", order: "asc" }
-      ]
+      initial: [{ field: "name", order: "asc" }]
     },
     filters: {
       permanent: [
@@ -54,7 +109,7 @@ export default function ModalSearchDrug({
     // Apply linked drugs filter
     if (showLinkedOnly) {
       filtered = filtered.filter(item =>
-        item.pcu2hospital_drug_mapping && item.pcu2hospital_drug_mapping.length > 0
+        item.pcu2hospital_drug_mapping?.length > 0
       );
     }
 
@@ -70,38 +125,100 @@ export default function ModalSearchDrug({
     return filtered;
   }, [listProps.dataSource, showLinkedOnly, search]);
 
+  // Fetch last inventory details when pcucode changes
   useEffect(() => {
     if (pcucode) {
-      getLastInventoryDrugDetail(pcucode).then(res => {
-        setLastInventoryDrugDetail(res);
-      });
+      getLastInventoryDrugDetail(pcucode).then(setLastInventoryDrugDetail);
     }
   }, [pcucode]);
 
-  function clearSearch() {
-    setSearch("")
-    setCurrent(1)
-    setFilters([], 'replace')
-  }
+  // Event handlers
+  const clearSearch = () => {
+    setSearch("");
+    setCurrent(1);
+    setFilters([], 'replace');
+  };
 
-  // Handle linked drugs filter toggle
   const handleLinkedFilterChange = (checked: boolean) => {
     setShowLinkedOnly(checked);
   };
 
-  // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+  };
+
+  const handleAddDrug = async (item: HospitalDrug) => {
+    try {
+      setIsAdding(true);
+      const data = await getRecommendDrug(pcucode, bill_warehouse, item.id);
+      handleOk(data[0]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAdding(false);
+      clearSearch();
+    }
+  };
+
+  const handleModalCancel = () => {
+    handleCancel();
+    clearSearch();
+  };
+
+  // Render drug item
+  const renderDrugItem = (item: HospitalDrug, index: number) => {
+    const { id, name, drugcode24, is_active, warehouse } = item;
+    const isSelected = hospital_drug_selected.includes(id);
+    const hasMapping = item.pcu2hospital_drug_mapping?.length > 0;
+    const lastInventoryDetail = hasMapping &&
+      lastInventoryDrugDetail[(item.pcu2hospital_drug_mapping[0] as any).drugcode];
+
+    return (
+      <List.Item
+        actions={[
+          <Button
+            key="add"
+            disabled={isSelected || !is_active}
+            onClick={() => handleAddDrug(item)}
+          >
+            เพิ่มรายการ
+          </Button>
+        ]}
+      >
+        <List.Item.Meta
+          style={{ opacity: is_active ? 1 : 0.5 }}
+          title={
+            <Space>
+              <Typography.Text style={{ minWidth: '30px' }}>
+                {index + 1}.
+              </Typography.Text>
+              {name}
+            </Space>
+          }
+          description={
+            <div>
+              <Typography.Text>[{drugcode24}]</Typography.Text>
+              <Tag style={{ marginLeft: 8 }}>{warehouse}</Tag>
+              <DrugTags item={item} />
+
+              {/* Show inventory details for linked drugs */}
+              {hasMapping && lastInventoryDetail && (
+                <DrugInventoryDetails
+                  lastInventoryDetail={lastInventoryDetail}
+                />
+              )}
+            </div>
+          }
+        />
+      </List.Item>
+    );
   };
 
   return (
     <Modal
       title="ค้นหายาที่ต้องการเพิ่ม"
       open={isModalOpen}
-      onCancel={() => {
-        handleCancel()
-        clearSearch()
-      }}
+      onCancel={handleModalCancel}
       okText="เพิ่มรายการยา"
       cancelText="ยกเลิก"
       footer={null}
@@ -113,97 +230,19 @@ export default function ModalSearchDrug({
           value={search}
           onChange={handleSearchChange}
         />
-        <Space>
-          <Switch
-            checked={showLinkedOnly}
-            onChange={handleLinkedFilterChange}
-            checkedChildren="แสดงเฉพาะยาที่เชื่อมโยงแล้ว"
-            unCheckedChildren="แสดงยาทั้งหมด"
-          />
-        </Space>
+        <Switch
+          checked={showLinkedOnly}
+          onChange={handleLinkedFilterChange}
+          checkedChildren="แสดงเฉพาะยาที่เชื่อมโยงแล้ว"
+          unCheckedChildren="แสดงยาทั้งหมด"
+        />
       </Space>
+
       <Spin spinning={isAdding}>
         <List
           dataSource={filteredData}
           pagination={false}
-          renderItem={(item: any, index: number) => {
-            const { id, name, drugcode24, is_active, warehouse } = item as HospitalDrug;
-            return <List.Item actions={[
-              <Button
-                disabled={hospital_drug_selected.includes(item.id) || !item.is_active}
-                onClick={async () => {
-                  try {
-                    setIsAdding(true)
-                    const data = await getRecommendDrug(pcucode, bill_warehouse, item.id);
-                    handleOk(data[0]);
-                  } catch (error) {
-                    console.error(error);
-                  } finally {
-                    setIsAdding(false)
-                    clearSearch()
-                  }
-                }}
-              >
-                เพิ่มรายการ
-              </Button>
-            ]}>
-              <List.Item.Meta
-                style={{
-                  opacity: item.is_active ? 1 : 0.5
-                }}
-                title={
-                  <Space>
-                    <Typography.Text style={{ minWidth: '30px' }}>
-                      {index + 1}.
-                    </Typography.Text>
-                    {name}
-                  </Space>
-                }
-                description={
-                  <div>
-                    <Typography.Text>[{drugcode24}] </Typography.Text>
-                    <Tag style={{ marginLeft: 8 }}>{warehouse}</Tag>
-                    {
-                      item.is_active ? "" : <Tag style={{ marginLeft: 8 }} color="error">ยกเลิก</Tag>
-                    }
-                    {
-                      item.pcu2hospital_drug_mapping && item.pcu2hospital_drug_mapping.length > 0 && (
-                        <Tag style={{ marginLeft: 8 }} color="success">เชื่อมโยงแล้ว</Tag>
-                      )
-                    }
-                    {/* แสดงข้อมูลสำหรับยาที่เชื่อมโยงแล้ว */}
-                    {item.pcu2hospital_drug_mapping && item.pcu2hospital_drug_mapping.length > 0 && lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode] && (
-                      <div style={{ marginTop: 8 }}>
-                        <Space size="small" wrap>
-                          <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                            การใช้งาน 30 วัน: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].issued30day.toLocaleString()}
-                          </Typography.Text>
-                          <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                            คงเหลือ: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].remaining.toLocaleString()}
-                          </Typography.Text>
-                          <Tag
-                            color={lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.color}
-                            style={{ fontSize: '11px' }}
-                          >
-                            อัตรา: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.value} เท่า ({lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.days} วัน)
-                          </Tag>
-                          <Tag
-                            color={lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.color}
-                            style={{ fontSize: '11px' }}
-                          >
-                            {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.status}
-                          </Tag>
-                          <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                            หน่วย: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].unitsellname}
-                          </Typography.Text>
-                        </Space>
-                      </div>
-                    )}
-                  </div>
-                }
-              />
-            </List.Item>
-          }}
+          renderItem={renderDrugItem}
         />
       </Spin>
     </Modal>
