@@ -171,6 +171,34 @@ export default function ModalSearchDrug({
                         <Tag style={{ marginLeft: 8 }} color="success">เชื่อมโยงแล้ว</Tag>
                       )
                     }
+                    {/* แสดงข้อมูลสำหรับยาที่เชื่อมโยงแล้ว */}
+                    {item.pcu2hospital_drug_mapping && item.pcu2hospital_drug_mapping.length > 0 && lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode] && (
+                      <div style={{ marginTop: 8 }}>
+                        <Space size="small" wrap>
+                          <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                            การใช้งาน 30 วัน: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].issued30day.toLocaleString()}
+                          </Typography.Text>
+                          <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                            คงเหลือ: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].remaining.toLocaleString()}
+                          </Typography.Text>
+                          <Tag
+                            color={lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.color}
+                            style={{ fontSize: '11px' }}
+                          >
+                            อัตรา: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.value} เท่า ({lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.days} วัน)
+                          </Tag>
+                          <Tag
+                            color={lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.color}
+                            style={{ fontSize: '11px' }}
+                          >
+                            {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].ratio.status}
+                          </Tag>
+                          <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                            หน่วย: {lastInventoryDrugDetail[item.pcu2hospital_drug_mapping[0].drugcode].unitsellname}
+                          </Typography.Text>
+                        </Space>
+                      </div>
+                    )}
                   </div>
                 }
               />
