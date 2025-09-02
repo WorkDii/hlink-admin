@@ -6,6 +6,7 @@ import { HospitalDrug as _HospitalDrug } from "../../../../type";
 import { getLastInventoryDrugDetail, LastInventoryDrugDetail } from "./getInventoryDrugDetail";
 import { Collections } from "../../../../directus/generated/client";
 import { getRecommendDrug } from "../getRecommendDrug1";
+import { getRecommendRequestQuantity } from "../getRecommendRequestQuantity1";
 
 type Props = {
   isModalOpen: boolean;
@@ -20,12 +21,13 @@ interface HospitalDrug extends Omit<_HospitalDrug, 'pcu2hospital_drug_mapping'> 
 
 // Component for displaying drug inventory details
 const DrugInventoryDetails = ({
-  lastInventoryDetail
+  lastInventoryDetail,
+  recommendQuantity,
 }: {
   lastInventoryDetail: LastInventoryDrugDetail;
+  recommendQuantity: number;
 }) => {
   const { issued30day, remaining, ratio, unitsellname } = lastInventoryDetail;
-
   return (
     <div style={{ marginTop: 8 }}>
       <Space size="small" wrap>
@@ -41,9 +43,9 @@ const DrugInventoryDetails = ({
         <Tag color={ratio.color} style={{ fontSize: '11px' }}>
           {ratio.status}
         </Tag>
-        <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-          หน่วย: {unitsellname}
-        </Typography.Text>
+        <Tag color="blue" style={{ fontSize: '11px' }}>
+          แนะนำ: {recommendQuantity.toLocaleString()} {unitsellname}
+        </Tag>
       </Space>
     </div>
   );
@@ -172,11 +174,16 @@ export default function ModalSearchDrug({
 
   // Render drug item
   const renderDrugItem = (item: HospitalDrug, index: number) => {
-    const { id, name, drugcode24, is_active, warehouse } = item;
+    const { id, name, drugcode24, is_active, warehouse, prepack } = item;
     const isSelected = hospital_drug_selected.includes(id);
 
     const lastInventoryDetail = item.pcu2hospital_drug_mapping.length > 0 ? lastInventoryDrugDetail[item.pcu2hospital_drug_mapping?.[0].drugcode || ''] : undefined;
 
+    const recommendQuantity = getRecommendRequestQuantity({
+      current_rate: Number(lastInventoryDetail?.issued30day),
+      current_remain: Number(lastInventoryDetail?.remaining),
+      prepack,
+    })
     return (
       <List.Item
         actions={[
@@ -209,6 +216,7 @@ export default function ModalSearchDrug({
               {lastInventoryDetail && (
                 <DrugInventoryDetails
                   lastInventoryDetail={lastInventoryDetail}
+                  recommendQuantity={recommendQuantity}
                 />
               )}
             </div>
