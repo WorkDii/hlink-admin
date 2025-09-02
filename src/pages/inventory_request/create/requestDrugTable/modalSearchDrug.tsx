@@ -26,11 +26,13 @@ export interface HospitalDrug extends Omit<_HospitalDrug, 'pcu2hospital_drug_map
 const DrugInventoryDetails = ({
   lastInventoryDetail,
   recommendQuantity,
+  unitsellname,
 }: {
   lastInventoryDetail: LastInventoryDrugDetail;
   recommendQuantity: number;
+  unitsellname: string;
 }) => {
-  const { issued30day, remaining, ratio, unitsellname } = lastInventoryDetail;
+  const { issued30day, remaining, ratio, } = lastInventoryDetail;
   return (
     <div style={{ marginTop: 8 }}>
       <Space size="small" wrap>
@@ -47,7 +49,7 @@ const DrugInventoryDetails = ({
           {ratio.status}
         </Tag>
         <Tag color="blue" style={{ fontSize: '11px' }}>
-          แนะนำ: {accountant(recommendQuantity)} {unitsellname}
+          แนะนำ: {accountant(recommendQuantity)} {unitsellname || 'หน่วย'}
         </Tag>
       </Space>
     </div>
@@ -267,6 +269,7 @@ export default function ModalSearchDrug({
                 <DrugInventoryDetails
                   lastInventoryDetail={lastInventoryDetail}
                   recommendQuantity={recommendQuantity}
+                  unitsellname={item.default_unit.name}
                 />
               )}
             </div>
