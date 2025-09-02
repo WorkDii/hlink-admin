@@ -1,41 +1,47 @@
 import { Edit, useForm, useSelect } from "@refinedev/antd";
-import { Form, Select, Typography, Spin, message } from "antd";
+import { useBack, useDataProvider, useGo, useResourceParams } from "@refinedev/core";
+import { Form, Select, Typography, message } from "antd";
 import { useEffect, useState } from "react";
-import { useWatch } from "antd/es/form/Form";
 import { RequestTableDrug } from "./create/requestDrugTable";
 import { updateDataInventoryRequest } from "./edit/update";
 import { directusClient } from "../../directusClient";
-import { readInventoryRequestDrugItems, updateInventoryRequestItem } from "../../directus/generated/client";
-import { useParams, useNavigate } from "react-router-dom";
+import { readInventoryRequestDrugItems } from "../../directus/generated/client";
 
 const Text = Typography.Text;
 
-export const InventoryRequestEdit = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { formProps, form } = useForm();
-  const [isLoading, setIsLoading] = useState(false);
-
+export const InventoryRequestEdit = (props: any) => {
+  const { formProps, form, saveButtonProps } = useForm({
+    warnWhenUnsavedChanges: false
+  });
+  const dataProvider = useDataProvider();
+  const { id } = useResourceParams()
+  const go = useGo();
   const customSaveButtonProps = {
-    htmlType: "submit" as const,
-    loading: isLoading,
+    ...saveButtonProps,
     onClick: async () => {
       try {
-        setIsLoading(true);
         const values = await form.validateFields();
         const transformedData = await updateDataInventoryRequest({
-          id: id!,
+          id: String(id),
           inventory_drug: (values as any).inventory_drug || [],
         });
 
-        await directusClient.request(updateInventoryRequestItem(id!, transformedData as any));
+        await dataProvider().update({
+          resource: "inventory_request",
+          id: id!,
+          variables: transformedData,
+        });
+
         message.success("อัปเดตข้อมูลสำเร็จ");
-        navigate("/inventory_requests");
+        go({
+          to: {
+            resource: "inventory_request",
+            action: "list"
+          },
+        });
       } catch (error) {
         console.error("Update failed:", error);
         message.error("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
-      } finally {
-        setIsLoading(false);
       }
     },
   };
