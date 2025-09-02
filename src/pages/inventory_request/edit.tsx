@@ -1,16 +1,44 @@
 import { Edit, useForm, useSelect } from "@refinedev/antd";
-import { Form, Select, Typography } from "antd";
+import { Form, Select, Typography, Spin, message } from "antd";
+import { useEffect, useState } from "react";
 import { useWatch } from "antd/es/form/Form";
-import { useEffect } from "react";
 import { RequestTableDrug } from "./create/requestDrugTable";
-import { resetHospitalDrugSelect } from "./create/resetHospitalDrugSelect";
-import { createDataInventoryRequest } from "./create/create";
+import { updateDataInventoryRequest } from "./edit/update";
+import { directusClient } from "../../directusClient";
+import { readInventoryRequestDrugItems, updateInventoryRequestItem } from "../../directus/generated/client";
+import { useParams, useNavigate } from "react-router-dom";
 
 const Text = Typography.Text;
 
 export const InventoryRequestEdit = () => {
-  const { formProps, saveButtonProps, form } = useForm();
-  const pcucode = useWatch("pcucode", form);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { formProps, form } = useForm();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const customSaveButtonProps = {
+    htmlType: "submit" as const,
+    loading: isLoading,
+    onClick: async () => {
+      try {
+        setIsLoading(true);
+        const values = await form.validateFields();
+        const transformedData = await updateDataInventoryRequest({
+          id: id!,
+          inventory_drug: (values as any).inventory_drug || [],
+        });
+
+        await directusClient.request(updateInventoryRequestItem(id!, transformedData as any));
+        message.success("อัปเดตข้อมูลสำเร็จ");
+        navigate("/inventory_requests");
+      } catch (error) {
+        console.error("Update failed:", error);
+        message.error("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+  };
 
   const { selectProps: ouHospitalSelectProps } = useSelect({
     resource: "ou",
@@ -30,86 +58,114 @@ export const InventoryRequestEdit = () => {
     filters: [{ field: "drug_stock_parent", operator: "nnull", value: true }],
   });
 
+  // Load initial data when form is ready
   useEffect(() => {
-    form.setFieldValue("inventory_drug", null);
-    if (pcucode) {
-      form.setFieldValue(
-        "inventory_drug",
-        []
-      );
-      resetHospitalDrugSelect(form);
+    const loadInitialData = async (inventoryRequestDrug: string[]) => {
+      if (inventoryRequestDrug && Array.isArray(inventoryRequestDrug) && inventoryRequestDrug.length > 0) {
+        try {
+          const response = await directusClient.request(readInventoryRequestDrugItems({
+            filter: {
+              id: {
+                _in: inventoryRequestDrug,
+              },
+            },
+            fields: ['*', { hospital_drug: ['*'] }],
+            limit: -1,
+          }));
+
+          form.setFieldValue("inventory_drug", response);
+          form.setFieldValue("hospital_drug_selected", (response as any[]).map((item: any) => item.hospital_drug.id));
+        } catch (error) {
+          console.error("Error loading inventory drug data:", error);
+        }
+      } else {
+        // Initialize empty arrays if no existing data
+        form.setFieldValue("inventory_drug", []);
+        form.setFieldValue("hospital_drug_selected", []);
+      }
+    };
+    if (formProps.initialValues?.inventory_request_drug) {
+      loadInitialData(formProps.initialValues.inventory_request_drug);
     }
-  }, [pcucode]);
+  }, [formProps.initialValues]);
 
   return (
-    <Edit saveButtonProps={saveButtonProps}>
+    <Edit saveButtonProps={customSaveButtonProps}>
       <Form
         {...formProps}
         layout="vertical"
-        onFinish={async (v: any) => {
-          const data = await createDataInventoryRequest(v);
-          if (formProps.onFinish) formProps.onFinish(data || {});
-        }}
       >
+        <Form.Item name={"hospital_drug_selected"} ></Form.Item>
         <Form.Item
-          label="รพ."
-          name={"hcode"}
+          label={"โรงพยาบาล"}
+          name={["hcode"]}
           rules={[
             {
               required: true,
             },
           ]}
         >
-          <Select {...ouHospitalSelectProps} />
-        </Form.Item>
-
-        <Form.Item
-          label="รพ.สต."
-          name={"pcucode"}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select {...ouPCUSelectProps} />
-        </Form.Item>
-
-        <Form.Item
-          label="สถานที่เบิกยา"
-          name={"bill_warehouse"}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select {...warehouseSelectProps} />
-        </Form.Item>
-
-        <Form.Item label="หมายเหตุ" name={"note"}>
           <Select
-            mode="tags"
-            style={{ width: "100%" }}
-            placeholder="หมายเหตุ (ถ้ามี)"
-            open={false}
+            {...ouHospitalSelectProps}
+            disabled
           />
         </Form.Item>
-
-        {pcucode && (
-          <>
-            <Text>เลือกยาที่ต้องการเบิก</Text>
-            <Form.List name="inventory_drug">
-              {(fields, operations) => (
-                <RequestTableDrug 
-                  fields={fields} 
-                  operation={operations} 
-                  errors={[]} 
-                  form={form} 
-                />
-              )}
-            </Form.List>
-          </>
+        <Form.Item
+          label={"สถานที่เบิกยา"}
+          name={["bill_warehouse"]}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Select
+            {...warehouseSelectProps}
+            disabled
+          />
+        </Form.Item>
+        <Form.Item
+          label={"รพ.สต."}
+          name={["pcucode"]}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Select
+            {...ouPCUSelectProps}
+            disabled
+          />
+        </Form.Item>
+        {(
+          <Form.List
+            name={["inventory_drug"]}
+            rules={[
+              {
+                validator: async (_, names) => {
+                  if (!names || names.length < 1) {
+                    return Promise.reject(
+                      <Text type="danger">
+                        กรุณาเพิ่มรายการยา อย่างน้อย 1 รายการ
+                      </Text>
+                    );
+                  }
+                },
+              },
+            ]}
+          >
+            {(fields, operation, { errors }) => {
+              return (
+                <RequestTableDrug
+                  form={form}
+                  fields={fields}
+                  operation={operation}
+                  errors={errors}
+                ></RequestTableDrug>
+              );
+            }}
+          </Form.List>
         )}
       </Form>
     </Edit>
