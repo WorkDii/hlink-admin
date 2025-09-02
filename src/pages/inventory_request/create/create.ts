@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import { readItems } from "@tspvivek/refine-directus";
 import {
   INVENTORY_DRUG_REQUEST_BILL_ID,
@@ -10,7 +10,7 @@ import { getRecommendDrug } from "./getRecommendDrug";
 export type From = {
   hcode: string;
   pcucode: string;
-  inventory_drug: Awaited<ReturnType<typeof getRecommendDrug>>;
+  inventory_drug: Awaited<ReturnType<typeof getRecommendDrug>>[];
   hospital_drug_selected: string[];
   bill_warehouse: string;
 };
@@ -32,9 +32,9 @@ export async function createDataInventoryRequest(data: From) {
       pcucode: data.pcucode,
       hcode: data.hcode,
       status: PENDING_STATUS,
-      inventory_request_drug: data.inventory_drug.map((i) => ({
-        ...i,
-        hospital_drug: i.hospital_drug.id,
+      inventory_request_drug: data.inventory_drug.map((item) => ({
+        ...item,
+        hospital_drug: item.hospital_drug.id,
       })),
       bill_warehouse: data.bill_warehouse,
     };
@@ -42,7 +42,7 @@ export async function createDataInventoryRequest(data: From) {
 }
 async function getLatestRequestID(data: From) {
   const _data = await directusClient.request<{ request_id: string }[]>(
-    // @ts-ignore
+
     readItems("inventory_request", {
       limit: 1,
       filter: {

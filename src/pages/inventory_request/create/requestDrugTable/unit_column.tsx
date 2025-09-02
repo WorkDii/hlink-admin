@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import { Form, FormInstance, Select } from "antd";
 import { useWatch } from "antd/es/form/Form";
 import { updateQuantity } from "./updateQuantity";
 import { PREPACK_UNIT_ID } from "../../../../contexts/constants";
 
-type Props = {
+interface Props {
   index: number;
   form: FormInstance;
-};
+}
 
 export default function UnitColumn({ index, form }: Props) {
   const defaultUnit = useWatch<{ id: string; name: string }>(

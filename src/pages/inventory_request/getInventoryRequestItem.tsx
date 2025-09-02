@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { directusClient } from "../../directusClient";
 import { readItem } from "@tspvivek/refine-directus";
 import { InventoryRequest } from "../../type";
@@ -18,7 +17,6 @@ export const getInventoryRequestItem = async (id: string) => {
           ]
         }
       ],
-      limit: -1,
       deep: {
         inventory_request_drug: {
           _limit: -1,
@@ -30,6 +28,7 @@ export const getInventoryRequestItem = async (id: string) => {
   return data.inventory_request_drug
     .map((drug) => ({
       id: drug.id,
+      inventory_request_id: data.id,
       request_id: data.request_id,
       hcode: data.hcode,
       pcucode: data.pcucode,

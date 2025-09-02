@@ -69,14 +69,14 @@ function App() {
                   icon: <DashboardOutlined />,
                 },
               },
-              {
-                name: "inventory",
-                list: "/inventories",
-                meta: {
-                  noStatus: true,
-                  label: "คลังยา",
-                },
-              },
+              // {
+              //   name: "inventory",
+              //   list: "/inventories",
+              //   meta: {
+              //     noStatus: true,
+              //     label: "คลังยา",
+              //   },
+              // },
               {
                 name: "inventory_request",
                 list: "/inventory_requests",
@@ -95,14 +95,14 @@ function App() {
                   label: "บิลเบิกยา",
                 },
               },
-              {
-                name: "visitdrug",
-                list: "/visitdrugs",
-                meta: {
-                  noStatus: true,
-                  label: "รายการใช้ยา",
-                },
-              },
+              // {
+              //   name: "visitdrug",
+              //   list: "/visitdrugs",
+              //   meta: {
+              //     noStatus: true,
+              //     label: "รายการใช้ยา",
+              //   },
+              // },
               {
                 name: "setting",
                 meta: {
@@ -153,15 +153,15 @@ function App() {
                   parent: "setting",
                 },
               },
-              {
-                name: 'inventory_drug_detail',
-                list: '/inventory_drug_detail',
-                meta: {
-                  noStatus: true,
-                  label: 'รายละเอียดคลังยา',
-                  parent: 'setting',
-                },
-              }
+              // {
+              //   name: 'inventory_drug_detail',
+              //   list: '/inventory_drug_detail',
+              //   meta: {
+              //     noStatus: true,
+              //     label: 'รายละเอียดคลังยา',
+              //     parent: 'setting',
+              //   },
+              // }
 
             ]}
             options={{

@@ -8,6 +8,10 @@ export function getRecommendRequestQuantity({
   current_remain: number;
   prepack: number;
 }) {
+
+  if (!current_rate) {
+    return 0
+  }
   const minQuantity = current_rate * 1; // จำนวน "น้อยที่สุด" ที่ต้องการสต็อก คือ 1 เท่าของการใช้ยา 30 วัน
   const expectQuantity = current_rate * 2; // จำนวนที่ "คาดหวัง" ต้องการสต็อก คือ 2 เท่าของการใช้ยา 30 วัน
   const needForExpectQuantity = expectQuantity - current_remain; // จำนวนที่ต้องการเติมเพื่อให้สต็อกครบ
@@ -23,8 +27,5 @@ export function getRecommendRequestQuantity({
     // กรณีที่ _quantity ได้เท่า  0 แต่ จำนทวนที่น้อยที่สุด ที่จำเป็นต้องมี มากกว่า จำนวนคงเหลืออยู่ จะเติมเติมอย่างน้อย 1 pack
     _quantity = 1;
   }
-  return {
-    quantity: _quantity * prepack,
-    _quantity,
-  };
+  return _quantity * prepack
 }

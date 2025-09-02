@@ -1,18 +1,15 @@
 import { describe, expect } from "vitest";
 import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity";
 
-describe("getRecommendDrug", (test) => {
-  test("should return recommend drug", async () => {
+describe("getRecommendRequestQuantity", (test) => {
+  test("should return recommend quantity", async () => {
     expect(
       getRecommendRequestQuantity({
         current_rate: 10,
         current_remain: 1,
         prepack: 10,
       })
-    ).toEqual({
-      _quantity: 2,
-      quantity: 20,
-    });
+    ).toEqual(20);
 
     expect(
       getRecommendRequestQuantity({
@@ -20,10 +17,7 @@ describe("getRecommendDrug", (test) => {
         current_remain: -6,
         prepack: 10,
       })
-    ).toEqual({
-      _quantity: 3,
-      quantity: 30,
-    });
+    ).toEqual(30);
 
     expect(
       getRecommendRequestQuantity({
@@ -31,10 +25,7 @@ describe("getRecommendDrug", (test) => {
         current_remain: -4,
         prepack: 10,
       })
-    ).toEqual({
-      _quantity: 2,
-      quantity: 20,
-    });
+    ).toEqual(20);
 
     expect(
       getRecommendRequestQuantity({
@@ -42,10 +33,7 @@ describe("getRecommendDrug", (test) => {
         current_remain: 101,
         prepack: 10,
       })
-    ).toEqual({
-      _quantity: 10,
-      quantity: 100,
-    });
+    ).toEqual(100);
 
     expect(
       getRecommendRequestQuantity({
@@ -53,10 +41,7 @@ describe("getRecommendDrug", (test) => {
         current_remain: 109,
         prepack: 10,
       })
-    ).toEqual({
-      _quantity: 9,
-      quantity: 90,
-    });
+    ).toEqual(90);
 
     expect(
       getRecommendRequestQuantity({
@@ -64,10 +49,7 @@ describe("getRecommendDrug", (test) => {
         current_remain: 109,
         prepack: 10,
       })
-    ).toEqual({
-      _quantity: 0,
-      quantity: 0,
-    });
+    ).toEqual(0);
 
     // look strange => should consult P'tai hatyai hospital
     expect(
@@ -76,9 +58,6 @@ describe("getRecommendDrug", (test) => {
         current_remain: 1,
         prepack: 100,
       })
-    ).toEqual({
-      _quantity: 1,
-      quantity: 100,
-    });
+    ).toEqual(100);
   });
 });

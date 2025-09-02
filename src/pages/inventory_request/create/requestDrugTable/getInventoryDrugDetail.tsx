@@ -1,6 +1,6 @@
 import { format } from "date-fns";
-import { readInventoryDrugDetailItems, Collections } from "../../../../directus/generated/client"
-import { directusClient } from "../../../../directusClient"
+import { readInventoryDrugDetailItems, Collections } from "../../../../directus/generated/client";
+import { directusClient } from "../../../../directusClient";
 import { getRatioData } from "../../../inventory-dashboard/hooks.controller";
 
 export interface LastInventoryDrugDetail {
@@ -15,7 +15,7 @@ export interface LastInventoryDrugDetail {
 }
 
 export const getLastInventoryDrugDetail = async (pcucode: string) => {
-  const _data: { [key: string]: LastInventoryDrugDetail } = {}
+  const _data: { [key: string]: LastInventoryDrugDetail } = {};
 
   const lastDate = await directusClient.request(readInventoryDrugDetailItems({
     filter: {
@@ -26,7 +26,7 @@ export const getLastInventoryDrugDetail = async (pcucode: string) => {
     sort: ["-date"],
     limit: 1,
     fields: ['date']
-  })) as { date: string }[]
+  })) as { date: string }[];
   if (lastDate.length) {
     const data = await directusClient.request(readInventoryDrugDetailItems({
       filter: {
@@ -39,18 +39,18 @@ export const getLastInventoryDrugDetail = async (pcucode: string) => {
       },
       limit: -1
     })) as Collections.InventoryDrugDetail[]
-    data.forEach(i => {
-      _data[i.drugcode as string] = {
-        issued30day: Number(i.issued30day) || 0,
-        remaining: Number(i.remaining),
-        drugtype: i.drugtype || "",
-        drugcode: i.drugcode || "",
-        unitsellcode: i.unitsellcode || "",
-        unitsellname: i.unitsellname || "",
-        date: i.date ? format(i.date, 'yyyy-MM-dd') : "",
-        ratio: getRatioData(i.issued30day, i.remaining)
-      }
-    })
+    data.forEach(item => {
+      _data[item.drugcode as string] = {
+        issued30day: Number(item.issued30day) || 0,
+        remaining: Number(item.remaining),
+        drugtype: item.drugtype || "",
+        drugcode: item.drugcode || "",
+        unitsellcode: item.unitsellcode || "",
+        unitsellname: item.unitsellname || "",
+        date: item.date ? format(item.date, 'yyyy-MM-dd') : "",
+        ratio: getRatioData(item.issued30day, item.remaining)
+      };
+    });
   }
   return _data
 }

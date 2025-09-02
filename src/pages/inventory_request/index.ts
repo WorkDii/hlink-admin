@@ -1,2 +1,2 @@
-export * from "./list";
-export * from "./create";
+export { InventoryRequestList } from "./list";
+export { InventoryRequestCreate } from "./create";

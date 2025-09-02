@@ -1,12 +1,12 @@
 import { accountant } from "@wdii/numth";
 import { useWatch } from "antd/es/form/Form";
 
-type Props = {
+interface Props {
   index: number;
   form: any;
-};
+}
 
-const NetAmountAfterRequest = ({ form, index }: Props) => {
+function NetAmountAfterRequest({ form, index }: Props) {
   const quantity = useWatch(["inventory_drug", index, "quantity"], form);
   const current_remain = useWatch(
     ["inventory_drug", index, "current_remain"],
@@ -24,6 +24,6 @@ const NetAmountAfterRequest = ({ form, index }: Props) => {
       <div>(x{accountant(total / current_rate)})</div>
     </>
   );
-};
+}
 
 export default NetAmountAfterRequest;

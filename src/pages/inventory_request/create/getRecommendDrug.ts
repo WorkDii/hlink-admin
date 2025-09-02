@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import { aggregate, readItem, readItems } from "@tspvivek/refine-directus";
 import { directusClient } from "../../../directusClient";
 import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity";
-import { PREPACK_UNIT_ID } from "../../../contexts/constants";
 import { dateTime2TimeBangkok } from "../../../utils";
-import { HospitalDrug } from "../../../type";
+import { HospitalDrug as _HospitalDrug } from "../../../type";
+import { LastInventoryDrugDetail } from "./requestDrugTable/getInventoryDrugDetail";
+import { HospitalDrug } from "./requestDrugTable/modalSearchDrug";
 
 
 
@@ -172,33 +173,24 @@ async function getPcuDateResetDrugStock(pcucode: string) {
 }
 
 export async function getRecommendDrug(
-  pcucode: string,
-  bill_warehouse: string,
-  fix_hospital_drug?: string
+  item: HospitalDrug,
+  lastInventoryDetail?: LastInventoryDrugDetail,
 ) {
-  const dateResetStocck = await getPcuDateResetDrugStock(pcucode);
-  const recommendObject = await getInitialData(pcucode, bill_warehouse, fix_hospital_drug);
-  const usage = await getUsage(pcucode, recommendObject, dateResetStocck);
-  const bought = await getBought(pcucode, usage);
-  const recommend = Object.keys(recommendObject).map((key) => {
-    const r = recommendObject[key];
-    const _usage = usage[key]?.usage || 0;
-    const _bought = bought[key]?.bought || 0;
-    const prepack = r.hospital_drug.prepack;
-    return {
-      hospital_drug: r.hospital_drug,
-      current_rate: r.current_rate,
-      current_remain: _bought - _usage,
-      current_usage: _usage,
-      current_bought: _bought,
-      unit: PREPACK_UNIT_ID,
-      current_prepack: prepack,
-      ...getRecommendRequestQuantity({
-        current_rate: r.current_rate,
-        current_remain: _bought - _usage,
-        prepack,
-      }),
-    };
+
+
+  const recommend = getRecommendRequestQuantity({
+    current_rate: Number(lastInventoryDetail?.issued30day),
+    current_remain: Number(lastInventoryDetail?.remaining),
+    prepack: item.prepack,
   });
-  return recommend;
+
+
+
+  return {
+    hospital_drug: item,
+    quantity: recommend,
+    current_remain: Math.round(Number(lastInventoryDetail?.remaining)),
+    current_rate: Math.round(Number(lastInventoryDetail?.issued30day)),
+    current_prepack: item.prepack,
+  };
 }
