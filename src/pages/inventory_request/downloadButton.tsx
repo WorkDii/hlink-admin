@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import CsvDownloader from "react-csv-downloader";
 import { getInventoryRequestItem } from "./getInventoryRequestItem";
 
-type Props = {
+interface Props {
   id: string;
   request_id: string;
-};
+}
 
-const columns = [
+const CSV_COLUMNS = [
   { displayName: "id", id: "id" },
   { displayName: "inventory_request_id", id: "inventory_request_id" },
   { displayName: "request_id", id: "request_id" },
@@ -16,6 +15,7 @@ const columns = [
   { displayName: "hospital_drug_id", id: "hospital_drug_id" },
   { displayName: "hospital_drug_name", id: "hospital_drug_name" },
   { displayName: "hospital_drug_drugcode24", id: "hospital_drug_drugcode24" },
+  { displayName: "h_drugcode", id: "h_drugcode" },
   { displayName: "quantity", id: "quantity" },
   { displayName: "current_rate", id: "current_rate" },
   { displayName: "current_remain", id: "current_remain" },
@@ -23,14 +23,18 @@ const columns = [
 ];
 
 export default function DownloadButton({ id, request_id }: Props) {
+  const handleDownload = async () => {
+    return await getInventoryRequestItem(id);
+  };
+
+  const filename = `inventory_request_${request_id}_${Date.now()}.csv`;
+
   return (
     <CsvDownloader
       text="ดาวน์โหลดข้อมูล CSV"
-      datas={async () => {
-        return (await getInventoryRequestItem(id)) as any;
-      }}
-      filename={`inventory_request_${request_id}_${new Date().getTime()}.csv`}
-      columns={columns}
+      datas={handleDownload}
+      filename={filename}
+      columns={CSV_COLUMNS}
     />
   );
 }
