@@ -19,12 +19,12 @@ import ModalSearchDrug from "./modalSearchDrug";
 import { useWatch } from "antd/es/form/Form";
 import NetAmountAfterRequest from "./netAmountAfterRequest";
 
-type Props = {
+interface Props {
   fields: FormListFieldData[];
   operation: FormListOperation;
   errors: React.ReactNode[];
   form: FormInstance;
-};
+}
 
 export const RequestTableDrug = ({
   fields,
@@ -45,11 +45,12 @@ export const RequestTableDrug = ({
     {
       title: "รายการยา",
       render: (_: any, { index }: { index: number }) => {
-        const { name, drugcode24 } = form.getFieldValue([
+        const hospitalDrug = form.getFieldValue([
           "inventory_drug",
           index,
           "hospital_drug",
         ]) as { id: number; name: string; drugcode24: string };
+        const { name, drugcode24 } = hospitalDrug;
         return (
           <>
             <div>{name}</div>
@@ -113,7 +114,7 @@ export const RequestTableDrug = ({
           <Button
             icon={<DeleteOutlined />}
             onClick={() => {
-              const { id } = form.getFieldValue([
+              const hospitalDrug = form.getFieldValue([
                 "inventory_drug",
                 index,
                 "hospital_drug",
@@ -123,7 +124,7 @@ export const RequestTableDrug = ({
               );
               form.setFieldValue(
                 "hospital_drug_selected",
-                hospital_drug_selected.filter((v: number) => v !== id)
+                hospital_drug_selected.filter((drugId: number) => drugId !== hospitalDrug.id)
               );
               remove(index);
             }}

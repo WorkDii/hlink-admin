@@ -5,17 +5,17 @@ import { useSimpleList } from "@refinedev/antd";
 import { HospitalDrug as _HospitalDrug } from "../../../../type";
 import { getLastInventoryDrugDetail, LastInventoryDrugDetail } from "./getInventoryDrugDetail";
 import { Collections } from "../../../../directus/generated/client";
-import { getRecommendDrug } from "../getRecommendDrug1";
-import { getRecommendRequestQuantity } from "../getRecommendRequestQuantity1";
+import { getRecommendDrug } from "../getRecommendDrug";
+import { getRecommendRequestQuantity } from "../getRecommendRequestQuantity";
 import QuantityInputModal from "./QuantityInputModal";
 import { accountant } from '@wdii/numth'
 
-type Props = {
+interface Props {
   isModalOpen: boolean;
   handleOk: (data: any) => void;
   handleCancel: () => void;
   form: any;
-};
+}
 
 export interface HospitalDrug extends Omit<_HospitalDrug, 'pcu2hospital_drug_mapping' | 'default_unit'> {
   pcu2hospital_drug_mapping: Collections.Pcu2hospitalDrugMapping[];
