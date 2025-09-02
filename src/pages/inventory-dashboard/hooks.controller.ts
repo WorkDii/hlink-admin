@@ -57,7 +57,7 @@ const getDrugStockStatus = (ratio: number): DrugStockStatus => {
   }
 }
 
-const getRatioData = (issued: any, remain: any) => {
+export const getRatioData = (issued: any, remain: any) => {
   // 2 decimal places
   let value = Math.round((Number(remain || 0) / Number(issued || 0)) * 100) / 100
   const days = Math.round(value * 30)

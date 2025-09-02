@@ -249,7 +249,6 @@ export namespace Collections {
    * The hospital drug collection.
    */
   export interface HospitalDrug {
-    h_drugcode: Types.Optional<Types.String>;
     id: Types.PrimaryKey<Types.UUID>;
     user_created: Types.Optional<Types.UUID | Collections.DirectusUser>;
     date_created: Types.Optional<Types.DateTime>;
@@ -265,6 +264,8 @@ export namespace Collections {
     warehouse: Types.Optional<Types.String | Collections.Warehouse>;
     cost: Types.Optional<Types.Number>;
     only_ou: Collections.HospitalDrugOu[];
+    h_drugcode: Types.Optional<Types.String>;
+    pcu2hospital_drug_mapping: Collections.Pcu2hospitalDrugMapping[];
   }
 
   /**
