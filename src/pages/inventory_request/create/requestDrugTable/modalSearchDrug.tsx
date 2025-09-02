@@ -85,6 +85,7 @@ export default function ModalSearchDrug({
   const [isAdding, setIsAdding] = useState(false);
   const [search, setSearch] = useState("");
   const [showLinkedOnly, setShowLinkedOnly] = useState(false);
+  const [showRecommendQuantityOnly, setShowRecommendQuantityOnly] = useState(false);
   const [lastInventoryDrugDetail, setLastInventoryDrugDetail] = useState<{
     [key: string]: LastInventoryDrugDetail
   }>({});
@@ -107,17 +108,38 @@ export default function ModalSearchDrug({
     },
   });
 
-  // Client-side filtering
+  // Client-side filtering with recommendQuantity calculation
   const filteredData = useMemo(() => {
     if (!listProps.dataSource) return [];
 
-    let filtered = listProps.dataSource
+    let filtered = listProps.dataSource.map(item => {
+      const lastInventoryDetail = item.pcu2hospital_drug_mapping.length > 0
+        ? lastInventoryDrugDetail[item.pcu2hospital_drug_mapping?.[0].drugcode || '']
+        : undefined;
+
+      const recommendQuantity = getRecommendRequestQuantity({
+        current_rate: Number(lastInventoryDetail?.issued30day),
+        current_remain: Number(lastInventoryDetail?.remaining),
+        prepack: item.prepack,
+      });
+
+      return {
+        ...item,
+        lastInventoryDetail,
+        recommendQuantity
+      };
+    });
 
     // Apply linked drugs filter
     if (showLinkedOnly) {
       filtered = filtered.filter(item =>
         item.pcu2hospital_drug_mapping?.length > 0
       );
+    }
+
+    // Apply recommendQuantity > 0 filter
+    if (showRecommendQuantityOnly) {
+      filtered = filtered.filter(item => item.recommendQuantity > 0);
     }
 
     // Apply search filter
@@ -130,7 +152,7 @@ export default function ModalSearchDrug({
     }
 
     return filtered;
-  }, [listProps.dataSource, showLinkedOnly, search]);
+  }, [listProps.dataSource, showLinkedOnly, showRecommendQuantityOnly, search, lastInventoryDrugDetail]);
 
   // Fetch last inventory details when pcucode changes
   useEffect(() => {
@@ -148,6 +170,10 @@ export default function ModalSearchDrug({
 
   const handleLinkedFilterChange = (checked: boolean) => {
     setShowLinkedOnly(checked);
+  };
+
+  const handleRecommendQuantityFilterChange = (checked: boolean) => {
+    setShowRecommendQuantityOnly(checked);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,17 +199,10 @@ export default function ModalSearchDrug({
   };
 
   // Render drug item
-  const renderDrugItem = (item: HospitalDrug, index: number) => {
-    const { id, name, drugcode24, is_active, warehouse, prepack } = item;
+  const renderDrugItem = (item: any, index: number) => {
+    const { id, name, drugcode24, is_active, warehouse, lastInventoryDetail, recommendQuantity } = item;
     const isSelected = hospital_drug_selected.includes(id);
 
-    const lastInventoryDetail = item.pcu2hospital_drug_mapping.length > 0 ? lastInventoryDrugDetail[item.pcu2hospital_drug_mapping?.[0].drugcode || ''] : undefined;
-
-    const recommendQuantity = getRecommendRequestQuantity({
-      current_rate: Number(lastInventoryDetail?.issued30day),
-      current_remain: Number(lastInventoryDetail?.remaining),
-      prepack,
-    })
     return (
       <List.Item
         actions={[
@@ -242,12 +261,14 @@ export default function ModalSearchDrug({
           value={search}
           onChange={handleSearchChange}
         />
-        <Switch
-          checked={showLinkedOnly}
-          onChange={handleLinkedFilterChange}
-          checkedChildren="แสดงเฉพาะยาที่เชื่อมโยงแล้ว"
-          unCheckedChildren="แสดงยาทั้งหมด"
-        />
+        <Space >
+          <Switch
+            checked={showRecommendQuantityOnly}
+            onChange={handleRecommendQuantityFilterChange}
+            checkedChildren="แสดงเฉพาะยาที่แนะนำให้ขอ (จำนวน > 0)"
+            unCheckedChildren="แสดงยาทั้งหมด"
+          />
+        </Space>
       </Space>
 
       <Spin spinning={isAdding}>
