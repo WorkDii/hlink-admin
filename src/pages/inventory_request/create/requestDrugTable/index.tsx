@@ -77,6 +77,17 @@ export const RequestTableDrug = ({
       },
     },
     {
+      title: "จำนวน prepack",
+      render: (_: any, { index }: { index: number }) => {
+        const prepack = form.getFieldValue([
+          "inventory_drug",
+          index,
+          "current_prepack"
+        ]);
+        return prepack ? prepack : "-";
+      },
+    },
+    {
       title: "จำนวนขอ",
       render: (_: any, { index }: { index: number }) => {
         return accountant(

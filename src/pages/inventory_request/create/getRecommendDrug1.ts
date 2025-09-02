@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { aggregate, readItem, readItems } from "@tspvivek/refine-directus";
 import { directusClient } from "../../../directusClient";
-import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity";
+import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity1";
 import { PREPACK_UNIT_ID } from "../../../contexts/constants";
 import { dateTime2TimeBangkok } from "../../../utils";
 import { HospitalDrug as _HospitalDrug } from "../../../type";
@@ -181,9 +181,18 @@ export async function getRecommendDrug(
   lastInventoryDetail?: LastInventoryDrugDetail,
 ) {
 
+
+  const recommend = getRecommendRequestQuantity({
+    current_rate: Number(lastInventoryDetail?.issued30day),
+    current_remain: Number(lastInventoryDetail?.remaining),
+    prepack: item.prepack,
+  });
+
+
+
   return {
     hospital_drug: item,
-    quantity: 10,
+    quantity: recommend,
     current_remain: Math.round(Number(lastInventoryDetail?.remaining)),
     current_rate: Math.round(Number(lastInventoryDetail?.issued30day)),
     current_prepack: item.prepack,
