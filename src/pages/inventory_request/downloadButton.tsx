@@ -1,4 +1,7 @@
-import CsvDownloader from "react-csv-downloader";
+import React from "react";
+import { Button } from "antd";
+import { DownloadOutlined, LoadingOutlined } from "@ant-design/icons";
+import { saveAs } from "file-saver";
 import { getInventoryRequestItem } from "./getInventoryRequestItem";
 
 interface Props {
@@ -23,18 +26,37 @@ const CSV_COLUMNS = [
 ];
 
 export default function DownloadButton({ id, request_id }: Props) {
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const handleDownload = async () => {
-    return await getInventoryRequestItem(id);
+    setIsLoading(true);
+    try {
+      const data = await getInventoryRequestItem(id);
+      
+      // Convert data to CSV format
+      const csvHeaders = CSV_COLUMNS.map(col => col.displayName).join(',');
+      const csvRows = data.map((row: any) => 
+        CSV_COLUMNS.map(col => row[col.id] || '').join(',')
+      ).join('\n');
+      const csvContent = `${csvHeaders}\n${csvRows}`;
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const filename = `inventory_request_${request_id}_${Date.now()}.csv`;
+      saveAs(blob, filename);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const filename = `inventory_request_${request_id}_${Date.now()}.csv`;
-
   return (
-    <CsvDownloader
-      text="ดาวน์โหลดข้อมูล CSV"
-      datas={handleDownload}
-      filename={filename}
-      columns={CSV_COLUMNS}
-    />
+    <Button
+      type="default"
+      loading={isLoading}
+      onClick={handleDownload}
+      icon={isLoading ? <LoadingOutlined /> : <DownloadOutlined />}
+      title="ดาวน์โหลดข้อมูล CSV"
+    >
+      ดาวน์โหลด CSV
+    </Button>
   );
 }

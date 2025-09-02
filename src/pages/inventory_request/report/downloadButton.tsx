@@ -31,6 +31,7 @@ function ReportDownloadButton(props: Props) {
       icon={
         isLoading ? <LoadingOutlined></LoadingOutlined> : <FilePdfOutlined />
       }
+      title="ดาวน์โหลดเอกสารขอเบิกยา PDF"
     >
       เอกสารขอเบิกยา
     </Button>
