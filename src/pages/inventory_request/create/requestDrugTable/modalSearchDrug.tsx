@@ -94,6 +94,7 @@ export default function ModalSearchDrug({
     lastInventoryDetail?: LastInventoryDrugDetail;
     recommendQuantity: number;
   } | null>(null);
+  const [currentFocusedIndex, setCurrentFocusedIndex] = useState<number>(-1);
 
   // API data fetching
   const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({
@@ -185,12 +186,15 @@ export default function ModalSearchDrug({
     setSearch(e.target.value);
   };
 
-  const handleAddDrug = (item: HospitalDrug, recommendQuantity: number, lastInventoryDetail?: LastInventoryDrugDetail) => {
+  const handleAddDrug = (item: HospitalDrug, recommendQuantity: number, lastInventoryDetail?: LastInventoryDrugDetail, index?: number) => {
     setSelectedDrug({
       item,
       lastInventoryDetail,
       recommendQuantity
     });
+    if (index !== undefined) {
+      setCurrentFocusedIndex(index);
+    }
   };
 
   const handleConfirmAdd = async (quantity: number) => {
@@ -208,6 +212,11 @@ export default function ModalSearchDrug({
 
       handleOk(finalData);
       setSelectedDrug(null);
+
+      // Focus on next available drug after successful addition
+      setTimeout(() => {
+        focusNextAvailableDrug();
+      }, 100);
     } catch (error) {
       console.error(error);
     } finally {
@@ -218,6 +227,45 @@ export default function ModalSearchDrug({
 
   const handleCancelAdd = () => {
     setSelectedDrug(null);
+  };
+
+  const focusNextAvailableDrug = () => {
+    if (currentFocusedIndex >= 0 && filteredData.length > 0) {
+      // Find the next available drug (not selected and active)
+      let nextIndex = currentFocusedIndex + 1;
+
+      // Look for next available drug
+      while (nextIndex < filteredData.length) {
+        const nextDrug = filteredData[nextIndex];
+        const isSelected = hospital_drug_selected.includes(nextDrug.id);
+
+        if (!isSelected && nextDrug.is_active) {
+          // Focus on the next available drug
+          const nextButton = document.querySelector(`[data-drug-index="${nextIndex}"]`) as HTMLButtonElement;
+          if (nextButton) {
+            nextButton.focus();
+            setCurrentFocusedIndex(nextIndex);
+          }
+          return;
+        }
+        nextIndex++;
+      }
+
+      // If no next drug found, try to find the first available drug
+      for (let i = 0; i < filteredData.length; i++) {
+        const drug = filteredData[i];
+        const isSelected = hospital_drug_selected.includes(drug.id);
+
+        if (!isSelected && drug.is_active) {
+          const button = document.querySelector(`[data-drug-index="${i}"]`) as HTMLButtonElement;
+          if (button) {
+            button.focus();
+            setCurrentFocusedIndex(i);
+          }
+          return;
+        }
+      }
+    }
   };
 
   const handleModalCancel = () => {
@@ -237,7 +285,8 @@ export default function ModalSearchDrug({
           <Button
             key="add"
             disabled={isSelected || !is_active}
-            onClick={() => handleAddDrug(item, recommendQuantity, lastInventoryDetail)}
+            onClick={() => handleAddDrug(item, recommendQuantity, lastInventoryDetail, index)}
+            data-drug-index={index}
           >
             เพิ่มรายการ
           </Button>

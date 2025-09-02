@@ -1,5 +1,5 @@
 import { Button, Modal, Typography, Row, Col, Divider, InputNumber } from "antd";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { accountant } from "@wdii/numth";
 import { HospitalDrug as _HospitalDrug } from "../../../../type";
 import { LastInventoryDrugDetail } from "./getInventoryDrugDetail";
@@ -125,6 +125,7 @@ export default function QuantityInputModal({
   isAdding,
 }: Props) {
   const [requestQuantity, setRequestQuantity] = useState<number>(0);
+  const inputRef = useRef<any>(null);
 
   // Initialize quantity when modal opens or drug changes
   useEffect(() => {
@@ -134,6 +135,13 @@ export default function QuantityInputModal({
         : 0; // Start with 0 for unlinked drugs
 
       setRequestQuantity(initialQuantity);
+
+      // Auto-focus the input field when modal opens
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
     } else {
       setRequestQuantity(0);
     }
@@ -167,6 +175,43 @@ export default function QuantityInputModal({
   };
 
   /**
+   * Handle keyboard shortcuts for better ergonomics
+   */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+      e.preventDefault();
+      if (requestQuantity > 0 && !isAdding) {
+        handleConfirm();
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancel();
+    }
+  };
+
+  /**
+   * Handle global keyboard events for modal
+   */
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleCancel();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleGlobalKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [isOpen]);
+
+  /**
    * Handle quantity input change and convert to actual quantity using prepack
    */
   const handleQuantityChange = (value: number | null) => {
@@ -174,6 +219,24 @@ export default function QuantityInputModal({
       const actualQuantity = (value || 0) * selectedDrug.item.prepack;
       setRequestQuantity(actualQuantity);
     }
+  };
+
+  /**
+   * Get validation status for the input
+   */
+  const getInputStatus = (): 'error' | 'warning' | undefined => {
+    if (requestQuantity < 0) return 'error';
+    if (requestQuantity === 0) return 'warning';
+    return undefined;
+  };
+
+  /**
+   * Get validation message
+   */
+  const getValidationMessage = (): string => {
+    if (requestQuantity < 0) return 'จำนวนต้องมากกว่าหรือเท่ากับ 0';
+    if (requestQuantity === 0) return 'กรุณาระบุจำนวนที่ต้องการเบิก';
+    return '';
   };
 
   /**
@@ -189,8 +252,13 @@ export default function QuantityInputModal({
       open={isOpen}
       onCancel={handleCancel}
       footer={[
-        <Button key="cancel" onClick={handleCancel}>
-          ยกเลิก
+        <Button
+          key="cancel"
+          onClick={handleCancel}
+          tabIndex={3}
+          aria-label="ยกเลิกการกำหนดจำนวน"
+        >
+          ยกเลิก (Esc)
         </Button>,
         <Button
           key="confirm"
@@ -198,11 +266,14 @@ export default function QuantityInputModal({
           onClick={handleConfirm}
           disabled={requestQuantity <= 0}
           loading={isAdding}
+          tabIndex={2}
+          aria-label="ยืนยันการกำหนดจำนวน"
         >
-          ยืนยัน
+          ยืนยัน (Enter)
         </Button>
       ]}
       width={600}
+      destroyOnClose
     >
       {selectedDrug && (
         <div>
@@ -223,13 +294,28 @@ export default function QuantityInputModal({
             <Col span={12}>
               <Typography.Text strong>จำนวนที่ต้องการเบิก:</Typography.Text>
               <InputNumber
+                ref={inputRef}
                 style={{ width: '100%', marginTop: 8 }}
                 value={displayQuantity}
                 onChange={handleQuantityChange}
+                onKeyDown={handleKeyDown}
                 min={0}
                 placeholder="กรุณาระบุจำนวน"
                 addonAfter={`x${selectedDrug.item.prepack}`}
+                autoComplete="off"
+                tabIndex={1}
+                status={getInputStatus()}
+                aria-label="จำนวนที่ต้องการเบิก"
+                aria-describedby="quantity-help"
+                aria-invalid={getInputStatus() === 'error'}
               />
+              <Typography.Text
+                id="quantity-help"
+                type={getInputStatus() === 'error' ? 'danger' : getInputStatus() === 'warning' ? 'warning' : 'secondary'}
+                style={{ fontSize: '12px', display: 'block', marginTop: 4 }}
+              >
+                {getValidationMessage() || 'กด Enter เพื่อยืนยัน หรือ Esc เพื่อยกเลิก'}
+              </Typography.Text>
             </Col>
 
             <Col span={12}>
