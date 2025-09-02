@@ -8,6 +8,7 @@ import { Collections } from "../../../../directus/generated/client";
 import { getRecommendDrug } from "../getRecommendDrug1";
 import { getRecommendRequestQuantity } from "../getRecommendRequestQuantity1";
 import QuantityInputModal from "./QuantityInputModal";
+import { accountant } from '@wdii/numth'
 
 type Props = {
   isModalOpen: boolean;
@@ -16,8 +17,9 @@ type Props = {
   form: any;
 };
 
-interface HospitalDrug extends Omit<_HospitalDrug, 'pcu2hospital_drug_mapping'> {
+export interface HospitalDrug extends Omit<_HospitalDrug, 'pcu2hospital_drug_mapping' | 'default_unit'> {
   pcu2hospital_drug_mapping: Collections.Pcu2hospitalDrugMapping[];
+  default_unit: Collections.Unit;
 }
 
 // Component for displaying drug inventory details
@@ -33,19 +35,19 @@ const DrugInventoryDetails = ({
     <div style={{ marginTop: 8 }}>
       <Space size="small" wrap>
         <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-          การใช้งาน 30 วัน: {issued30day.toLocaleString()}
+          การใช้งาน 30 วัน: {accountant(issued30day)}
         </Typography.Text>
         <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-          คงเหลือ: {remaining.toLocaleString()}
+          คงเหลือ: {accountant(remaining)}
         </Typography.Text>
         <Tag color={ratio.color} style={{ fontSize: '11px' }}>
-          อัตรา: {ratio.value} เท่า ({ratio.days} วัน)
+          อัตรา: {ratio.value} เท่า ({accountant(ratio.days)} วัน)
         </Tag>
         <Tag color={ratio.color} style={{ fontSize: '11px' }}>
           {ratio.status}
         </Tag>
         <Tag color="blue" style={{ fontSize: '11px' }}>
-          แนะนำ: {recommendQuantity.toLocaleString()} {unitsellname}
+          แนะนำ: {accountant(recommendQuantity)} {unitsellname}
         </Tag>
       </Space>
     </div>
@@ -59,11 +61,6 @@ const DrugTags = ({ item }: { item: HospitalDrug }) => {
   if (!item.is_active) {
     tags.push(<Tag key="inactive" color="error">ยกเลิก</Tag>);
   }
-
-  if (item.pcu2hospital_drug_mapping?.length > 0) {
-    tags.push(<Tag key="linked" color="success">เชื่อมโยงแล้ว</Tag>);
-  }
-
   return tags.length > 0 ? (
     <Space size="small">
       {tags}
@@ -100,7 +97,7 @@ export default function ModalSearchDrug({
   const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({
     resource: "hospital_drug",
     meta: {
-      fields: ["*", 'pcu2hospital_drug_mapping.*'],
+      fields: ["*", 'pcu2hospital_drug_mapping.*', 'default_unit.*'],
       limit: -1
     },
     sorters: {
@@ -228,8 +225,8 @@ export default function ModalSearchDrug({
   };
 
   // Render drug item
-  const renderDrugItem = (item: any, index: number) => {
-    const { id, name, drugcode24, is_active, warehouse, lastInventoryDetail, recommendQuantity } = item;
+  const renderDrugItem = (item: typeof filteredData[number], index: number) => {
+    const { id, name, drugcode24, is_active, warehouse, lastInventoryDetail, recommendQuantity, prepack } = item;
     const isSelected = hospital_drug_selected.includes(id);
 
     return (
@@ -252,11 +249,16 @@ export default function ModalSearchDrug({
                 {index + 1}.
               </Typography.Text>
               {name}
+              {item.lastInventoryDetail && (
+                <Tag color="success" style={{ fontSize: '11px' }}>
+                  เชื่อมโยงแล้ว
+                </Tag>
+              )}
             </Space>
           }
           description={
             <div>
-              <Typography.Text>[{drugcode24}]</Typography.Text>
+              <Typography.Text>[{drugcode24}] [prepack = {accountant(prepack)}]</Typography.Text>
               <Tag style={{ marginLeft: 8 }}>{warehouse}</Tag>
               <DrugTags item={item} />
 

@@ -41,8 +41,8 @@ export const getLastInventoryDrugDetail = async (pcucode: string) => {
     })) as Collections.InventoryDrugDetail[]
     data.forEach(i => {
       _data[i.drugcode as string] = {
-        issued30day: i.issued30day || 0,
-        remaining: i.remaining,
+        issued30day: Number(i.issued30day) || 0,
+        remaining: Number(i.remaining),
         drugtype: i.drugtype || "",
         drugcode: i.drugcode || "",
         unitsellcode: i.unitsellcode || "",

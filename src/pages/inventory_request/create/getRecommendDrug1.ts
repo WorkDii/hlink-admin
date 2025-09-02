@@ -2,16 +2,12 @@
 import { aggregate, readItem, readItems } from "@tspvivek/refine-directus";
 import { directusClient } from "../../../directusClient";
 import { getRecommendRequestQuantity } from "./getRecommendRequestQuantity1";
-import { PREPACK_UNIT_ID } from "../../../contexts/constants";
 import { dateTime2TimeBangkok } from "../../../utils";
 import { HospitalDrug as _HospitalDrug } from "../../../type";
 import { LastInventoryDrugDetail } from "./requestDrugTable/getInventoryDrugDetail";
-import { Collections } from "../../../directus/generated/client";
+import { HospitalDrug } from "./requestDrugTable/modalSearchDrug";
 
 
-interface HospitalDrug extends Omit<_HospitalDrug, 'pcu2hospital_drug_mapping'> {
-  pcu2hospital_drug_mapping: Collections.Pcu2hospitalDrugMapping[];
-}
 
 export interface DefaultUnit {
   id: string;
