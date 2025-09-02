@@ -7,6 +7,7 @@ import { getLastInventoryDrugDetail, LastInventoryDrugDetail } from "./getInvent
 import { Collections } from "../../../../directus/generated/client";
 import { getRecommendDrug } from "../getRecommendDrug1";
 import { getRecommendRequestQuantity } from "../getRecommendRequestQuantity1";
+import QuantityInputModal from "./QuantityInputModal";
 
 type Props = {
   isModalOpen: boolean;
@@ -89,6 +90,11 @@ export default function ModalSearchDrug({
   const [lastInventoryDrugDetail, setLastInventoryDrugDetail] = useState<{
     [key: string]: LastInventoryDrugDetail
   }>({});
+  const [selectedDrug, setSelectedDrug] = useState<{
+    item: HospitalDrug;
+    lastInventoryDetail?: LastInventoryDrugDetail;
+    recommendQuantity: number;
+  } | null>(null);
 
   // API data fetching
   const { listProps, setFilters, setCurrent } = useSimpleList<HospitalDrug>({
@@ -180,11 +186,29 @@ export default function ModalSearchDrug({
     setSearch(e.target.value);
   };
 
-  const handleAddDrug = async (item: HospitalDrug, lastInventoryDetail?: LastInventoryDrugDetail) => {
+  const handleAddDrug = (item: HospitalDrug, recommendQuantity: number, lastInventoryDetail?: LastInventoryDrugDetail) => {
+    setSelectedDrug({
+      item,
+      lastInventoryDetail,
+      recommendQuantity
+    });
+  };
+
+  const handleConfirmAdd = async (quantity: number) => {
+    if (!selectedDrug || quantity <= 0) return;
+
     try {
       setIsAdding(true);
-      const data = await getRecommendDrug(item, lastInventoryDetail);
-      handleOk(data);
+      const data = await getRecommendDrug(selectedDrug.item, selectedDrug.lastInventoryDetail);
+
+      // Override quantity with user input
+      const finalData = {
+        ...data,
+        quantity: quantity
+      };
+
+      handleOk(finalData);
+      setSelectedDrug(null);
     } catch (error) {
       console.error(error);
     } finally {
@@ -193,9 +217,14 @@ export default function ModalSearchDrug({
     }
   };
 
+  const handleCancelAdd = () => {
+    setSelectedDrug(null);
+  };
+
   const handleModalCancel = () => {
     handleCancel();
     clearSearch();
+    setSelectedDrug(null);
   };
 
   // Render drug item
@@ -209,7 +238,7 @@ export default function ModalSearchDrug({
           <Button
             key="add"
             disabled={isSelected || !is_active}
-            onClick={() => handleAddDrug(item, lastInventoryDetail)}
+            onClick={() => handleAddDrug(item, recommendQuantity, lastInventoryDetail)}
           >
             เพิ่มรายการ
           </Button>
@@ -245,39 +274,53 @@ export default function ModalSearchDrug({
     );
   };
 
-  return (
-    <Modal
-      title="ค้นหายาที่ต้องการเพิ่ม"
-      open={isModalOpen}
-      onCancel={handleModalCancel}
-      okText="เพิ่มรายการยา"
-      cancelText="ยกเลิก"
-      footer={null}
-      width={800}
-    >
-      <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
-        <Input.Search
-          placeholder="ค้นหายาที่ต้องการเพิ่ม (ชื่อยาหรือรหัสยา 24 หลัก)"
-          value={search}
-          onChange={handleSearchChange}
-        />
-        <Space >
-          <Switch
-            checked={showRecommendQuantityOnly}
-            onChange={handleRecommendQuantityFilterChange}
-            checkedChildren="แสดงเฉพาะยาที่แนะนำให้ขอ (จำนวน > 0)"
-            unCheckedChildren="แสดงยาทั้งหมด"
-          />
-        </Space>
-      </Space>
 
-      <Spin spinning={isAdding}>
-        <List
-          dataSource={filteredData}
-          pagination={false}
-          renderItem={renderDrugItem}
-        />
-      </Spin>
-    </Modal>
+
+  return (
+    <>
+      {/* Quantity Input Modal */}
+      <QuantityInputModal
+        isOpen={!!selectedDrug}
+        onCancel={handleCancelAdd}
+        onConfirm={handleConfirmAdd}
+        selectedDrug={selectedDrug}
+        isAdding={isAdding}
+      />
+
+      {/* Main Search Modal */}
+      <Modal
+        title="ค้นหายาที่ต้องการเพิ่ม"
+        open={isModalOpen}
+        onCancel={handleModalCancel}
+        okText="เพิ่มรายการยา"
+        cancelText="ยกเลิก"
+        footer={null}
+        width={800}
+      >
+        <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
+          <Input.Search
+            placeholder="ค้นหายาที่ต้องการเพิ่ม (ชื่อยาหรือรหัสยา 24 หลัก)"
+            value={search}
+            onChange={handleSearchChange}
+          />
+          <Space >
+            <Switch
+              checked={showRecommendQuantityOnly}
+              onChange={handleRecommendQuantityFilterChange}
+              checkedChildren="แสดงเฉพาะยาที่แนะนำให้ขอ (จำนวน > 0)"
+              unCheckedChildren="แสดงยาทั้งหมด"
+            />
+          </Space>
+        </Space>
+
+        <Spin spinning={isAdding}>
+          <List
+            dataSource={filteredData}
+            pagination={false}
+            renderItem={renderDrugItem}
+          />
+        </Spin>
+      </Modal>
+    </>
   );
 }
