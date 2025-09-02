@@ -1,7 +1,7 @@
-import { Edit, useForm, useSelect } from "@refinedev/antd";
-import { useBack, useDataProvider, useGo, useResourceParams } from "@refinedev/core";
-import { Form, Select, Typography, message } from "antd";
-import { useEffect, useState } from "react";
+import { DeleteButton, Edit, useForm, useSelect } from "@refinedev/antd";
+import { useDataProvider, useGo, useResourceParams } from "@refinedev/core";
+import { Form, Select, Typography, message, Space } from "antd";
+import { useEffect } from "react";
 import { RequestTableDrug } from "./create/requestDrugTable";
 import { updateDataInventoryRequest } from "./edit/update";
 import { directusClient } from "../../directusClient";
@@ -43,6 +43,23 @@ export const InventoryRequestEdit = (props: any) => {
         console.error("Update failed:", error);
         message.error("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
       }
+    },
+  };
+
+  const customDeleteButtonProps = {
+    recordItemId: id,
+    onSuccess: () => {
+      message.success("ลบข้อมูลสำเร็จ");
+      go({
+        to: {
+          resource: "inventory_request",
+          action: "list"
+        },
+      });
+    },
+    onError: (error: any) => {
+      console.error("Delete failed:", error);
+      message.error("เกิดข้อผิดพลาดในการลบข้อมูล");
     },
   };
 
@@ -96,7 +113,15 @@ export const InventoryRequestEdit = (props: any) => {
   }, [formProps.initialValues]);
 
   return (
-    <Edit saveButtonProps={customSaveButtonProps}>
+    <Edit
+      saveButtonProps={customSaveButtonProps}
+      headerButtons={({ defaultButtons }) => (
+        <Space>
+          {defaultButtons}
+          <DeleteButton {...customDeleteButtonProps} />
+        </Space>
+      )}
+    >
       <Form
         {...formProps}
         layout="vertical"
