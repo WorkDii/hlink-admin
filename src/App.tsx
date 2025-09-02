@@ -35,6 +35,7 @@ import { InventoryList } from "./pages/inventory";
 import {
   InventoryRequestCreate,
   InventoryRequestList,
+  InventoryRequestEdit,
 } from "./pages/inventory_request";
 import { ConfigProvider } from "./contexts/configProvider";
 import { DashboardOutlined } from "@ant-design/icons";
@@ -81,6 +82,7 @@ function App() {
                 name: "inventory_request",
                 list: "/inventory_requests",
                 create: "/inventory_requests/create",
+                edit: "/inventory_requests/edit/:id",
                 meta: {
                   noStatus: true,
                   label: "คำขอเบิกยา",
@@ -214,6 +216,7 @@ function App() {
                 <Route path="/inventory_requests">
                   <Route index element={<InventoryRequestList />} />
                   <Route path="create" element={<InventoryRequestCreate />} />
+                  <Route path="edit/:id" element={<InventoryRequestEdit />} />
                 </Route>
                 <Route path="/hospital_drug_units">
                   <Route index element={<HospitalDrugUnitList />} />

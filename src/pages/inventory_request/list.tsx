@@ -1,4 +1,4 @@
-import { List, useTable } from "@refinedev/antd";
+import { List, useTable, EditButton } from "@refinedev/antd";
 import { Flex, Table } from "antd";
 import dayjs from "dayjs";
 import BillStatusTag from "../bill_staus";
@@ -98,6 +98,9 @@ export const InventoryRequestList = () => {
                   request_id={record.request_id}
                   date_created={record.date_created}
                 />
+                {record.status?.id === "pending" && (
+                  <EditButton size="middle" recordItemId={id} >แก้ไข</EditButton>
+                )}
               </Flex>
             )}
           />
