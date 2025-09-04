@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Tag } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { Button, Tag, Popconfirm, Space } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { ColumnType } from 'antd/es/table';
 import { DRUG_TYPE_MAP, STATUS_PRIORITY } from '../../../types';
 import { TABLE_COLUMN_WIDTHS } from '../constants';
@@ -21,18 +21,20 @@ import { DrugRecord } from '../types';
  * with sorting, filtering, and interactive features.
  * 
  * @param onOpenMappingModal - Callback function to open the drug mapping modal
+ * @param onCancelMapping - Callback function to cancel/remove drug mapping
  * @returns Array of Ant Design table column configurations
  * 
  * @example
  * ```tsx
- * const columns = createTableColumns((record) => {
- *   console.log('Opening mapping modal for:', record.drugcode);
- * });
+ * const columns = createTableColumns(
+ *   (record) => console.log('Opening mapping modal for:', record.drugcode),
+ *   (record) => console.log('Canceling mapping for:', record.drugcode)
+ * );
  * ```
  * 
  * Column features:
  * - Drug Code: Sortable, fixed left column
- * - Drug Name: Shows mapping button for unlinked drugs
+ * - Drug Name: Shows mapping button for unlinked drugs, cancel button for linked drugs
  * - Drug Type: Mapped from type codes to readable names
  * - Remaining: Right-aligned numbers with formatting
  * - Usage (30 days): Right-aligned numbers with formatting
@@ -43,7 +45,8 @@ import { DrugRecord } from '../types';
  * - Total Value: Calculated cost × remaining with formatting
  */
 export const createTableColumns = (
-  onOpenMappingModal: (record: DrugRecord) => void
+  onOpenMappingModal: (record: DrugRecord) => void,
+  onCancelMapping: (record: DrugRecord) => void
 ): ColumnType<DrugRecord>[] => [
     {
       title: 'รหัสยา',
@@ -67,7 +70,30 @@ export const createTableColumns = (
       render: (_: string, record: DrugRecord) => {
         const name = getDrugName(record);
         if (isLinkedDrug(record.hospital_drug)) {
-          return name;
+          return (
+            <Space>
+              <span >
+                {name}
+              </span>
+              <Popconfirm
+                title="ยกเลิกการเชื่อมโยงยา"
+                description="คุณแน่ใจหรือไม่ที่จะยกเลิกการเชื่อมโยงยานี้?"
+                onConfirm={() => onCancelMapping(record)}
+                okText="ยืนยัน"
+                cancelText="ยกเลิก"
+                okButtonProps={{ danger: true }}
+
+              >
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<DeleteOutlined />}
+                  danger
+                >
+                </Button>
+              </Popconfirm>
+            </Space>
+          );
         }
         return (
           <div>

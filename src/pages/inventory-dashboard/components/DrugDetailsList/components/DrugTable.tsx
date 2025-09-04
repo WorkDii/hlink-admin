@@ -8,11 +8,12 @@ import { createTableColumns } from './tableColumns';
 export const DrugTable: React.FC<DrugTableProps> = ({
   data,
   onOpenMappingModal,
+  onCancelMapping,
   pageSize,
   onPageSizeChange,
   searchText,
 }) => {
-  const columns = useMemo(() => createTableColumns(onOpenMappingModal), [onOpenMappingModal]);
+  const columns = useMemo(() => createTableColumns(onOpenMappingModal, onCancelMapping), [onOpenMappingModal, onCancelMapping]);
 
   const paginationConfig = {
     pageSize,

@@ -44,6 +44,7 @@ export interface FilteredDataResult {
 export interface DrugTableProps {
   data: DrugRecord[];
   onOpenMappingModal: (record: DrugRecord) => void;
+  onCancelMapping: (record: DrugRecord) => void;
   pageSize: number;
   onPageSizeChange: (current: number, size: number) => void;
   searchText: string;

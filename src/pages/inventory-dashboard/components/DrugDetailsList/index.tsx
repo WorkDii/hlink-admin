@@ -64,6 +64,7 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
     handleCreateMapping,
     handleCancelMapping,
     handleUpdateHospitalDrugId,
+    handleCancelDrugMapping,
   } = useDrugMapping();
 
   // ============================================================================
@@ -166,6 +167,7 @@ export const DrugDetailsList: React.FC<DrugDetailsListProps> = ({ data }) => {
         <DrugTable
           data={sortedData}
           onOpenMappingModal={handleOpenMappingModal}
+          onCancelMapping={handleCancelDrugMapping}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
           searchText={searchText}
