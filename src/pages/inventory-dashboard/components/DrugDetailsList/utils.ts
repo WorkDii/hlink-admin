@@ -1,6 +1,8 @@
 import { DRUG_TYPE_MAP, FilterType } from '../../types';
 import { STATUS_COLORS } from './constants';
 import { DrugRecord, HospitalDrug, FilteredDataResult } from './types';
+import { directusClient } from '../../../../directusClient';
+import { readPcu2hospitalDrugMappingItems, deletePcu2hospitalDrugMappingItem } from '../../../../directus/generated/client';
 
 // ============================================================================
 // TYPE GUARDS
@@ -129,4 +131,44 @@ export const sortDataByPriority = (
     const priorityB = STATUS_PRIORITY[b.ratio.status] || 999;
     return priorityA - priorityB;
   });
+};
+
+// ============================================================================
+// MAPPING OPERATIONS
+// ============================================================================
+
+/**
+ * Find and delete drug mapping record by drugcode and pcucode
+ * @param drugcode - The drug code to search for
+ * @param pcucode - The PCU code to search for
+ * @returns Promise<boolean> - True if deletion was successful, false otherwise
+ */
+export const deleteDrugMapping = async (drugcode: string, pcucode: string): Promise<boolean> => {
+  try {
+    // First, find the mapping record
+    const mappingRecords = await directusClient.request(
+      readPcu2hospitalDrugMappingItems({
+        filter: {
+          drugcode: { _eq: drugcode },
+          pcucode: { _eq: pcucode }
+        },
+        fields: ['id']
+      })
+    );
+
+    if (!mappingRecords || !Array.isArray(mappingRecords) || mappingRecords.length === 0) {
+      console.warn(`No mapping found for drugcode: ${drugcode}, pcucode: ${pcucode}`);
+      return false;
+    }
+
+    // Delete all matching records (should typically be just one)
+    for (const record of mappingRecords) {
+      await directusClient.request(deletePcu2hospitalDrugMappingItem(record.id));
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting drug mapping:', error);
+    return false;
+  }
 };

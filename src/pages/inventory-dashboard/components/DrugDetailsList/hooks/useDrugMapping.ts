@@ -7,6 +7,7 @@ import {
   handleApiError,
   safeAsyncOperation
 } from '../utils/errorHandling';
+import { deleteDrugMapping } from '../utils';
 
 /**
  * Custom hook for managing drug mapping modal state and operations
@@ -123,11 +124,36 @@ export const useDrugMapping = () => {
     setMappingModal(prev => ({ ...prev, selectedHospitalDrugId: value }));
   }, []);
 
+  /**
+   * Cancel/Remove drug mapping by deleting the mapping record
+   * @param record - The drug record to remove mapping for
+   */
+  const handleCancelDrugMapping = useCallback(async (record: DrugRecord) => {
+    if (!record) {
+      message.error(ERROR_MESSAGES.INVALID_DATA);
+      return;
+    }
+
+    const result = await safeAsyncOperation(
+      async () => {
+        return await deleteDrugMapping(record.drugcode, record.pcucode);
+      },
+      'การยกเลิกการเชื่อมโยงยา'
+    );
+
+    if (result) {
+      message.success('ยกเลิกการเชื่อมโยงยาสำเร็จ');
+      // You might want to refresh the data here or update the local state
+      message.info('กรุณารีเฟรชหน้าจอเพื่อดูข้อมูลที่อัปเดตแล้ว');
+    }
+  }, []);
+
   return {
     mappingModal,
     handleOpenMappingModal,
     handleCreateMapping,
     handleCancelMapping,
     handleUpdateHospitalDrugId,
+    handleCancelDrugMapping,
   };
 };
