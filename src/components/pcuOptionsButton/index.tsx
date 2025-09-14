@@ -33,14 +33,25 @@ const PcuOptionsButton = ({ setPcucode, pcucode, ...props }: Props) => {
           placeholder="เลือกหน่วยงาน"
           style={{ minWidth: 300 }}
           showSearch
-          filterOption={(input, option) =>
-            (option?.label as string)
-              ?.toLowerCase()
-              .includes(input.toLowerCase())
-          }
+          filterOption={(input, option) => {
+            // Antd exposes option.label (v5+) for Select.Option; fall back to children or value
+            const candidate = (option &&
+              (option.label ?? option.children ?? option.value)) as
+              | string
+              | number
+              | undefined;
+            if (!candidate) return false;
+            return String(candidate)
+              .toLowerCase()
+              .includes(input.toLowerCase());
+          }}
         >
           {allChildrenPcu?.data.map((v) => (
-            <Select.Option key={v.id} value={v.id}>
+            <Select.Option
+              key={v.id}
+              value={v.id}
+              label={`[${v.id}] ${v.name}`}
+            >
               [{v.id}] {v.name}
             </Select.Option>
           ))}
