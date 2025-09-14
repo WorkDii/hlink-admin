@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
-import { wholeNumber } from "@wdii/numth";
+import { wholeNumber } from "../../../utils/numth";
 import { getInventoryBillItem } from "../downloadCSV/getInventoryBillItem";
 
 const styles = StyleSheet.create({

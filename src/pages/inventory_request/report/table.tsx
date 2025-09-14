@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import { getInventoryRequestItem } from "../getInventoryRequestItem";
-import { wholeNumber } from "@wdii/numth";
+import { wholeNumber } from "../../../utils/numth";
 
 const styles = StyleSheet.create({
   table: {

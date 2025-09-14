@@ -1,6 +1,6 @@
 import { Button, Modal, Typography, Row, Col, Divider, InputNumber } from "antd";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { accountant } from "@wdii/numth";
+import { accountant } from "../../../../utils/numth";
 import { HospitalDrug as _HospitalDrug } from "../../../../type";
 import { LastInventoryDrugDetail } from "./getInventoryDrugDetail";
 import { Collections } from "../../../../directus/generated/client";

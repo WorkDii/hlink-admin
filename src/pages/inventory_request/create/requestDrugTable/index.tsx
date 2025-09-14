@@ -14,7 +14,7 @@ import {
   Typography,
 } from "antd";
 import React, { useState } from "react";
-import { accountant } from "@wdii/numth";
+import { accountant } from "../../../../utils/numth";
 import ModalSearchDrug from "./modalSearchDrug";
 import { useWatch } from "antd/es/form/Form";
 import NetAmountAfterRequest from "./netAmountAfterRequest";

@@ -8,7 +8,7 @@ import { Collections } from "../../../../directus/generated/client";
 import { getRecommendDrug } from "../getRecommendDrug";
 import { getRecommendRequestQuantity } from "../getRecommendRequestQuantity";
 import QuantityInputModal from "./QuantityInputModal";
-import { accountant } from '@wdii/numth'
+import { accountant } from '../../../../utils/numth'
 
 interface Props {
   isModalOpen: boolean;
